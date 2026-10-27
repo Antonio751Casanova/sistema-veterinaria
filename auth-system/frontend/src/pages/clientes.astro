@@ -1,0 +1,850 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Sidebar from '../components/Sidebar.astro';
+---
+
+<Layout title="Clientes - VetPets">
+  <div class="min-h-screen" style="background: #f1f5f9;">
+
+    <Sidebar />
+
+    <!-- Main Content -->
+    <div class="lg:ml-64 min-h-screen">
+      <!-- Top bar -->
+      <header class="bg-white/80 backdrop-blur-md border-b sticky top-0 z-30" style="border-color: #e8e0d8;">
+        <div class="px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <!-- Hamburger mobile -->
+            <button id="hamburgerBtn" class="lg:hidden p-2 rounded-lg transition-colors" style="color: #475569;">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+            </button>
+            <div>
+              <h1 class="text-xl md:text-2xl font-bold" style="color: #0f172a;">Gesti&oacute;n de Clientes</h1>
+              <p class="text-sm" style="color: #9a8b7c;">Administra los due&ntilde;os de mascotas</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="px-4 sm:px-6 lg:px-8 py-6">
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+          <div></div>
+          <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <a
+              href="/mascotas"
+              class="px-4 md:px-6 py-3 bg-white font-semibold rounded-xl hover:bg-black/5 transition-all duration-200 flex items-center justify-center space-x-2"
+              style="border: 1px solid #e2e8f0; color: #475569;"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+              </svg>
+              <span>Nueva Mascota</span>
+            </a>
+            <button
+              id="addClientBtn"
+              class="px-4 md:px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 flex items-center justify-center space-x-2"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              <span>Nuevo Cliente</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="flex items-center justify-between mb-6">
+          <div class="bg-white rounded-xl px-6 py-3" style="border: 1px solid #e2e8f0;">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background: rgba(13, 148, 136, 0.12);">
+                <svg class="w-5 h-5" style="color: #3b82f6;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+              </div>
+              <div>
+                <p class="text-xs" style="color: #9a8b7c;">Total Clientes</p>
+                <p id="totalClients" class="text-xl font-bold" style="color: #0f172a;">0</p>
+              </div>
+            </div>
+          </div>
+          <!-- TODO: Activar en Avance 2 / Avance 3 (Estadísticas)
+          <a href="/estadisticas" class="text-sm flex items-center space-x-1" style="color: #3b82f6;">
+            <span>Ver estad&iacute;sticas</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </a>
+          -->
+        </div>
+
+        <!-- Clients Table Card -->
+        <div class="bg-white rounded-2xl overflow-hidden" style="border: 1px solid #e2e8f0;">
+          <!-- Search and Filter -->
+          <div class="p-4" style="border-bottom: 1px solid #e2e8f0;">
+            <div class="flex flex-col sm:flex-row gap-3">
+              <div class="relative flex-1 flex gap-2">
+                <select
+                  id="searchType"
+                  class="rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;"
+                >
+                  <option value="todo">Todo</option>
+                  <option value="id">ID</option>
+                  <option value="nombre">Nombre</option>
+                  <option value="telefono">Tel&eacute;fono</option>
+                </select>
+                <div class="relative flex-1">
+                  <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5" style="color: #94a3b8;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                  </svg>
+                  <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Buscar cliente..."
+                    class="w-full pl-10 pr-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Loading State -->
+          <div id="loadingState" class="p-12 text-center">
+            <svg class="animate-spin h-8 w-8 mx-auto" style="color: #3b82f6;" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="mt-4" style="color: #9a8b7c;">Cargando clientes...</p>
+          </div>
+
+          <!-- Empty State -->
+          <div id="emptyState" class="hidden p-12 text-center">
+            <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style="background: #f1f5f9;">
+              <svg class="w-8 h-8" style="color: #c4b5a5;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+            </div>
+            <p style="color: #9a8b7c;">No hay clientes registrados</p>
+            <p class="text-sm mt-1" style="color: #94a3b8;">Agrega tu primer cliente para comenzar</p>
+          </div>
+
+          <!-- Table -->
+          <div id="tableContainer" class="hidden">
+            <!-- Top Pagination -->
+            <div id="paginationTop" class="hidden p-4 flex-col sm:flex-row items-center justify-between gap-4" style="border-bottom: 1px solid #e2e8f0;">
+              <p class="text-sm" style="color: #9a8b7c;">
+                Mostrando <span class="showingFromSync">1</span>-<span class="showingToSync">500</span> de <span class="totalItemsSync">0</span> clientes
+              </p>
+              <div class="flex items-center space-x-2">
+                <button class="prevPageSync px-3 py-2 bg-white rounded-lg hover:bg-black/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors" style="border: 1px solid #e2e8f0; color: #475569;">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                  </svg>
+                </button>
+                <span class="px-3 text-sm" style="color: #0f172a;">P&aacute;gina <span class="currentPageSync">1</span> de <span class="totalPagesSync">1</span></span>
+                <button class="nextPageSync px-3 py-2 bg-white rounded-lg hover:bg-black/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors" style="border: 1px solid #e2e8f0; color: #475569;">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="hidden md:table-header-group" style="background: #f8fafc;">
+                  <tr>
+                    <th class="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider w-16" style="color: #9a8b7c;">ID</th>
+                    <th class="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: #9a8b7c;">Cliente</th>
+                    <th class="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider w-28" style="color: #9a8b7c;">Tel&eacute;fono</th>
+                    <th class="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider hidden xl:table-cell" style="color: #9a8b7c;">Direcci&oacute;n</th>
+                    <th class="px-3 py-3 text-center text-xs font-medium uppercase tracking-wider w-20" style="color: #9a8b7c;">Mascotas</th>
+                    <th class="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider w-24" style="color: #9a8b7c;">Registro</th>
+                    <th class="px-3 py-3 text-right text-xs font-medium uppercase tracking-wider w-32" style="color: #9a8b7c;">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="clientsTableBody" class="divide-y" style="--tw-divide-opacity:1; --tw-divide-color: #f1f5f9;">
+                  <!-- Rows inserted by JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Bottom Pagination -->
+            <div id="paginationContainer" class="hidden p-4 flex-col sm:flex-row items-center justify-between gap-4" style="border-top: 1px solid #e2e8f0;">
+              <p class="text-sm" style="color: #9a8b7c;">
+                Mostrando <span class="showingFromSync">1</span>-<span class="showingToSync">500</span> de <span class="totalItemsSync">0</span> clientes
+              </p>
+              <div class="flex items-center space-x-2">
+                <button class="prevPageSync px-3 py-2 bg-white rounded-lg hover:bg-black/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors" style="border: 1px solid #e2e8f0; color: #475569;">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                  </svg>
+                </button>
+                <span class="px-3 text-sm" style="color: #0f172a;">P&aacute;gina <span class="currentPageSync">1</span> de <span class="totalPagesSync">1</span></span>
+                <button class="nextPageSync px-3 py-2 bg-white rounded-lg hover:bg-black/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors" style="border: 1px solid #e2e8f0; color: #475569;">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+  <!-- Modal -->
+  <div id="modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+    <div class="bg-white rounded-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto" style="border: 1px solid #e2e8f0;">
+      <div class="p-4 md:p-6 flex justify-between items-center sticky top-0 bg-white" style="border-bottom: 1px solid #e2e8f0;">
+        <h3 id="modalTitle" class="text-xl font-semibold" style="color: #0f172a;">Nuevo Cliente</h3>
+        <button id="closeModal" class="p-1 rounded-lg transition-colors hover:bg-black/5" style="color: #9a8b7c;">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <form id="clientForm" class="p-4 md:p-6 space-y-4">
+        <input type="hidden" id="clientId" name="clientId" />
+
+        <div>
+          <label class="block text-sm font-medium mb-2" style="color: #475569;">Nombre Completo *</label>
+          <input type="text" name="nombre" required maxlength="100" class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;" placeholder="Juan P&eacute;rez Garc&iacute;a" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-2" style="color: #475569;">Tel&eacute;fono *</label>
+          <input type="tel" name="telefono" required maxlength="20" class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;" placeholder="5512345678" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-2" style="color: #475569;">Email</label>
+          <input type="email" name="email" maxlength="100" class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;" placeholder="juan@email.com" />
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-sm font-medium" style="color: #475569;">Direcci&oacute;n *</label>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="col-span-2 sm:col-span-1">
+              <label class="block text-xs mb-1" style="color: #9a8b7c;">Calle *</label>
+              <input type="text" name="calle" required maxlength="100"
+                class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;"
+                placeholder="Av. Insurgentes" />
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+              <label class="block text-xs mb-1" style="color: #9a8b7c;">N&uacute;mero *</label>
+              <input type="text" name="numero_domicilio" required maxlength="30"
+                class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;"
+                placeholder="123 &middot; Depto 4-B" />
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+              <label class="block text-xs mb-1" style="color: #9a8b7c;">Colonia *</label>
+              <input type="text" name="colonia" required maxlength="80"
+                class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;"
+                placeholder="Col. Centro" />
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+              <label class="block text-xs mb-1" style="color: #9a8b7c;">Municipio *</label>
+              <input type="text" name="municipio" required maxlength="80"
+                class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;"
+                placeholder="Guadalajara" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="formError" class="hidden p-3 rounded-xl" style="background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25);">
+          <p class="text-red-600 text-sm text-center" id="formErrorText"></p>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex justify-end space-x-3 pt-2">
+          <button type="button" id="cancelBtn" class="px-4 py-2 transition-colors" style="color: #9a8b7c;">
+            Cancelar
+          </button>
+          <button type="submit" class="px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200">
+            Guardar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="deleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+    <div class="bg-white rounded-2xl w-full max-w-md mx-4 p-6" style="border: 1px solid #e2e8f0;">
+      <div class="text-center">
+        <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style="background: rgba(239,68,68,0.08);">
+          <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+        </div>
+        <h3 class="text-xl font-semibold mb-2" style="color: #0f172a;">&iquest;Eliminar cliente?</h3>
+        <p class="text-sm mb-6" style="color: #9a8b7c;">Se eliminar&aacute;n todas las mascotas asociadas. Esta acci&oacute;n no se puede deshacer.</p>
+        <div class="flex justify-center space-x-4">
+          <button id="cancelDelete" class="px-6 py-2 transition-colors" style="color: #9a8b7c;">
+            Cancelar
+          </button>
+          <button id="confirmDelete" class="px-6 py-2 bg-red-500 text-white font-semibold rounded-xl hover:bg-red-600 transition-colors">
+            Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Context Menu -->
+  <div id="contextMenu" class="fixed hidden bg-white rounded-xl shadow-2xl py-2 z-50 min-w-[180px]" style="border: 1px solid #e2e8f0;">
+    <button id="ctxEdit" class="w-full px-4 py-2.5 text-left flex items-center space-x-3 hover:bg-black/5 transition-colors" style="color: #475569;">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+      </svg>
+      <span>Editar Cliente</span>
+    </button>
+    <button id="ctxMascotas" class="w-full px-4 py-2.5 text-left flex items-center space-x-3 hover:bg-black/5 transition-colors" style="color: #475569;">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+      </svg>
+      <span>Ver Mascotas</span>
+    </button>
+    <div class="my-1" style="border-top: 1px solid #e2e8f0;"></div>
+    <button id="ctxDelete" class="w-full px-4 py-2.5 text-left text-red-500 hover:bg-black/5 flex items-center space-x-3 transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+      </svg>
+      <span>Eliminar</span>
+    </button>
+  </div>
+
+  </div>
+</Layout>
+
+<style>
+  :global(body) {
+    background: #f1f5f9 !important;
+  }
+</style>
+
+<script>
+  import { getVeterinaria, getUsuario, clearSession, isAuthenticated } from '../services/authService';
+  import { listarClientes, crearCliente, actualizarCliente, eliminarCliente, type Cliente, type ClienteCreate } from '../services/clienteService';
+
+  // Check auth
+  if (!isAuthenticated()) {
+    window.location.href = '/';
+  }
+  const _meClientes = getUsuario();
+  if (_meClientes?.rol === 'veterinario') { window.location.href = '/home'; }
+
+  // Sidebar elements
+  const sidebar = document.getElementById('sidebar') as HTMLElement | null;
+  const sidebarOverlay = document.getElementById('sidebarOverlay') as HTMLDivElement | null;
+  const hamburgerBtn = document.getElementById('hamburgerBtn') as HTMLButtonElement | null;
+  const vetNameEl = document.getElementById('vetName') as HTMLSpanElement | null;
+  const sidebarVetName = document.getElementById('sidebarVetName') as HTMLParagraphElement | null;
+  const userAvatar = document.getElementById('userAvatar') as HTMLDivElement | null;
+  const logoutBtn = document.getElementById('logoutBtn') as HTMLButtonElement | null;
+
+  // Elements
+  const addClientBtn = document.getElementById('addClientBtn') as HTMLButtonElement | null;
+  const loadingState = document.getElementById('loadingState') as HTMLDivElement | null;
+  const emptyState = document.getElementById('emptyState') as HTMLDivElement | null;
+  const tableContainer = document.getElementById('tableContainer') as HTMLDivElement | null;
+  const clientsTableBody = document.getElementById('clientsTableBody') as HTMLTableSectionElement | null;
+  const totalClientsEl = document.getElementById('totalClients') as HTMLParagraphElement | null;
+  const searchInput = document.getElementById('searchInput') as HTMLInputElement | null;
+  const searchType = document.getElementById('searchType') as HTMLSelectElement | null;
+
+  // Pagination elements
+  const paginationContainer = document.getElementById('paginationContainer') as HTMLDivElement | null;
+  const paginationTop = document.getElementById('paginationTop') as HTMLDivElement | null;
+  const prevPageBtns = document.querySelectorAll('.prevPageSync') as NodeListOf<HTMLButtonElement>;
+  const nextPageBtns = document.querySelectorAll('.nextPageSync') as NodeListOf<HTMLButtonElement>;
+  const currentPageDisplays = document.querySelectorAll('.currentPageSync') as NodeListOf<HTMLSpanElement>;
+  const totalPagesDisplays = document.querySelectorAll('.totalPagesSync') as NodeListOf<HTMLSpanElement>;
+  const showingFromEls = document.querySelectorAll('.showingFromSync') as NodeListOf<HTMLSpanElement>;
+  const showingToEls = document.querySelectorAll('.showingToSync') as NodeListOf<HTMLSpanElement>;
+  const totalItemsEls = document.querySelectorAll('.totalItemsSync') as NodeListOf<HTMLSpanElement>;
+
+  // Modal elements
+  const modal = document.getElementById('modal') as HTMLDivElement | null;
+  const modalTitle = document.getElementById('modalTitle') as HTMLHeadingElement | null;
+  const closeModal = document.getElementById('closeModal') as HTMLButtonElement | null;
+  const cancelBtn = document.getElementById('cancelBtn') as HTMLButtonElement | null;
+  const clientForm = document.getElementById('clientForm') as HTMLFormElement | null;
+  const clientIdInput = document.getElementById('clientId') as HTMLInputElement | null;
+  const formError = document.getElementById('formError') as HTMLDivElement | null;
+  const formErrorText = document.getElementById('formErrorText') as HTMLParagraphElement | null;
+
+  // Delete modal
+  const deleteModal = document.getElementById('deleteModal') as HTMLDivElement | null;
+  const cancelDelete = document.getElementById('cancelDelete') as HTMLButtonElement | null;
+  const confirmDelete = document.getElementById('confirmDelete') as HTMLButtonElement | null;
+
+  // Context menu
+  const contextMenu = document.getElementById('contextMenu') as HTMLDivElement | null;
+  const ctxEdit = document.getElementById('ctxEdit') as HTMLButtonElement | null;
+  const ctxMascotas = document.getElementById('ctxMascotas') as HTMLButtonElement | null;
+  const ctxDelete = document.getElementById('ctxDelete') as HTMLButtonElement | null;
+
+  // State
+  let clients: Cliente[] = [];
+  let filteredClients: Cliente[] = [];
+  let currentPage = 1;
+  const itemsPerPage = 500;
+  let deleteClientId: number | null = null;
+  let contextClientId: number | null = null;
+
+  // Load vet name (safely ignore if elements are missing/commented out)
+  const vet = getVeterinaria();
+  if (vet) {
+    if (vetNameEl) vetNameEl.textContent = vet.nombre;
+    if (sidebarVetName) sidebarVetName.textContent = vet.nombre;
+    if (userAvatar) userAvatar.textContent = vet.nombre.charAt(0).toUpperCase();
+  }
+
+  // Mobile sidebar toggle
+  hamburgerBtn?.addEventListener('click', () => {
+    sidebar?.classList.toggle('-translate-x-full');
+    sidebarOverlay?.classList.toggle('hidden');
+  });
+
+  sidebarOverlay?.addEventListener('click', () => {
+    sidebar?.classList.add('-translate-x-full');
+    sidebarOverlay?.classList.add('hidden');
+  });
+
+  // Load clients
+  async function loadClients() {
+    try {
+      clients = await listarClientes();
+      filteredClients = [...clients];
+      updateStats();
+      renderTable();
+    } catch (error) {
+      console.error('Error loading clients:', error);
+    } finally {
+      loadingState?.classList.add('hidden');
+    }
+  }
+
+  // Update stats
+  function updateStats() {
+    if (totalClientsEl) totalClientsEl.textContent = clients.length.toString();
+  }
+
+  // Apply filters
+  function applyFilters() {
+    const searchTerm = (searchInput?.value || '').trim();
+    const searchTermLower = searchTerm.toLowerCase();
+    const searchTypeValue = searchType?.value || 'todo';
+
+    filteredClients = clients.filter(client => {
+      if (!searchTerm) return true;
+
+      switch (searchTypeValue) {
+        case 'id':
+          // Búsqueda exacta por ID
+          return client.id.toString() === searchTerm;
+        case 'nombre':
+          return client.nombre.toLowerCase().includes(searchTermLower);
+        case 'telefono':
+          return client.telefono.includes(searchTerm);
+        default: // 'todo'
+          // Para "todo", ID es exacto, nombre y teléfono son parciales
+          return client.id.toString() === searchTerm ||
+            client.nombre.toLowerCase().includes(searchTermLower) ||
+            client.telefono.includes(searchTerm);
+      }
+    });
+
+    currentPage = 1;
+    renderTable();
+  }
+
+  // Render table
+  function renderTable() {
+    if (filteredClients.length === 0) {
+      tableContainer?.classList.add('hidden');
+      emptyState?.classList.remove('hidden');
+      paginationContainer?.classList.add('hidden');
+      paginationTop?.classList.add('hidden');
+      return;
+    }
+
+    emptyState?.classList.add('hidden');
+    tableContainer?.classList.remove('hidden');
+
+    // Calculate pagination
+    const totalPages = Math.ceil(filteredClients.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, filteredClients.length);
+    const paginatedClients = filteredClients.slice(startIndex, endIndex);
+
+    // Update pagination info (both top and bottom)
+    if (filteredClients.length > itemsPerPage) {
+      paginationContainer?.classList.remove('hidden');
+      paginationContainer?.classList.add('flex');
+      paginationTop?.classList.remove('hidden');
+      paginationTop?.classList.add('flex');
+
+      showingFromEls.forEach(el => el.textContent = (startIndex + 1).toString());
+      showingToEls.forEach(el => el.textContent = endIndex.toString());
+      totalItemsEls.forEach(el => el.textContent = filteredClients.length.toString());
+      currentPageDisplays.forEach(el => el.textContent = currentPage.toString());
+      totalPagesDisplays.forEach(el => el.textContent = totalPages.toString());
+      prevPageBtns.forEach(btn => btn.disabled = currentPage === 1);
+      nextPageBtns.forEach(btn => btn.disabled = currentPage === totalPages);
+    } else {
+      paginationContainer?.classList.add('hidden');
+      paginationTop?.classList.add('hidden');
+    }
+
+    if (!clientsTableBody) return;
+
+    // Render rows
+    clientsTableBody.innerHTML = paginatedClients.map(client => `
+      <tr style="cursor:pointer;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''" data-client-id="${client.id}" oncontextmenu="event.preventDefault(); showContextMenu(event, ${client.id})">
+        <td class="px-3 py-3 text-sm hidden md:table-cell" style="color: #9a8b7c;">#${client.id}</td>
+        <td class="px-3 py-3">
+          <div class="flex items-center space-x-2">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style="background: rgba(13,148,136,0.10);">
+              <span class="text-sm font-semibold" style="color: #3b82f6;">${client.nombre.charAt(0).toUpperCase()}</span>
+            </div>
+            <div class="min-w-0">
+              <p class="font-medium text-sm truncate" style="color: #0f172a;">${client.nombre}</p>
+              <p class="text-xs md:hidden" style="color: #9a8b7c;">${client.telefono}</p>
+              <p class="text-xs truncate" style="color: #94a3b8;">${client.email || '-'}</p>
+            </div>
+          </div>
+        </td>
+        <td class="px-3 py-3 text-sm hidden md:table-cell" style="color: #475569;">${client.telefono}</td>
+        <td class="px-3 py-3 text-xs hidden xl:table-cell truncate max-w-[180px]" style="color: #9a8b7c;">${client.direccion || '-'}</td>
+        <td class="px-3 py-3 text-center">
+          <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-medium" style="${client.total_mascotas > 0 ? 'background: rgba(13,148,136,0.08); color: #3b82f6;' : 'background: #f1f5f9; color: #94a3b8;'}">${client.total_mascotas || 0}</span>
+        </td>
+        <td class="px-3 py-3 text-xs hidden md:table-cell" style="color: #9a8b7c;">${formatDate(client.fecha_creacion)}</td>
+        <td class="px-3 py-3">
+          <div class="flex justify-end space-x-1">
+            <button onclick="event.stopPropagation(); goToMascotas(${client.id})" class="p-2 rounded-lg transition-colors hover:bg-black/5" style="color: #3b82f6;" title="Ver Mascotas">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+              </svg>
+            </button>
+            <button onclick="event.stopPropagation(); editClient(${client.id})" class="p-2 rounded-lg transition-colors hover:bg-black/5" style="color: #3b82f6;" title="Editar">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+              </svg>
+            </button>
+            <button onclick="event.stopPropagation(); deleteClientPrompt(${client.id})" class="p-2 rounded-lg transition-colors hover:bg-black/5" style="color: #ef4444;" title="Eliminar">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // Format date
+  function formatDate(dateStr: string): string {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  }
+
+  // Phone validation
+  function validatePhone(phone: string): { valid: boolean; message: string } {
+    const digits = phone.replace(/\D/g, '');
+    if (digits.length !== 10) {
+      return { valid: false, message: 'El teléfono debe tener exactamente 10 dígitos' };
+    }
+    if (!/^[2-9]/.test(digits)) {
+      return { valid: false, message: 'El teléfono no es válido (debe iniciar con un dígito entre 2 y 9)' };
+    }
+    if (/^(\d)\1{9}$/.test(digits)) {
+      return { valid: false, message: 'El teléfono no es válido (no puede ser un número repetido)' };
+    }
+    if (digits === '1234567890' || digits === '0987654321') {
+      return { valid: false, message: 'El teléfono no es válido' };
+    }
+    return { valid: true, message: '' };
+  }
+
+  // Email validation
+  function validateEmail(email: string): { valid: boolean; message: string } {
+    if (!email) return { valid: true, message: '' };
+    email = email.trim().toLowerCase();
+    const parts = email.split('@');
+    if (parts.length !== 2) {
+      return { valid: false, message: 'El correo debe contener exactamente un @' };
+    }
+    const [local, domain] = parts;
+    if (local.length < 2) {
+      return { valid: false, message: 'El correo no es válido (la parte antes del @ es muy corta)' };
+    }
+    if (!domain.includes('.')) {
+      return { valid: false, message: 'El correo debe incluir un dominio válido (ej. gmail.com)' };
+    }
+    const domainParts = domain.split('.');
+    const tld = domainParts[domainParts.length - 1];
+    if (tld.length < 2) {
+      return { valid: false, message: 'El correo tiene una extensión de dominio inválida' };
+    }
+    const validTlds = ['com','mx','org','net','edu','gov','io','co','info','biz','gob','uk','es','ar','cl','gt','hn','ni','sv','cr','pa','do','ve','pe','bo','py','uy','ec','cu','pr','us','ca','de','fr','it','jp','br','ru'];
+    if (!validTlds.includes(tld)) {
+      return { valid: false, message: `La extensión ".${tld}" no es reconocida. Usa por ejemplo .com, .mx, .org` };
+    }
+    const pattern = /^[a-z0-9][a-z0-9._%+\-]{0,62}@[a-z0-9]([a-z0-9\-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9\-]*[a-z0-9])?)*\.[a-z]{2,}$/;
+    if (!pattern.test(email)) {
+      return { valid: false, message: 'El correo no tiene un formato válido' };
+    }
+    return { valid: true, message: '' };
+  }
+
+  // Modal functions
+  function openModal(title: string, client?: Cliente) {
+    if (!modal || !clientForm) return;
+    if (modalTitle) modalTitle.textContent = title;
+    clientForm.reset();
+    formError?.classList.add('hidden');
+
+    if (client) {
+      if (clientIdInput) clientIdInput.value = client.id.toString();
+      const nombreInput = clientForm.elements.namedItem('nombre') as HTMLInputElement | null;
+      const telInput = clientForm.elements.namedItem('telefono') as HTMLInputElement | null;
+      const emailInput = clientForm.elements.namedItem('email') as HTMLInputElement | null;
+      if (nombreInput) nombreInput.value = client.nombre;
+      if (telInput) telInput.value = client.telefono;
+      if (emailInput) emailInput.value = client.email || '';
+      // Parse stored "Calle X #N, Col. Y, Z" back into the 4 separate fields
+      let parsedCalle = '', parsedNumero = '', parsedColonia = '', parsedMunicipio = '';
+      if (client.direccion) {
+        const m = client.direccion.match(/^Calle\s+(.+?)\s+#([^,]+),\s*Col\.\s*([^,]+),\s*(.+)$/);
+        if (m) {
+          parsedCalle = m[1].trim();
+          parsedNumero = m[2].trim();
+          parsedColonia = m[3].trim();
+          parsedMunicipio = m[4].trim();
+        } else {
+          parsedCalle = client.direccion;
+        }
+      }
+      const calleInput = clientForm.elements.namedItem('calle') as HTMLInputElement | null;
+      const numInput = clientForm.elements.namedItem('numero_domicilio') as HTMLInputElement | null;
+      const colInput = clientForm.elements.namedItem('colonia') as HTMLInputElement | null;
+      const munInput = clientForm.elements.namedItem('municipio') as HTMLInputElement | null;
+      if (calleInput) calleInput.value = parsedCalle;
+      if (numInput) numInput.value = parsedNumero;
+      if (colInput) colInput.value = parsedColonia;
+      if (munInput) munInput.value = parsedMunicipio;
+    } else {
+      if (clientIdInput) clientIdInput.value = '';
+    }
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
+
+  function closeModalFn() {
+    modal?.classList.add('hidden');
+    modal?.classList.remove('flex');
+  }
+
+  // Context menu with proper positioning
+  (window as any).showContextMenu = (e: MouseEvent, clientId: number) => {
+    e.preventDefault();
+    contextClientId = clientId;
+    if (!contextMenu) return;
+
+    const menuWidth = 180;
+    const menuHeight = 140;
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    let x = e.clientX;
+    let y = e.clientY;
+
+    // Adjust if menu would go off-screen
+    if (x + menuWidth > viewportWidth) x = viewportWidth - menuWidth - 10;
+    if (y + menuHeight > viewportHeight) y = viewportHeight - menuHeight - 10;
+    if (x < 10) x = 10;
+    if (y < 10) y = 10;
+
+    contextMenu.style.left = `${x}px`;
+    contextMenu.style.top = `${y}px`;
+    contextMenu.classList.remove('hidden');
+  };
+
+  document.addEventListener('click', () => {
+    contextMenu?.classList.add('hidden');
+  });
+
+  document.addEventListener('scroll', () => {
+    contextMenu?.classList.add('hidden');
+  }, true);
+
+  ctxEdit?.addEventListener('click', () => {
+    if (contextClientId) {
+      const client = clients.find(c => c.id === contextClientId);
+      if (client) openModal('Editar Cliente', client);
+    }
+  });
+
+  ctxMascotas?.addEventListener('click', () => {
+    if (contextClientId) {
+      window.location.href = `/mascotas?cliente=${contextClientId}`;
+    }
+  });
+
+  ctxDelete?.addEventListener('click', () => {
+    if (contextClientId) {
+      deleteClientId = contextClientId;
+      deleteModal?.classList.remove('hidden');
+      deleteModal?.classList.add('flex');
+    }
+  });
+
+  // Global functions
+  (window as any).editClient = (id: number) => {
+    const client = clients.find(c => c.id === id);
+    if (client) openModal('Editar Cliente', client);
+  };
+
+  (window as any).goToMascotas = (id: number) => {
+    window.location.href = `/mascotas?cliente=${id}`;
+  };
+
+  (window as any).deleteClientPrompt = (id: number) => {
+    deleteClientId = id;
+    deleteModal?.classList.remove('hidden');
+    deleteModal?.classList.add('flex');
+  };
+
+  // Event listeners
+  logoutBtn?.addEventListener('click', () => {
+    clearSession();
+    window.location.href = '/';
+  });
+
+  addClientBtn?.addEventListener('click', () => openModal('Nuevo Cliente'));
+
+  closeModal?.addEventListener('click', closeModalFn);
+  cancelBtn?.addEventListener('click', closeModalFn);
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) closeModalFn();
+  });
+
+  searchInput?.addEventListener('input', applyFilters);
+  searchType?.addEventListener('change', applyFilters);
+
+  // Pagination (for both top and bottom)
+  prevPageBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderTable();
+      }
+    });
+  });
+
+  nextPageBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const totalPages = Math.ceil(filteredClients.length / itemsPerPage);
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderTable();
+      }
+    });
+  });
+
+  // Form submit
+  clientForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    formError?.classList.add('hidden');
+
+    const formData = new FormData(clientForm);
+
+    // Build direccion from 4 fields
+    const calle = (formData.get('calle') as string || '').trim();
+    const numeroDom = (formData.get('numero_domicilio') as string || '').trim();
+    const colonia = (formData.get('colonia') as string || '').trim();
+    const municipio = (formData.get('municipio') as string || '').trim();
+
+    if (!calle || !numeroDom || !colonia || !municipio) {
+      if (formErrorText) formErrorText.textContent = 'Completa todos los campos de la dirección (calle, número, colonia y municipio)';
+      formError?.classList.remove('hidden');
+      return;
+    }
+
+    const direccion = `Calle ${calle} #${numeroDom}, Col. ${colonia}, ${municipio}`;
+
+    const data: ClienteCreate = {
+      nombre: formData.get('nombre') as string,
+      telefono: formData.get('telefono') as string,
+      email: (formData.get('email') as string)?.toLowerCase().trim() || undefined,
+      direccion,
+    };
+
+    // Validate phone
+    const phoneResult = validatePhone(data.telefono);
+    if (!phoneResult.valid) {
+      if (formErrorText) formErrorText.textContent = phoneResult.message;
+      formError?.classList.remove('hidden');
+      return;
+    }
+
+    // Validate email
+    const emailResult = validateEmail(data.email || '');
+    if (!emailResult.valid) {
+      if (formErrorText) formErrorText.textContent = emailResult.message;
+      formError?.classList.remove('hidden');
+      return;
+    }
+
+    try {
+      const id = clientIdInput?.value || '';
+      if (id) {
+        await actualizarCliente(parseInt(id), data);
+      } else {
+        await crearCliente(data);
+      }
+      closeModalFn();
+      loadClients();
+    } catch (error) {
+      if (formErrorText) formErrorText.textContent = error instanceof Error ? error.message : 'Error al guardar';
+      formError?.classList.remove('hidden');
+    }
+  });
+
+  // Delete modal
+  cancelDelete?.addEventListener('click', () => {
+    deleteModal?.classList.add('hidden');
+    deleteModal?.classList.remove('flex');
+    deleteClientId = null;
+  });
+
+  confirmDelete?.addEventListener('click', async () => {
+    if (!deleteClientId) return;
+    try {
+      await eliminarCliente(deleteClientId);
+      deleteModal?.classList.add('hidden');
+      deleteModal?.classList.remove('flex');
+      deleteClientId = null;
+      loadClients();
+    } catch (error) {
+      console.error('Error deleting client:', error);
+    }
+  });
+
+  // Initial load
+  loadClients();
+</script>

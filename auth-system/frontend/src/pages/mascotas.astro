@@ -1,0 +1,1275 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Sidebar from '../components/Sidebar.astro';
+---
+
+<Layout title="Mascotas - Sistema Veterinarias">
+  <Sidebar />
+  <div class="lg:ml-64 min-h-screen transition-[margin] duration-200" style="background: #f1f5f9;" data-main-content>
+    <!-- Sticky Header -->
+    <header class="sticky top-0 z-30 backdrop-blur-md" style="background: rgba(255,255,255,0.8); border-bottom: 1px solid #e2e8f0;">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center space-x-3">
+        <button id="hamburgerBtn" class="lg:hidden p-2 rounded-lg hover:bg-black/5" style="color: #0f172a;">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+        <div>
+          <h1 class="text-xl md:text-2xl font-bold" style="color: #0f172a;">Gesti&#243;n de Mascotas</h1>
+          <p id="pageSubtitle" class="text-sm" style="color: #9a8b7c;">Administra las mascotas registradas</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+      <!-- Header Buttons -->
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <a href="/clientes" class="flex items-center space-x-2 hover:opacity-70 transition-colors" style="color: #9a8b7c;">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          <span class="text-sm">Volver a Clientes</span>
+        </a>
+        <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <a
+            href="/clientes"
+            class="px-4 md:px-6 py-3 font-semibold rounded-xl hover:bg-black/5 transition-all duration-200 flex items-center justify-center space-x-2"
+            style="border: 1px solid #e2e8f0; color: #0f172a;"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+            </svg>
+            <span>Nuevo Cliente</span>
+          </a>
+          <button
+            id="addPetBtn"
+            class="px-4 md:px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 flex items-center justify-center space-x-2"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            <span>Nueva Mascota</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Total Mascotas -->
+      <div class="bg-white rounded-xl p-4 mb-6 flex items-center justify-between" style="border: 1px solid #e2e8f0;">
+        <div>
+          <p class="text-xs" style="color: #9a8b7c;">Total Mascotas</p>
+          <p id="totalMascotas" class="text-2xl font-bold mt-1" style="color: #0f172a;">0</p>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
+            <span class="text-xl">&#128062;</span>
+          </div>
+          <!-- TODO: Activar en Avance 2 / Avance 3 --> <a href="/estadisticas" class="text-sm hover:opacity-70 flex items-center gap-1" style="color: #3b82f6;">
+            Ver estad&#237;sticas
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Pets Table Card -->
+      <div class="bg-white rounded-2xl overflow-hidden" style="border: 1px solid #e2e8f0;">
+        <!-- Search and Filter -->
+        <div class="p-4" style="border-bottom: 1px solid #e2e8f0;">
+          <div class="flex flex-col sm:flex-row gap-3">
+            <div class="relative flex-1 flex gap-2">
+              <select
+                id="searchType"
+                class="rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;"
+              >
+                <option value="todo" class="bg-white">Todo</option>
+                <option value="id" class="bg-white">ID</option>
+                <option value="nombre" class="bg-white">Nombre</option>
+              </select>
+              <div class="relative flex-1">
+                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5" style="color: #9a8b7c;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input
+                  type="text"
+                  id="searchInput"
+                  placeholder="Buscar mascota..."
+                  class="w-full pl-10 pr-4 py-2.5 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;"
+                />
+              </div>
+            </div>
+            <div class="flex gap-2 flex-wrap">
+              <select id="speciesFilter" class="px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;">
+                <option value="" class="bg-white">Todas las especies</option>
+                <option value="Perro" class="bg-white">Perros</option>
+                <option value="Gato" class="bg-white">Gatos</option>
+                <option value="Ave" class="bg-white">Aves</option>
+                <option value="Roedor" class="bg-white">Roedores</option>
+                <option value="Reptil" class="bg-white">Reptiles</option>
+                <option value="Pez" class="bg-white">Peces</option>
+                <option value="Anfibio" class="bg-white">Anfibios</option>
+                <option value="Exotico" class="bg-white">Exoticos</option>
+                <option value="Otro" class="bg-white">Otros</option>
+              </select>
+              <div class="relative">
+                <input type="text" id="clientFilterInput" placeholder="Buscar due&#241;o..." class="px-4 py-2.5 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 w-48" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;" autocomplete="off" />
+                <input type="hidden" id="clientFilter" value="" />
+                <div id="clientFilterDropdown" class="absolute z-50 top-full left-0 right-0 mt-1 bg-white rounded-lg max-h-48 overflow-y-auto hidden shadow-lg" style="border: 1px solid #e2e8f0;"></div>
+                <button type="button" id="clearClientFilter" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 hidden">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="p-12 text-center">
+          <svg class="animate-spin h-8 w-8 mx-auto text-blue-500" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <p class="mt-4" style="color: #9a8b7c;">Cargando mascotas...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden p-12 text-center">
+          <div class="w-16 h-16 rounded-full bg-gray-500/20 flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8" style="color: #9a8b7c;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+            </svg>
+          </div>
+          <p style="color: #9a8b7c;">No hay mascotas registradas</p>
+          <p class="text-sm mt-1" style="color: #94a3b8;">Agrega la primera mascota para comenzar</p>
+        </div>
+
+        <!-- Table -->
+        <div id="tableContainer" class="hidden">
+          <!-- Top Pagination -->
+          <div id="paginationTop" class="hidden p-4 flex-col sm:flex-row items-center justify-between gap-4" style="border-bottom: 1px solid #e2e8f0;">
+            <p class="text-sm" style="color: #9a8b7c;">
+              Mostrando <span class="showingFromSync">1</span>-<span class="showingToSync">10</span> de <span class="totalItemsSync">0</span> mascotas
+            </p>
+            <div class="flex items-center space-x-2">
+              <button class="prevPageSync px-3 py-2 bg-[#f8fafc] rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:bg-black/5" style="border: 1px solid #e2e8f0; color: #475569;">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+              </button>
+              <span class="px-3 text-sm" style="color: #0f172a;">P&#225;gina <span class="currentPageSync">1</span> de <span class="totalPagesSync">1</span></span>
+              <button class="nextPageSync px-3 py-2 bg-[#f8fafc] rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:bg-black/5" style="border: 1px solid #e2e8f0; color: #475569;">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="hidden md:table-header-group" style="background: #f8fafc;">
+                <tr>
+                  <th class="px-4 md:px-6 py-4 text-left text-xs font-medium uppercase tracking-wider" style="color: #9a8b7c;">ID</th>
+                  <th class="px-4 md:px-6 py-4 text-left text-xs font-medium uppercase tracking-wider" style="color: #9a8b7c;">Mascota</th>
+                  <th class="px-4 md:px-6 py-4 text-left text-xs font-medium uppercase tracking-wider" style="color: #9a8b7c;">Especie</th>
+                  <th class="px-4 md:px-6 py-4 text-left text-xs font-medium uppercase tracking-wider hidden lg:table-cell" style="color: #9a8b7c;">Due&#241;o</th>
+                  <th class="px-4 md:px-6 py-4 text-left text-xs font-medium uppercase tracking-wider hidden xl:table-cell" style="color: #9a8b7c;">Edad/Peso</th>
+                  <th class="px-4 md:px-6 py-4 text-right text-xs font-medium uppercase tracking-wider" style="color: #9a8b7c;">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="petsTableBody" class="divide-y divide-[#e2e8f0]">
+                <!-- Rows inserted by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Bottom Pagination -->
+          <div id="paginationContainer" class="hidden p-4 flex-col sm:flex-row items-center justify-between gap-4" style="border-top: 1px solid #e2e8f0;">
+            <p class="text-sm" style="color: #9a8b7c;">
+              Mostrando <span class="showingFromSync">1</span>-<span class="showingToSync">10</span> de <span class="totalItemsSync">0</span> mascotas
+            </p>
+            <div class="flex items-center space-x-2">
+              <button class="prevPageSync px-3 py-2 bg-[#f8fafc] rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:bg-black/5" style="border: 1px solid #e2e8f0; color: #475569;">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+              </button>
+              <span class="px-3 text-sm" style="color: #0f172a;">P&#225;gina <span class="currentPageSync">1</span> de <span class="totalPagesSync">1</span></span>
+              <button class="nextPageSync px-3 py-2 bg-[#f8fafc] rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:bg-black/5" style="border: 1px solid #e2e8f0; color: #475569;">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add/Edit Pet Modal -->
+  <div id="petModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+    <div class="bg-white rounded-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto" style="border: 1px solid #e2e8f0;">
+      <div class="p-4 md:p-6 flex justify-between items-center sticky top-0 bg-white" style="border-bottom: 1px solid #e2e8f0;">
+        <h3 id="petModalTitle" class="text-xl font-semibold" style="color: #0f172a;">Nueva Mascota</h3>
+        <button id="closePetModal" class="p-1 hover:opacity-70" style="color: #9a8b7c;">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <form id="petForm" class="p-4 md:p-6 space-y-4">
+        <input type="hidden" id="petId" name="petId" />
+        <input type="hidden" id="petClienteId" name="petClienteId" />
+
+        <div>
+          <label class="block text-sm font-medium mb-2" style="color: #475569;">Due&#241;o *</label>
+          <div class="flex gap-2 mb-2">
+            <select id="clienteSearchType" class="px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;">
+              <option value="nombre" class="bg-white">Por Nombre</option>
+              <option value="telefono" class="bg-white">Por Telefono</option>
+              <option value="id" class="bg-white">Por ID</option>
+            </select>
+            <div class="relative flex-1">
+              <input type="text" id="clienteSearch" placeholder="Escribe para buscar..." autocomplete="off" class="w-full px-4 py-2.5 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;" />
+              <input type="hidden" name="cliente_id" id="clienteIdHidden" required />
+              <div id="clienteDropdown" class="absolute z-50 top-full left-0 right-0 mt-1 bg-white rounded-lg max-h-48 overflow-y-auto hidden shadow-lg" style="border: 1px solid #e2e8f0;"></div>
+            </div>
+          </div>
+          <p id="selectedClientInfo" class="text-sm mt-2 hidden" style="color: #3b82f6;"></p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium mb-2" style="color: #475569;">Nombre *</label>
+            <input type="text" name="nombre" required maxlength="100" class="w-full px-4 py-2.5 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;" placeholder="Max" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-2" style="color: #475569;">Especie *</label>
+            <input type="text" name="especie" id="especieInput" list="especiesList" required maxlength="50" class="w-full px-4 py-2.5 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;" placeholder="Ej: Perro, Gato..." />
+            <datalist id="especiesList">
+              <option value="Perro"></option>
+              <option value="Gato"></option>
+              <option value="Ave"></option>
+              <option value="Roedor"></option>
+              <option value="Reptil"></option>
+              <option value="Pez"></option>
+              <option value="Anfibio"></option>
+              <option value="Exotico"></option>
+            </datalist>
+            <p class="text-xs mt-1" style="color: #94a3b8;">Si la especie no est&#225; en la lista, escr&#237;bela y se guardar&#225; autom&#225;ticamente.</p>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-2" style="color: #475569;">Raza</label>
+          <input type="text" name="raza" id="razaInput" list="razasList" maxlength="100" class="w-full px-4 py-2.5 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;" placeholder="Ej: Labrador, Siam&#233;s..." />
+          <datalist id="razasList">
+            <!-- Dynamic options from JS -->
+          </datalist>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium mb-2" style="color: #475569;">Edad</label>
+            <div class="grid grid-cols-2 gap-2">
+              <div class="relative">
+                <input type="number" name="edad_anios" min="0" max="100" step="1" class="w-full pl-3 pr-12 py-2.5 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;" placeholder="0" />
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs pointer-events-none" style="color: #9a8b7c;">a&#241;os</span>
+              </div>
+              <div class="relative">
+                <input type="number" name="edad_meses" min="0" max="11" step="1" class="w-full pl-3 pr-14 py-2.5 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;" placeholder="0" />
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs pointer-events-none" style="color: #9a8b7c;">meses</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-2" style="color: #475569;">Peso</label>
+            <div class="flex gap-2">
+              <input type="number" name="peso_valor" min="0" max="500" step="0.1" class="flex-1 px-3 py-2.5 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;" placeholder="15" />
+              <select name="peso_unidad" class="w-16 px-2 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;">
+                <option value="kg" class="bg-white">kg</option>
+                <option value="g" class="bg-white">g</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-2" style="color: #475569;">Notas</label>
+          <textarea name="notas" rows="2" maxlength="500" class="w-full px-4 py-2.5 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;" placeholder="Alergias, condiciones especiales, etc."></textarea>
+        </div>
+
+        <!-- Error Message -->
+        <div id="petFormError" class="hidden p-3 bg-red-50 rounded-xl" style="border: 1px solid #fecaca;">
+          <p class="text-red-600 text-sm text-center" id="petFormErrorText"></p>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex justify-end space-x-3 pt-2">
+          <button type="button" id="cancelPetBtn" class="px-4 py-2 transition-colors hover:opacity-70" style="color: #475569;">
+            Cancelar
+          </button>
+          <button type="submit" class="px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200">
+            Guardar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="deleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+    <div class="bg-white rounded-2xl w-full max-w-md mx-4 p-6" style="border: 1px solid #e2e8f0;">
+      <div class="text-center">
+        <div class="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+        </div>
+        <h3 class="text-xl font-semibold mb-2" style="color: #0f172a;">&#191;Eliminar mascota?</h3>
+        <p class="mb-6 text-sm" style="color: #9a8b7c;">Se eliminar&#225; todo el historial m&#233;dico. Esta acci&#243;n no se puede deshacer.</p>
+        <div class="flex justify-center space-x-4">
+          <button id="cancelDelete" class="px-6 py-2 transition-colors hover:opacity-70" style="color: #475569;">
+            Cancelar
+          </button>
+          <button id="confirmDelete" class="px-6 py-2 bg-red-500 text-white font-semibold rounded-xl hover:bg-red-600 transition-colors">
+            Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bitacora Modal -->
+  <div id="bitacoraModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+    <div class="bg-white rounded-2xl w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto" style="border: 1px solid #e2e8f0;">
+      <div class="p-4 md:p-6 flex justify-between items-center sticky top-0 bg-white z-10" style="border-bottom: 1px solid #e2e8f0;">
+        <div>
+          <h3 class="text-xl font-semibold" style="color: #0f172a;">Bitacora de <span id="bitacoraPetName"></span></h3>
+          <p class="text-sm mt-1" style="color: #9a8b7c;">Registro de avances y observaciones</p>
+        </div>
+        <button id="closeBitacora" class="p-1 hover:opacity-70" style="color: #9a8b7c;">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Nueva entrada form -->
+      <div class="p-4 md:p-6" style="border-bottom: 1px solid #e2e8f0;">
+        <h4 class="text-base md:text-lg font-medium mb-4" style="color: #3b82f6;">Nueva Entrada</h4>
+        <form id="bitacoraForm" class="space-y-4">
+          <input type="hidden" id="bitacoraMascotaId" />
+          <div>
+            <label class="block text-sm font-medium mb-2" style="color: #475569;">Descripcion del Avance *</label>
+            <textarea name="descripcion" rows="4" required maxlength="1000" class="w-full px-4 py-2 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;" placeholder="Describe el avance, tratamiento, observaciones..."></textarea>
+          </div>
+          <div id="bitacoraFormError" class="hidden p-3 bg-red-50 rounded-lg" style="border: 1px solid #fecaca;">
+            <p class="text-red-600 text-sm text-center" id="bitacoraFormErrorText"></p>
+          </div>
+          <div class="flex justify-end">
+            <button type="submit" class="px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200">
+              Agregar Entrada
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Lista de entradas -->
+      <div class="p-4 md:p-6">
+        <h4 class="text-base md:text-lg font-medium mb-4" style="color: #3b82f6;">Historial</h4>
+        <div id="bitacoraLoading" class="text-center py-8">
+          <svg class="animate-spin h-8 w-8 mx-auto text-blue-500" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+        </div>
+        <div id="bitacoraEmpty" class="hidden text-center py-8">
+          <p style="color: #9a8b7c;">No hay entradas en la bit&#225;cora</p>
+        </div>
+        <div id="bitacoraList" class="hidden space-y-4"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pet Context Menu -->
+  <div id="petContextMenu" class="fixed hidden bg-white rounded-xl shadow-2xl py-2 z-50 min-w-[180px]" style="border: 1px solid #e2e8f0;">
+    <button id="ctxEditPet" class="w-full px-4 py-2.5 text-left hover:bg-black/5 flex items-center space-x-3" style="color: #475569;">
+      <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+      </svg>
+      <span>Editar Mascota</span>
+    </button>
+    <!-- TODO: Activar en Avance 2 (Bitácora clínica) -->
+    <button id="ctxBitacora" class="hidden w-full px-4 py-2.5 text-left hover:bg-black/5 items-center space-x-3" style="color: #475569;">
+      <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+      </svg>
+      <span>Ver Bit&#225;cora</span>
+    </button>
+    <div class="my-1" style="border-top: 1px solid #e2e8f0;"></div>
+    <button id="ctxDeletePet" class="w-full px-4 py-2.5 text-left text-red-500 hover:bg-black/5 flex items-center space-x-3">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+      </svg>
+      <span>Eliminar</span>
+    </button>
+  </div>
+</Layout>
+
+<style>
+  :global(body) {
+    background: #f1f5f9 !important;
+  }
+</style>
+
+<script>
+  import { getVeterinaria, getUsuario, clearSession, isAuthenticated } from '../services/authService';
+  import { listarClientes, type Cliente } from '../services/clienteService';
+  import { listarMascotas, crearMascota, actualizarMascota, eliminarMascota, type MascotaConDueno, type MascotaCreate } from '../services/mascotaService';
+  import { listarBitacora, crearEntradaBitacora, eliminarEntradaBitacora, type Bitacora, type BitacoraCreate } from '../services/bitacoraService';
+
+  // Check auth
+  if (!isAuthenticated()) {
+    window.location.href = '/';
+  }
+  const _meMascotas = getUsuario();
+  if (_meMascotas?.rol === 'veterinario') { window.location.href = '/home'; }
+
+  // Get URL params
+  const urlParams = new URLSearchParams(window.location.search);
+  const clienteIdFromUrl = urlParams.get('cliente');
+
+  // Elements
+  const vetNameEl = document.getElementById('vetName') as HTMLSpanElement;
+  const pageSubtitle = document.getElementById('pageSubtitle') as HTMLParagraphElement;
+  const logoutBtn = document.getElementById('logoutBtn') as HTMLButtonElement;
+  const addPetBtn = document.getElementById('addPetBtn') as HTMLButtonElement;
+  const loadingState = document.getElementById('loadingState') as HTMLDivElement;
+  const emptyState = document.getElementById('emptyState') as HTMLDivElement;
+  const tableContainer = document.getElementById('tableContainer') as HTMLDivElement;
+  const petsTableBody = document.getElementById('petsTableBody') as HTMLTableSectionElement;
+  const totalMascotasEl = document.getElementById('totalMascotas') as HTMLParagraphElement;
+  const searchInput = document.getElementById('searchInput') as HTMLInputElement;
+  const searchType = document.getElementById('searchType') as HTMLSelectElement;
+  const speciesFilter = document.getElementById('speciesFilter') as HTMLSelectElement;
+  const clientFilter = document.getElementById('clientFilter') as HTMLInputElement;
+  const clientFilterInput = document.getElementById('clientFilterInput') as HTMLInputElement;
+  const clientFilterDropdown = document.getElementById('clientFilterDropdown') as HTMLDivElement;
+  const clearClientFilter = document.getElementById('clearClientFilter') as HTMLButtonElement;
+
+  // Sidebar elements
+  const sidebar = document.getElementById('sidebar') as HTMLElement;
+  const sidebarOverlay = document.getElementById('sidebarOverlay') as HTMLDivElement;
+  const hamburgerBtn = document.getElementById('hamburgerBtn') as HTMLButtonElement;
+  const sidebarVetName = document.getElementById('sidebarVetName') as HTMLParagraphElement;
+  const userAvatar = document.getElementById('userAvatar') as HTMLDivElement;
+
+  // Pagination
+  const paginationContainer = document.getElementById('paginationContainer') as HTMLDivElement;
+  const paginationTop = document.getElementById('paginationTop') as HTMLDivElement;
+  const prevPageBtns = document.querySelectorAll('.prevPageSync') as NodeListOf<HTMLButtonElement>;
+  const nextPageBtns = document.querySelectorAll('.nextPageSync') as NodeListOf<HTMLButtonElement>;
+  const currentPageDisplays = document.querySelectorAll('.currentPageSync') as NodeListOf<HTMLSpanElement>;
+  const totalPagesDisplays = document.querySelectorAll('.totalPagesSync') as NodeListOf<HTMLSpanElement>;
+  const showingFromEls = document.querySelectorAll('.showingFromSync') as NodeListOf<HTMLSpanElement>;
+  const showingToEls = document.querySelectorAll('.showingToSync') as NodeListOf<HTMLSpanElement>;
+  const totalItemsEls = document.querySelectorAll('.totalItemsSync') as NodeListOf<HTMLSpanElement>;
+
+  // Pet Modal
+  const petModal = document.getElementById('petModal') as HTMLDivElement;
+  const petModalTitle = document.getElementById('petModalTitle') as HTMLHeadingElement;
+  const closePetModal = document.getElementById('closePetModal') as HTMLButtonElement;
+  const cancelPetBtn = document.getElementById('cancelPetBtn') as HTMLButtonElement;
+  const petForm = document.getElementById('petForm') as HTMLFormElement;
+  const petIdInput = document.getElementById('petId') as HTMLInputElement;
+  const petClienteIdInput = document.getElementById('petClienteId') as HTMLInputElement;
+  const clienteSearchType = document.getElementById('clienteSearchType') as HTMLSelectElement;
+  const clienteSearch = document.getElementById('clienteSearch') as HTMLInputElement;
+  const clienteIdHidden = document.getElementById('clienteIdHidden') as HTMLInputElement;
+  const clienteDropdown = document.getElementById('clienteDropdown') as HTMLDivElement;
+  const selectedClientInfo = document.getElementById('selectedClientInfo') as HTMLParagraphElement;
+  const especieInput = document.getElementById('especieInput') as HTMLInputElement;
+  const razaInput = document.getElementById('razaInput') as HTMLInputElement;
+  const razasList = document.getElementById('razasList') as HTMLDataListElement;
+  const petFormError = document.getElementById('petFormError') as HTMLDivElement;
+  const petFormErrorText = document.getElementById('petFormErrorText') as HTMLParagraphElement;
+
+  // Delete modal
+  const deleteModal = document.getElementById('deleteModal') as HTMLDivElement;
+  const cancelDelete = document.getElementById('cancelDelete') as HTMLButtonElement;
+  const confirmDelete = document.getElementById('confirmDelete') as HTMLButtonElement;
+
+  // Bitacora modal
+  const bitacoraModal = document.getElementById('bitacoraModal') as HTMLDivElement;
+  const bitacoraPetName = document.getElementById('bitacoraPetName') as HTMLSpanElement;
+  const closeBitacora = document.getElementById('closeBitacora') as HTMLButtonElement;
+  const bitacoraForm = document.getElementById('bitacoraForm') as HTMLFormElement;
+  const bitacoraMascotaIdInput = document.getElementById('bitacoraMascotaId') as HTMLInputElement;
+  const bitacoraFormError = document.getElementById('bitacoraFormError') as HTMLDivElement;
+  const bitacoraFormErrorText = document.getElementById('bitacoraFormErrorText') as HTMLParagraphElement;
+  const bitacoraLoading = document.getElementById('bitacoraLoading') as HTMLDivElement;
+  const bitacoraEmpty = document.getElementById('bitacoraEmpty') as HTMLDivElement;
+  const bitacoraList = document.getElementById('bitacoraList') as HTMLDivElement;
+
+  // State
+  let pets: MascotaConDueno[] = [];
+  let clients: Cliente[] = [];
+  let filteredPets: MascotaConDueno[] = [];
+  let currentPage = 1;
+  const itemsPerPage = 500;
+  let deletePetId: number | null = null;
+  let currentBitacoraMascotaId: number | null = null;
+  let contextPetId: number | null = null;
+
+  // Predefined species list (used to detect custom ones)
+  const PREDEFINED_SPECIES = ['Perro', 'Gato', 'Ave', 'Roedor', 'Reptil', 'Pez', 'Anfibio', 'Exotico'];
+  const LS_CUSTOM_SPECIES = 'vetpets_custom_species';
+  const LS_CUSTOM_BREEDS = 'vetpets_custom_breeds_';
+
+  // Breed options by species
+  const breedsBySpecies: Record<string, string[]> = {
+    'Perro': [
+      'Mestizo', 'Labrador Retriever', 'Golden Retriever', 'Pastor Aleman', 'Bulldog Ingles', 'Bulldog Frances',
+      'Poodle', 'Chihuahua', 'Rottweiler', 'Husky Siberiano', 'Beagle', 'Yorkshire Terrier', 'Schnauzer',
+      'Pit Bull', 'American Bully', 'Boxer', 'Dalmata', 'Cocker Spaniel', 'Pug', 'Doberman', 'Shih Tzu',
+      'Basset Hound', 'Border Collie', 'Boston Terrier', 'Bull Terrier', 'Caniche', 'Chow Chow',
+      'Dogo Argentino', 'Fila Brasileiro', 'Fox Terrier', 'Gran Danes', 'Jack Russell', 'Maltipoo',
+      'Maltes', 'Mastin Napolitano', 'Papillon', 'Pastor Australiano', 'Pastor Belga', 'Pekines',
+      'Pointer', 'Pomerania', 'Rhodesian Ridgeback', 'Samoyedo', 'San Bernardo', 'Shar Pei',
+      'Setter Irlandes', 'Shiba Inu', 'Springer Spaniel', 'Staffordshire', 'Terranova', 'Weimaraner',
+      'Welsh Corgi', 'West Highland', 'Xoloitzcuintle'
+    ],
+    'Gato': [
+      'Mestizo', 'Siames', 'Persa', 'Maine Coon', 'Bengali', 'Ragdoll', 'Britanico de Pelo Corto',
+      'Abisinio', 'Sphynx', 'Scottish Fold', 'Angora Turco', 'Birmano', 'Bombay', 'Burmese', 'Chartreux',
+      'Cornish Rex', 'Devon Rex', 'Exotico de Pelo Corto', 'Himalayo', 'Manx', 'Noruego del Bosque',
+      'Oriental', 'Ruso Azul', 'Savannah', 'Singapura', 'Somali', 'Tonkines', 'Van Turco'
+    ],
+    'Ave': [
+      'Periquito Australiano', 'Canario', 'Loro Amazonas', 'Cacatua', 'Agaporni', 'Cotorra Argentina',
+      'Guacamaya', 'Ninfa', 'Calopsita', 'Diamante Mandarin', 'Jilguero', 'Pinzon', 'Cardenal',
+      'Paloma', 'Codorniz', 'Faisán', 'Pavo Real', 'Gallina', 'Pato', 'Ganso', 'Tucan', 'Loro Gris Africano',
+      'Eclectus', 'Caique', 'Quaker', 'Loro Senegalés'
+    ],
+    'Roedor': [
+      'Hamster Sirio', 'Hamster Ruso', 'Hamster Roborovski', 'Cobaya', 'Conejo Holandes', 'Conejo Belier',
+      'Conejo Rex', 'Conejo Angora', 'Conejo Cabeza de Leon', 'Rata Domestica', 'Raton Domestico',
+      'Chinchilla', 'Huron', 'Jerbo', 'Ardilla de Richardson', 'Degú', 'Erizo Africano'
+    ],
+    'Reptil': [
+      'Iguana Verde', 'Tortuga de Orejas Rojas', 'Tortuga Rusa', 'Tortuga Sulcata', 'Gecko Leopardo',
+      'Gecko Crestado', 'Dragon Barbudo', 'Python Ball', 'Boa Constrictor', 'Serpiente del Maiz',
+      'Camaleon Velado', 'Camaleon Pantera', 'Monitor de Sabana', 'Tegu Argentino', 'Tortuga de Caja',
+      'Tortuga Mora', 'Axolotl', 'Salamandra'
+    ],
+    'Pez': [
+      'Betta', 'Goldfish', 'Guppy', 'Molly', 'Platy', 'Tetra Neon', 'Pez Angel', 'Disco', 'Oscar',
+      'Cichilido', 'Corydora', 'Pleco', 'Pez Payaso', 'Pez Cirujano', 'Pez Damisela', 'Pez Globo',
+      'Carpa Koi', 'Pez Bichir'
+    ],
+    'Anfibio': [
+      'Rana Arboricola', 'Rana Africana', 'Sapo Comun', 'Axolotl', 'Salamandra de Fuego',
+      'Triton Japones', 'Rana Punta de Flecha', 'Sapo de Caña'
+    ],
+    'Exotico': [
+      'Mono Capuchino', 'Mono Titi', 'Sugar Glider', 'Perezoso', 'Mapache', 'Coati', 'Kinkaju',
+      'Feneco', 'Zorro', 'Mofeta', 'Armadillo', 'Capibaraa', 'Mini Pig', 'Cabra Enana'
+    ],
+  };
+
+  // Species colors and emojis
+  const speciesEmojis: Record<string, string> = { 'Perro': '🐕', 'Gato': '🐱', 'Ave': '🦜', 'Roedor': '🐹', 'Reptil': '🦎', 'Pez': '🐠', 'Anfibio': '🐸', 'Exotico': '🦥', 'Otro': '🐾' };
+  const speciesColors: Record<string, string> = { 'Perro': 'bg-amber-500/20', 'Gato': 'bg-purple-500/20', 'Ave': 'bg-sky-500/20', 'Roedor': 'bg-pink-500/20', 'Reptil': 'bg-lime-500/20', 'Pez': 'bg-cyan-500/20', 'Anfibio': 'bg-green-500/20', 'Exotico': 'bg-orange-500/20', 'Otro': 'bg-gray-500/20' };
+  const speciesBadgeColors: Record<string, string> = { 'Perro': 'bg-amber-500/20 text-amber-300', 'Gato': 'bg-purple-500/20 text-purple-300', 'Ave': 'bg-sky-500/20 text-sky-300', 'Roedor': 'bg-pink-500/20 text-pink-300', 'Reptil': 'bg-lime-500/20 text-lime-300', 'Pez': 'bg-cyan-500/20 text-cyan-300', 'Anfibio': 'bg-green-500/20 text-green-300', 'Exotico': 'bg-orange-500/20 text-orange-300', 'Otro': 'bg-gray-500/20 text-gray-300' };
+
+  // Load vet name
+  const vet = getVeterinaria();
+  if (vet) {
+    vetNameEl.textContent = vet.nombre;
+    if (sidebarVetName) sidebarVetName.textContent = vet.nombre;
+    if (userAvatar) userAvatar.textContent = vet.nombre.charAt(0).toUpperCase();
+  }
+
+  // Sidebar toggle
+  hamburgerBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('-translate-x-full');
+    sidebarOverlay.classList.toggle('hidden');
+  });
+  sidebarOverlay.addEventListener('click', () => {
+    sidebar.classList.add('-translate-x-full');
+    sidebarOverlay.classList.add('hidden');
+  });
+
+  // ── Custom species/breed persistence ──────────────────────────
+  function getCustomSpecies(): string[] {
+    try { return JSON.parse(localStorage.getItem(LS_CUSTOM_SPECIES) || '[]'); } catch { return []; }
+  }
+  function saveCustomSpeciesList(list: string[]) {
+    localStorage.setItem(LS_CUSTOM_SPECIES, JSON.stringify(list));
+  }
+  function getCustomBreeds(species: string): string[] {
+    try { return JSON.parse(localStorage.getItem(LS_CUSTOM_BREEDS + species) || '[]'); } catch { return []; }
+  }
+  function saveCustomBreedsList(species: string, list: string[]) {
+    localStorage.setItem(LS_CUSTOM_BREEDS + species, JSON.stringify(list));
+  }
+
+  // Inject custom species into datalist + filter dropdown
+  function loadCustomSpeciesOptions() {
+    const especiesDatalist = document.getElementById('especiesList') as HTMLDataListElement;
+    getCustomSpecies().forEach(s => {
+      if (!Array.from(especiesDatalist.options).some(o => o.value === s)) {
+        const opt = document.createElement('option');
+        opt.value = s;
+        especiesDatalist.appendChild(opt);
+      }
+      if (!Array.from(speciesFilter.options).some(o => o.value === s)) {
+        const opt = document.createElement('option');
+        opt.value = s; opt.className = 'bg-white'; opt.textContent = s;
+        speciesFilter.appendChild(opt);
+      }
+    });
+  }
+
+  // Persist a new species (if truly new) to localStorage
+  function persistCustomSpecies(especie: string) {
+    if (!especie || PREDEFINED_SPECIES.includes(especie)) return;
+    const list = getCustomSpecies();
+    if (list.includes(especie)) return;
+    list.push(especie);
+    saveCustomSpeciesList(list);
+    // Update datalist
+    const dl = document.getElementById('especiesList') as HTMLDataListElement;
+    if (!Array.from(dl.options).some(o => o.value === especie)) {
+      const opt = document.createElement('option'); opt.value = especie; dl.appendChild(opt);
+    }
+    // Update species filter dropdown
+    if (!Array.from(speciesFilter.options).some(o => o.value === especie)) {
+      const opt = document.createElement('option');
+      opt.value = especie; opt.className = 'bg-white'; opt.textContent = especie;
+      speciesFilter.appendChild(opt);
+    }
+  }
+
+  // Persist a new breed for the given species
+  function persistCustomBreed(especie: string, raza: string) {
+    if (!especie || !raza) return;
+    const predefined = breedsBySpecies[especie] || [];
+    const custom = getCustomBreeds(especie);
+    if (predefined.includes(raza) || custom.includes(raza)) return;
+    custom.push(raza);
+    saveCustomBreedsList(especie, custom);
+  }
+  // ────────────────────────────────────────────────────────────────
+
+  // Update breeds when species changes (includes custom breeds)
+  function updateBreeds(species: string) {
+    const predefined = breedsBySpecies[species] || [];
+    const custom = getCustomBreeds(species);
+    const all = [...predefined, ...custom.filter(b => !predefined.includes(b))];
+    razasList.innerHTML = all.map(b => `<option value="${b}"></option>`).join('');
+  }
+
+  especieInput.addEventListener('input', () => updateBreeds(especieInput.value));
+
+  // Client autocomplete functionality
+  let selectedClientId: number | null = null;
+
+  function updateClientDropdown() {
+    const term = clienteSearch.value.trim();
+    const searchTypeValue = clienteSearchType.value;
+    if (!term) {
+      clienteDropdown.classList.add('hidden');
+      return;
+    }
+
+    const matches = clients.filter(c => {
+      if (searchTypeValue === 'id') {
+        return c.id.toString() === term;
+      } else if (searchTypeValue === 'telefono') {
+        const digitsOnly = term.replace(/\D/g, '');
+        return c.telefono.replace(/\D/g, '').includes(digitsOnly);
+      } else {
+        return c.nombre.toLowerCase().includes(term.toLowerCase());
+      }
+    }).slice(0, 8);
+
+    if (matches.length === 0) {
+      clienteDropdown.innerHTML = '<div class="px-4 py-3 text-sm" style="color: #9a8b7c;">No se encontraron clientes</div>';
+    } else {
+      clienteDropdown.innerHTML = matches.map(c => `
+        <button type="button" class="w-full px-4 py-3 text-left hover:bg-black/5 transition-colors" onclick="selectClient(${c.id}, '${c.nombre.replace(/'/g, "\\'")}', '${c.telefono}')">
+          <p class="font-medium" style="color: #0f172a;">${c.nombre}</p>
+          <p class="text-sm" style="color: #9a8b7c;">${c.telefono}</p>
+        </button>
+      `).join('');
+    }
+    clienteDropdown.classList.remove('hidden');
+  }
+
+  (window as any).selectClient = (id: number, nombre: string, telefono: string) => {
+    selectedClientId = id;
+    clienteIdHidden.value = id.toString();
+    clienteSearch.value = nombre;
+    selectedClientInfo.textContent = `✓ ${nombre} - ${telefono}`;
+    selectedClientInfo.classList.remove('hidden');
+    clienteDropdown.classList.add('hidden');
+  };
+
+  clienteSearch.addEventListener('input', updateClientDropdown);
+  clienteSearch.addEventListener('focus', updateClientDropdown);
+  clienteSearchType.addEventListener('change', () => {
+    clienteSearch.value = '';
+    clienteDropdown.classList.add('hidden');
+    clienteSearch.focus();
+  });
+  document.addEventListener('click', (e) => {
+    if (!clienteSearch.contains(e.target as Node) && !clienteDropdown.contains(e.target as Node)) {
+      clienteDropdown.classList.add('hidden');
+    }
+  });
+
+  // Client filter dropdown logic
+  function updateClientFilterDropdown() {
+    const term = clientFilterInput.value.toLowerCase().trim();
+
+    if (!term) {
+      clientFilterDropdown.classList.add('hidden');
+      return;
+    }
+
+    const matches = clients.filter(c =>
+      c.nombre.toLowerCase().includes(term) ||
+      c.telefono.includes(term)
+    ).slice(0, 8);
+
+    if (matches.length === 0) {
+      clientFilterDropdown.innerHTML = '<div class="px-4 py-2 text-sm" style="color: #9a8b7c;">No se encontraron clientes</div>';
+    } else {
+      clientFilterDropdown.innerHTML = matches.map(c => `
+        <button type="button" class="w-full px-4 py-2 text-left hover:bg-black/5 transition-colors" onclick="selectClientFilter(${c.id}, '${c.nombre.replace(/'/g, "\\'")}')">
+          <p class="font-medium text-sm" style="color: #0f172a;">${c.nombre}</p>
+          <p class="text-xs" style="color: #9a8b7c;">${c.telefono}</p>
+        </button>
+      `).join('');
+    }
+    clientFilterDropdown.classList.remove('hidden');
+  }
+
+  (window as any).selectClientFilter = (id: number, nombre: string) => {
+    clientFilter.value = id.toString();
+    clientFilterInput.value = nombre;
+    clientFilterDropdown.classList.add('hidden');
+    clearClientFilter.classList.remove('hidden');
+    applyFilters();
+  };
+
+  clientFilterInput.addEventListener('input', updateClientFilterDropdown);
+  clientFilterInput.addEventListener('focus', updateClientFilterDropdown);
+  document.addEventListener('click', (e) => {
+    if (!clientFilterInput.contains(e.target as Node) && !clientFilterDropdown.contains(e.target as Node)) {
+      clientFilterDropdown.classList.add('hidden');
+    }
+  });
+
+  clearClientFilter.addEventListener('click', () => {
+    clientFilter.value = '';
+    clientFilterInput.value = '';
+    clearClientFilter.classList.add('hidden');
+    pageSubtitle.textContent = 'Gestiona las mascotas de la veterinaria';
+    applyFilters();
+  });
+
+  // Load data
+  async function loadData() {
+    try {
+      [pets, clients] = await Promise.all([listarMascotas(), listarClientes()]);
+
+      // If client ID from URL, set filter
+      if (clienteIdFromUrl) {
+        clientFilter.value = clienteIdFromUrl;
+        const client = clients.find(c => c.id === parseInt(clienteIdFromUrl));
+        if (client) {
+          clientFilterInput.value = client.nombre;
+          clearClientFilter.classList.remove('hidden');
+          pageSubtitle.textContent = `Mascotas de ${client.nombre}`;
+        }
+      }
+
+      filteredPets = [...pets];
+      applyFilters();
+      updateStats();
+      loadCustomSpeciesOptions();
+    } catch (error) {
+      console.error('Error loading data:', error);
+    } finally {
+      loadingState.classList.add('hidden');
+    }
+  }
+
+  // Update stats
+  function updateStats() {
+    totalMascotasEl.textContent = pets.length.toString();
+  }
+
+  // Apply filters
+  function applyFilters() {
+    const searchTerm = searchInput.value.trim();
+    const searchTermLower = searchTerm.toLowerCase();
+    const searchTypeValue = searchType.value;
+    const speciesValue = speciesFilter.value;
+    const clientValue = clientFilter.value;
+
+    filteredPets = pets.filter(pet => {
+      // Search filter
+      let matchesSearch = true;
+      if (searchTerm) {
+        switch (searchTypeValue) {
+          case 'id':
+            matchesSearch = pet.id.toString() === searchTerm;
+            break;
+          case 'nombre':
+            matchesSearch = pet.nombre.toLowerCase().includes(searchTermLower);
+            break;
+          default: // 'todo'
+            matchesSearch = pet.id.toString() === searchTerm ||
+              pet.nombre.toLowerCase().includes(searchTermLower);
+        }
+      }
+      const matchesSpecies = !speciesValue || pet.especie === speciesValue;
+      const matchesClient = !clientValue || pet.cliente_id === parseInt(clientValue);
+      return matchesSearch && matchesSpecies && matchesClient;
+    });
+
+    currentPage = 1;
+    renderTable();
+  }
+
+  // Render table
+  function renderTable() {
+    if (filteredPets.length === 0) {
+      tableContainer.classList.add('hidden');
+      emptyState.classList.remove('hidden');
+      paginationContainer.classList.add('hidden');
+      paginationTop.classList.add('hidden');
+      return;
+    }
+
+    emptyState.classList.add('hidden');
+    tableContainer.classList.remove('hidden');
+
+    const totalPages = Math.ceil(filteredPets.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, filteredPets.length);
+    const paginatedPets = filteredPets.slice(startIndex, endIndex);
+
+    if (filteredPets.length > itemsPerPage) {
+      paginationContainer.classList.remove('hidden');
+      paginationContainer.classList.add('flex');
+      paginationTop.classList.remove('hidden');
+      paginationTop.classList.add('flex');
+
+      showingFromEls.forEach(el => el.textContent = (startIndex + 1).toString());
+      showingToEls.forEach(el => el.textContent = endIndex.toString());
+      totalItemsEls.forEach(el => el.textContent = filteredPets.length.toString());
+      currentPageDisplays.forEach(el => el.textContent = currentPage.toString());
+      totalPagesDisplays.forEach(el => el.textContent = totalPages.toString());
+      prevPageBtns.forEach(btn => btn.disabled = currentPage === 1);
+      nextPageBtns.forEach(btn => btn.disabled = currentPage === totalPages);
+    } else {
+      paginationContainer.classList.add('hidden');
+      paginationTop.classList.add('hidden');
+    }
+
+    petsTableBody.innerHTML = paginatedPets.map(pet => `
+      <tr class="hover:bg-black/[0.02] transition-colors cursor-pointer" data-pet-id="${pet.id}" oncontextmenu="event.preventDefault(); showPetContextMenu(event, ${pet.id}, '${pet.nombre.replace(/'/g, "\\'")}')">
+        <td class="px-4 md:px-6 py-4 text-sm hidden md:table-cell" style="color: #9a8b7c;">#${pet.id}</td>
+        <td class="px-4 md:px-6 py-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-full ${speciesColors[pet.especie] || 'bg-gray-500/20'} flex items-center justify-center flex-shrink-0">
+              <span class="text-lg">${speciesEmojis[pet.especie] || '🐾'}</span>
+            </div>
+            <div class="min-w-0">
+              <p class="font-medium truncate" style="color: #0f172a;">${pet.nombre}</p>
+              <p class="text-sm truncate" style="color: #9a8b7c;">${pet.raza || '-'}</p>
+            </div>
+          </div>
+        </td>
+        <td class="px-4 md:px-6 py-4">
+          <span class="px-2 py-1 rounded-full text-xs font-medium ${speciesBadgeColors[pet.especie] || 'bg-gray-500/20 text-gray-300'}">${pet.especie}</span>
+        </td>
+        <td class="px-4 md:px-6 py-4 hidden lg:table-cell">
+          <p class="text-sm" style="color: #0f172a;">${pet.nombre_dueno}</p>
+          <p class="text-xs" style="color: #94a3b8;">${pet.telefono_dueno}</p>
+        </td>
+        <td class="px-4 md:px-6 py-4 text-sm hidden xl:table-cell" style="color: #9a8b7c;">
+          ${pet.edad || '-'} / ${pet.peso || '-'}
+        </td>
+        <td class="px-4 md:px-6 py-4">
+          <div class="flex justify-end space-x-1">
+            <button onclick="openBitacora(${pet.id}, '${pet.nombre}')" class="hidden p-2 text-blue-400 hover:text-blue-600 hover:bg-black/5 rounded-lg transition-colors" title="Bitácora">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+            </button>
+            <button onclick="editPet(${pet.id})" class="p-2 text-blue-400 hover:text-blue-600 hover:bg-black/5 rounded-lg transition-colors" title="Editar">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+              </svg>
+            </button>
+            <button onclick="deletePetPrompt(${pet.id})" class="p-2 text-red-500 hover:text-red-600 hover:bg-black/5 rounded-lg transition-colors" title="Eliminar">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // Modal functions
+  function openPetModal(title: string, pet?: MascotaConDueno) {
+    petModalTitle.textContent = title;
+    petForm.reset();
+    petFormError.classList.add('hidden');
+    razasList.innerHTML = '';
+    clienteSearch.value = '';
+    clienteIdHidden.value = '';
+    selectedClientInfo.classList.add('hidden');
+    clienteDropdown.classList.add('hidden');
+
+    if (pet) {
+      petIdInput.value = pet.id.toString();
+      petClienteIdInput.value = pet.cliente_id.toString();
+      clienteIdHidden.value = pet.cliente_id.toString();
+      clienteSearch.value = pet.nombre_dueno;
+      selectedClientInfo.textContent = `✓ ${pet.nombre_dueno} - ${pet.telefono_dueno}`;
+      selectedClientInfo.classList.remove('hidden');
+      (petForm.elements.namedItem('nombre') as HTMLInputElement).value = pet.nombre;
+      especieInput.value = pet.especie;
+      updateBreeds(pet.especie);
+      razaInput.value = pet.raza || '';
+
+      // Parse edad (can be "X años", "Y meses", or "X años Y meses")
+      const edadStr = pet.edad || '';
+      const aniosMatch = edadStr.match(/(\d+)\s*años?/i);
+      const mesesMatch = edadStr.match(/(\d+)\s*mes(es)?/i);
+      if (aniosMatch) {
+        (petForm.elements.namedItem('edad_anios') as HTMLInputElement).value = aniosMatch[1];
+      }
+      if (mesesMatch) {
+        (petForm.elements.namedItem('edad_meses') as HTMLInputElement).value = mesesMatch[1];
+      }
+
+      // Parse peso
+      const pesoMatch = (pet.peso || '').match(/^([\d.]+)\s*(kg|g)?$/i);
+      if (pesoMatch) {
+        (petForm.elements.namedItem('peso_valor') as HTMLInputElement).value = pesoMatch[1];
+        (petForm.elements.namedItem('peso_unidad') as HTMLSelectElement).value = pesoMatch[2]?.toLowerCase() || 'kg';
+      }
+
+      (petForm.elements.namedItem('notas') as HTMLTextAreaElement).value = pet.notas || '';
+    } else {
+      petIdInput.value = '';
+      petClienteIdInput.value = '';
+      if (clienteIdFromUrl) {
+        const client = clients.find(c => c.id === parseInt(clienteIdFromUrl));
+        if (client) {
+          clienteIdHidden.value = clienteIdFromUrl;
+          clienteSearch.value = client.nombre;
+          selectedClientInfo.textContent = `✓ ${client.nombre} - ${client.telefono}`;
+          selectedClientInfo.classList.remove('hidden');
+        }
+      }
+    }
+
+    petModal.classList.remove('hidden');
+    petModal.classList.add('flex');
+  }
+
+  function closePetModalFn() {
+    petModal.classList.add('hidden');
+    petModal.classList.remove('flex');
+  }
+
+  // Global functions
+  (window as any).editPet = (id: number) => {
+    const pet = pets.find(p => p.id === id);
+    if (pet) openPetModal('Editar Mascota', pet);
+  };
+
+  (window as any).deletePetPrompt = (id: number) => {
+    deletePetId = id;
+    deleteModal.classList.remove('hidden');
+    deleteModal.classList.add('flex');
+  };
+
+  (window as any).openBitacora = async (id: number, name: string) => {
+    currentBitacoraMascotaId = id;
+    bitacoraMascotaIdInput.value = id.toString();
+    bitacoraPetName.textContent = name;
+    bitacoraForm.reset();
+    bitacoraFormError.classList.add('hidden');
+    bitacoraModal.classList.remove('hidden');
+    bitacoraModal.classList.add('flex');
+    await loadBitacora(id);
+  };
+
+  // Bitacora functions
+  async function loadBitacora(mascotaId: number) {
+    bitacoraLoading.classList.remove('hidden');
+    bitacoraEmpty.classList.add('hidden');
+    bitacoraList.classList.add('hidden');
+
+    try {
+      const entradas = await listarBitacora(mascotaId);
+      if (entradas.length === 0) {
+        bitacoraEmpty.classList.remove('hidden');
+      } else {
+        renderBitacora(entradas);
+        bitacoraList.classList.remove('hidden');
+      }
+    } catch (error) {
+      console.error('Error loading bitacora:', error);
+    } finally {
+      bitacoraLoading.classList.add('hidden');
+    }
+  }
+
+  function renderBitacora(entradas: Bitacora[]) {
+    bitacoraList.innerHTML = entradas.map(e => `
+      <div class="bg-white rounded-xl p-3 md:p-4" style="border: 1px solid #e2e8f0;">
+        <div class="flex justify-between items-start gap-2 mb-2">
+          <span class="text-sm font-medium" style="color: #3b82f6;">${formatDateTime(e.fecha)}</span>
+          <button onclick="deleteBitacoraEntry(${e.id})" class="text-red-500 hover:text-red-600">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+          </button>
+        </div>
+        <p class="whitespace-pre-wrap" style="color: #0f172a;">${e.descripcion}</p>
+      </div>
+    `).join('');
+  }
+
+  function formatDateTime(dateStr: string): string {
+    const date = new Date(dateStr);
+    return date.toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  }
+
+  (window as any).deleteBitacoraEntry = async (entradaId: number) => {
+    if (!currentBitacoraMascotaId) return;
+    if (!confirm('¿Eliminar esta entrada?')) return;
+    try {
+      await eliminarEntradaBitacora(currentBitacoraMascotaId, entradaId);
+      await loadBitacora(currentBitacoraMascotaId);
+    } catch (error) {
+      console.error('Error deleting bitacora entry:', error);
+    }
+  };
+
+  // Event listeners
+  logoutBtn.addEventListener('click', () => {
+    clearSession();
+    window.location.href = '/';
+  });
+
+  addPetBtn.addEventListener('click', () => openPetModal('Nueva Mascota'));
+
+  closePetModal.addEventListener('click', closePetModalFn);
+  cancelPetBtn.addEventListener('click', closePetModalFn);
+  petModal.addEventListener('click', (e) => {
+    if (e.target === petModal) closePetModalFn();
+  });
+
+  searchInput.addEventListener('input', applyFilters);
+  searchType.addEventListener('change', applyFilters);
+  speciesFilter.addEventListener('change', applyFilters);
+
+  // Pagination (for both top and bottom)
+  prevPageBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (currentPage > 1) { currentPage--; renderTable(); }
+    });
+  });
+  nextPageBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const totalPages = Math.ceil(filteredPets.length / itemsPerPage);
+      if (currentPage < totalPages) { currentPage++; renderTable(); }
+    });
+  });
+
+  // Pet form submit
+  petForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    petFormError.classList.add('hidden');
+
+    const formData = new FormData(petForm);
+    const clienteIdStr = clienteIdHidden.value;
+
+    if (!clienteIdStr) {
+      petFormErrorText.textContent = 'Debes seleccionar un dueño';
+      petFormError.classList.remove('hidden');
+      return;
+    }
+
+    const clienteId = parseInt(clienteIdStr);
+    const edadAnios = formData.get('edad_anios') as string;
+    const edadMeses = formData.get('edad_meses') as string;
+    const pesoValor = formData.get('peso_valor') as string;
+    const pesoUnidad = formData.get('peso_unidad') as string;
+
+    // Build age string
+    let edadStr = '';
+    if (edadAnios && parseInt(edadAnios) > 0) {
+      edadStr = `${edadAnios} año${parseInt(edadAnios) > 1 ? 's' : ''}`;
+    }
+    if (edadMeses && parseInt(edadMeses) > 0) {
+      if (edadStr) edadStr += ' ';
+      edadStr += `${edadMeses} mes${parseInt(edadMeses) > 1 ? 'es' : ''}`;
+    }
+
+    const data: MascotaCreate = {
+      nombre: formData.get('nombre') as string,
+      especie: formData.get('especie') as string,
+      raza: formData.get('raza') as string || undefined,
+      edad: edadStr || undefined,
+      peso: pesoValor ? `${pesoValor} ${pesoUnidad}` : undefined,
+      notas: formData.get('notas') as string || undefined,
+    };
+
+    try {
+      const id = petIdInput.value;
+      if (id) {
+        await actualizarMascota(parseInt(id), data);
+      } else {
+        await crearMascota(clienteId, data);
+      }
+      // Persist custom species/breed if new
+      persistCustomSpecies(data.especie);
+      if (data.raza) persistCustomBreed(data.especie, data.raza);
+      closePetModalFn();
+      loadData();
+    } catch (error) {
+      petFormErrorText.textContent = error instanceof Error ? error.message : 'Error al guardar';
+      petFormError.classList.remove('hidden');
+    }
+  });
+
+  // Delete modal
+  cancelDelete.addEventListener('click', () => {
+    deleteModal.classList.add('hidden');
+    deleteModal.classList.remove('flex');
+    deletePetId = null;
+  });
+
+  confirmDelete.addEventListener('click', async () => {
+    if (!deletePetId) return;
+    try {
+      await eliminarMascota(deletePetId);
+      deleteModal.classList.add('hidden');
+      deleteModal.classList.remove('flex');
+      deletePetId = null;
+      loadData();
+    } catch (error) {
+      console.error('Error deleting pet:', error);
+    }
+  });
+
+  // Bitacora modal
+  closeBitacora.addEventListener('click', () => {
+    bitacoraModal.classList.add('hidden');
+    bitacoraModal.classList.remove('flex');
+    currentBitacoraMascotaId = null;
+  });
+
+  bitacoraForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    bitacoraFormError.classList.add('hidden');
+    if (!currentBitacoraMascotaId) return;
+
+    const formData = new FormData(bitacoraForm);
+    const data: BitacoraCreate = {
+      tipo: 'Avance',
+      descripcion: formData.get('descripcion') as string,
+    };
+
+    try {
+      await crearEntradaBitacora(currentBitacoraMascotaId, data);
+      bitacoraForm.reset();
+      await loadBitacora(currentBitacoraMascotaId);
+    } catch (error) {
+      bitacoraFormErrorText.textContent = error instanceof Error ? error.message : 'Error al guardar';
+      bitacoraFormError.classList.remove('hidden');
+    }
+  });
+
+  // Pet context menu elements
+  const petContextMenu = document.getElementById('petContextMenu') as HTMLDivElement;
+  const ctxEditPet = document.getElementById('ctxEditPet') as HTMLButtonElement;
+  const ctxBitacora = document.getElementById('ctxBitacora') as HTMLButtonElement;
+  const ctxDeletePet = document.getElementById('ctxDeletePet') as HTMLButtonElement;
+  let contextPetName: string = '';
+
+  // Context menu with proper positioning
+  (window as any).showPetContextMenu = (e: MouseEvent, petId: number, petName: string) => {
+    e.preventDefault();
+    contextPetId = petId;
+    contextPetName = petName;
+
+    const menuWidth = 180;
+    const menuHeight = 140;
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    let x = e.clientX;
+    let y = e.clientY;
+
+    if (x + menuWidth > viewportWidth) x = viewportWidth - menuWidth - 10;
+    if (y + menuHeight > viewportHeight) y = viewportHeight - menuHeight - 10;
+    if (x < 10) x = 10;
+    if (y < 10) y = 10;
+
+    petContextMenu.style.left = `${x}px`;
+    petContextMenu.style.top = `${y}px`;
+    petContextMenu.classList.remove('hidden');
+  };
+
+  document.addEventListener('click', () => {
+    petContextMenu.classList.add('hidden');
+  });
+
+  document.addEventListener('scroll', () => {
+    petContextMenu.classList.add('hidden');
+  }, true);
+
+  ctxEditPet.addEventListener('click', () => {
+    if (contextPetId) {
+      (window as any).editPet(contextPetId);
+    }
+    petContextMenu.classList.add('hidden');
+  });
+
+  ctxBitacora.addEventListener('click', () => {
+    if (contextPetId && contextPetName) {
+      (window as any).openBitacora(contextPetId, contextPetName);
+    }
+    petContextMenu.classList.add('hidden');
+  });
+
+  ctxDeletePet.addEventListener('click', () => {
+    if (contextPetId) {
+      deletePetId = contextPetId;
+      deleteModal.classList.remove('hidden');
+      deleteModal.classList.add('flex');
+    }
+    petContextMenu.classList.add('hidden');
+  });
+
+  // Initial load
+  loadData();
+</script>

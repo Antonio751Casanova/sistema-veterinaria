@@ -1,0 +1,177 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Login - Sistema Veterinarias">
+  <main class="min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md animate-slide-up">
+      <!-- Card Container -->
+      <div class="bg-white rounded-2xl shadow-lg p-8" style="border: 1px solid #e2e8f0;">
+        <!-- Header -->
+        <div class="text-center mb-8">
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 mb-4">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+            </svg>
+          </div>
+          <h1 class="text-3xl font-bold mb-2" style="color: #1e293b;">Sistema Veterinarias</h1>
+          <p style="color: #94a3b8;">Ingresa a tu cuenta</p>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" class="space-y-6">
+          <!-- Email Field -->
+          <div>
+            <label for="email" class="block text-sm font-medium mb-2" style="color: #475569;">
+              Email
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5" style="color: #94a3b8;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
+                </svg>
+              </div>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                class="w-full pl-10 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                style="background: #ffffff; border: 1px solid #e2e8f0; color: #1e293b;"
+                placeholder="veterinaria@ejemplo.com"
+              />
+            </div>
+          </div>
+
+          <!-- Password Field -->
+          <div>
+            <label for="password" class="block text-sm font-medium mb-2" style="color: #475569;">
+              Contraseña
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5" style="color: #94a3b8;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
+              </div>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                required
+                class="w-full pl-10 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                style="background: #ffffff; border: 1px solid #e2e8f0; color: #1e293b;"
+                placeholder="••••••••"
+              />
+            </div>
+          </div>
+
+          <!-- Error Message -->
+          <div id="errorMessage" class="hidden p-4 bg-red-50 rounded-xl" style="border: 1px solid #fecaca;">
+            <p class="text-red-600 text-sm text-center" id="errorText"></p>
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            id="submitBtn"
+            class="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+          >
+            <span id="btnText">Iniciar Sesión</span>
+            <span id="btnLoader" class="hidden">
+              <svg class="animate-spin h-5 w-5 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </span>
+          </button>
+        </form>
+
+        <!-- Register Link -->
+        <div class="mt-6 pt-6 text-center" style="border-top: 1px solid #e2e8f0;">
+          <p class="text-sm mb-3" style="color: #94a3b8;">¿No tienes cuenta?</p>
+          <a
+            href="/registro"
+            class="inline-block w-full py-2 px-4 font-medium rounded-xl hover:bg-black/5 focus:outline-none transition-all duration-200 text-center"
+            style="background: #f8fafc; border: 1px solid #e2e8f0; color: #475569;"
+          >
+            Registrar Veterinaria
+          </a>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <p class="text-center text-sm mt-6" style="color: #94a3b8;">
+        Sistema de Veterinarias © 2026
+      </p>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out;
+  }
+</style>
+
+<script>
+  import { login, saveSession } from '../services/authService';
+
+  const form = document.getElementById('loginForm') as HTMLFormElement;
+  const submitBtn = document.getElementById('submitBtn') as HTMLButtonElement;
+  const btnText = document.getElementById('btnText') as HTMLSpanElement;
+  const btnLoader = document.getElementById('btnLoader') as HTMLSpanElement;
+  const errorMessage = document.getElementById('errorMessage') as HTMLDivElement;
+  const errorText = document.getElementById('errorText') as HTMLParagraphElement;
+
+  function setLoading(loading: boolean) {
+    submitBtn.disabled = loading;
+    btnText.classList.toggle('hidden', loading);
+    btnLoader.classList.toggle('hidden', !loading);
+  }
+
+  function showError(message: string) {
+    errorText.textContent = message;
+    errorMessage.classList.remove('hidden');
+  }
+
+  function hideError() {
+    errorMessage.classList.add('hidden');
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideError();
+    setLoading(true);
+
+    const formData = new FormData(form);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    try {
+      const response = await login({ email, password });
+
+      if (response.success && response.token && response.veterinaria) {
+        saveSession(response.token, response.veterinaria, response.usuario);
+        window.location.href = '/home';
+      } else {
+        showError('Error al iniciar sesión');
+      }
+    } catch (error) {
+      showError(error instanceof Error ? error.message : 'Error de conexión');
+    } finally {
+      setLoading(false);
+    }
+  });
+</script>

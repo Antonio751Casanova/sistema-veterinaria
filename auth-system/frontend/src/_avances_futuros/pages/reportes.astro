@@ -1,0 +1,1223 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Sidebar from '../components/Sidebar.astro';
+---
+
+<Layout title="Reportes - VetPets">
+  <div class="min-h-screen" style="background: #f1f5f9;">
+
+    <Sidebar />
+
+    <div class="lg:ml-64 min-h-screen transition-[margin] duration-200" data-main-content>
+      <!-- Top bar -->
+      <header class="bg-white/80 backdrop-blur-md border-b sticky top-0 z-30" style="border-color: #e8e0d8;">
+        <div class="px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <!-- Hamburger mobile -->
+            <button id="hamburgerBtn" class="lg:hidden p-2 rounded-lg transition-colors" style="color: #475569;">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+            </button>
+            <div>
+              <h1 class="text-xl md:text-2xl font-bold" style="color: #0f172a;">Reportes de Citas</h1>
+              <p class="text-sm" style="color: #9a8b7c;">Genera reportes personalizados y exportalos en PDF o Excel</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main -->
+      <main class="px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+
+        <!-- Filter Panel -->
+        <div class="bg-white rounded-2xl p-5 mb-6" style="border: 1px solid #e2e8f0;">
+          <h2 class="font-semibold mb-4 flex items-center gap-2" style="color: #0f172a;">
+            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"></path></svg>
+            Configurar Reporte
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <label class="block text-sm font-medium mb-2" style="color: #9a8b7c;">Fecha Desde *</label>
+              <input type="date" id="fechaDesde"
+                class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2" style="color: #9a8b7c;">Fecha Hasta *</label>
+              <input type="date" id="fechaHasta"
+                class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2" style="color: #9a8b7c;">Estado</label>
+              <select id="estadoReporte"
+                class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;">
+                <option value="" class="bg-white">Todos los estados</option>
+                <option value="confirmado" class="bg-white">Confirmado</option>
+                <option value="rechazado" class="bg-white">Rechazado</option>
+              </select>
+            </div>
+            <div class="relative">
+              <label class="block text-sm font-medium mb-2" style="color: #9a8b7c;">Tipo de Atencion</label>
+              <input type="text" id="tipoReporte" placeholder="Escribe o selecciona..." autocomplete="off"
+                class="w-full px-4 py-2.5 rounded-lg placeholder:text-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-blue-500" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;" />
+              <div id="tipoDropdown" class="absolute z-50 top-full left-0 right-0 mt-1 bg-white shadow-lg rounded-lg max-h-52 overflow-y-auto hidden" style="border: 1px solid #e2e8f0;"></div>
+            </div>
+          </div>
+          <div id="filterError" class="hidden mt-3 bg-red-50 rounded-lg px-4 py-2.5" style="border: 1px solid #fecaca;">
+            <p id="filterErrorText" class="text-red-600 text-sm"></p>
+          </div>
+          <div class="flex gap-3 mt-5">
+            <button id="generarReporteBtn"
+              class="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 flex items-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+              Generar Reporte
+            </button>
+            <button id="limpiarFiltrosBtn"
+              class="px-5 py-2.5 rounded-xl hover:bg-black/10 transition-colors flex items-center gap-2" style="background: rgba(0,0,0,0.04); border: 1px solid #e2e8f0; color: #475569;">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+              Limpiar
+            </button>
+          </div>
+        </div>
+
+        <!-- Report Section (hidden until generated) -->
+        <div id="reportSection" class="hidden space-y-6">
+
+          <!-- Report Info Banner -->
+          <div class="bg-blue-500/10 border border-blue-500/30 rounded-xl px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              </div>
+              <div>
+                <p class="font-medium text-sm" style="color: #0f172a;">Reporte generado exitosamente</p>
+                <p id="reportInfoText" class="text-blue-600 text-xs mt-0.5"></p>
+              </div>
+            </div>
+            <!-- Export Buttons -->
+            <div class="flex gap-3 flex-shrink-0">
+              <button id="exportPDFBtn"
+                class="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 text-sm font-semibold shadow-sm hover:shadow-md" style="background: #fef2f2; border: 1.5px solid #fca5a5; color: #dc2626;" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='#fef2f2'">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                Descargar PDF
+              </button>
+              <button id="exportExcelBtn"
+                class="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 text-sm font-semibold shadow-sm hover:shadow-md" style="background: #eff6ff; border: 1.5px solid #93c5fd; color: #2563eb;" onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#eff6ff'">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                Descargar Excel
+              </button>
+            </div>
+          </div>
+
+          <!-- Stats Cards -->
+          <div class="grid grid-cols-3 gap-3">
+            <div class="bg-white rounded-xl p-4" style="border: 1px solid #e2e8f0;">
+              <p class="text-xs mb-1" style="color: #9a8b7c;">Total Citas</p>
+              <p id="statTotal" class="text-2xl font-bold mt-1" style="color: #0f172a;">0</p>
+            </div>
+            <div class="bg-white rounded-xl p-4" style="border: 1px solid #e2e8f0;">
+              <p class="text-xs mb-1" style="color: #9a8b7c;">Confirmados</p>
+              <p id="statConfirmado" class="text-2xl font-bold text-blue-400 mt-1">0</p>
+            </div>
+            <div class="bg-white rounded-xl p-4" style="border: 1px solid #e2e8f0;">
+              <p class="text-xs mb-1" style="color: #9a8b7c;">Rechazados</p>
+              <p id="statRechazado" class="text-2xl font-bold text-red-400 mt-1">0</p>
+            </div>
+          </div>
+
+          <!-- Chart -->
+          <div id="chartSection" class="hidden bg-white rounded-2xl p-5" style="border: 1px solid #e2e8f0;">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
+              <div class="flex items-center justify-center">
+                <div style="position: relative; width: 160px; height: 160px;">
+                  <canvas id="chartEstado"></canvas>
+                </div>
+              </div>
+              <div class="md:col-span-3">
+                <canvas id="chartFecha" style="max-height: 160px;"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty state for filtered results -->
+          <div id="reportEmptyState" class="hidden bg-white rounded-2xl p-12 text-center" style="border: 1px solid #e2e8f0;">
+            <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style="background: #f1f5f9;">
+              <span class="text-3xl">📋</span>
+            </div>
+            <h3 class="text-lg font-medium" style="color: #0f172a;">Sin resultados</h3>
+            <p class="mt-2 text-sm" style="color: #9a8b7c;">No se encontraron citas con los filtros seleccionados</p>
+          </div>
+
+          <!-- Results Table -->
+          <div id="reportTableSection" class="bg-white rounded-2xl overflow-hidden" style="border: 1px solid #e2e8f0;">
+            <div class="px-5 py-4 flex items-center justify-between" style="border-bottom: 1px solid #e2e8f0;">
+              <h3 class="font-semibold text-sm" style="color: #0f172a;">Detalle de Citas</h3>
+              <span id="tableCountBadge" class="text-xs px-3 py-1 rounded-full" style="color: #9a8b7c; background: #f1f5f9;"></span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                  <tr>
+                    <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: #9a8b7c;">#</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: #9a8b7c;">Fecha / Hora</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: #9a8b7c;">Mascota</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: #9a8b7c;">Cliente</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: #9a8b7c;">Tipo de Atencion</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: #9a8b7c;">Estado</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider" style="color: #9a8b7c;">Costo</th>
+                  </tr>
+                </thead>
+                <tbody id="reportTableBody" class="divide-y divide-[#e2e8f0]"></tbody>
+              </table>
+            </div>
+            <!-- Pagination -->
+            <div id="reportPaginationContainer" class="hidden px-4 py-3" style="border-top: 1px solid #e2e8f0;">
+              <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="text-sm" style="color: #9a8b7c;">
+                  Mostrando <span id="showingFrom">1</span> a <span id="showingTo">15</span> de <span id="showingTotal">0</span> citas
+                </div>
+                <div class="flex items-center space-x-2">
+                  <button id="prevPageBtn" class="px-3 py-1.5 rounded-lg hover:bg-black/10 disabled:opacity-50 disabled:cursor-not-allowed" style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0;">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                  </button>
+                  <span class="text-sm px-3" style="color: #0f172a;"><span id="currentPageDisp">1</span> / <span id="totalPagesDisp">1</span></span>
+                  <button id="nextPageBtn" class="px-3 py-1.5 rounded-lg hover:bg-black/10 disabled:opacity-50 disabled:cursor-not-allowed" style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0;">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Initial placeholder -->
+        <div id="placeholderSection" class="py-20 text-center">
+          <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5" style="background: #f1f5f9; border: 1px solid #e2e8f0;">
+            <svg class="w-10 h-10" style="color: #94a3b8;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          </div>
+          <h3 class="text-lg font-medium" style="color: #9a8b7c;">Configura el reporte</h3>
+          <p class="text-sm mt-2" style="color: #94a3b8;">Selecciona el rango de fechas y haz clic en<br><span class="text-blue-400 font-medium">Generar Reporte</span> para visualizar y exportar</p>
+        </div>
+
+        <!-- Loading overlay -->
+        <div id="dataLoadingState" class="hidden py-20 text-center">
+          <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-400 mx-auto"></div>
+          <p class="mt-4" style="color: #9a8b7c;">Cargando datos...</p>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div id="toastNotification" class="fixed bottom-6 right-6 z-50 hidden items-center gap-2 text-white px-4 py-3 rounded-xl shadow-xl">
+    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+    <span id="toastText" class="text-sm font-medium"></span>
+  </div>
+
+  <!-- Export Loading Overlay -->
+  <div id="exportOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+    <div class="bg-white rounded-2xl w-full max-w-sm mx-4 p-8 text-center" style="border: 1px solid #e2e8f0;">
+      <div class="relative mx-auto w-14 h-14">
+        <div class="animate-spin rounded-full h-14 w-14 border-4 border-t-transparent" style="border-color: #e2e8f0; border-top-color: #3b82f6;"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <svg class="w-6 h-6" style="color: #3b82f6;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+          </svg>
+        </div>
+      </div>
+      <h3 id="exportOverlayTitle" class="text-lg font-semibold mt-5" style="color: #0f172a;">Generando archivo...</h3>
+      <p id="exportOverlayMsg" class="text-sm mt-2" style="color: #9a8b7c;">Por favor espera</p>
+      <div id="exportOverlayProgress" class="hidden mt-4">
+        <div class="w-full rounded-full h-2" style="background: #e2e8f0;">
+          <div id="exportProgressBar" class="h-2 rounded-full transition-all duration-300" style="background: linear-gradient(90deg, #3b82f6, #60a5fa); width: 0%;"></div>
+        </div>
+        <p id="exportProgressText" class="text-xs mt-2" style="color: #9a8b7c;">Preparando...</p>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  :global(body) {
+    background: #f1f5f9 !important;
+  }
+
+  /* ─── Report Status Badges ─── */
+  :global(.rpt-badge-confirmado) {
+    background: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #93c5fd;
+  }
+  :global(.rpt-badge-rechazado) {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+  }
+  :global(.rpt-badge-pendiente) {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fcd34d;
+  }
+  :global(.rpt-badge-default) {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+  }
+</style>
+
+<script>
+  import { listarCitas, type CitaConDetalles } from '../services/citaService';
+  import { getVetName, getUsuario, isAuthenticated, logout } from '../services/authService';
+
+  if (!isAuthenticated()) window.location.href = '/';
+  const _meReportes = getUsuario();
+  if (_meReportes?.rol === 'veterinario') { window.location.href = '/home'; }
+
+  // ─── Tipos de atencion catalog ───────────────────────────────────────────────
+  const TIPOS_ATENCION = [
+    'Consulta General','Consulta de Emergencia','Consulta de Seguimiento','Primera Consulta','Segunda Opinion',
+    'Vacunacion','Vacunacion Cachorro','Vacunacion Adulto','Vacunacion Antirabica','Refuerzo de Vacunas',
+    'Desparasitacion Interna','Desparasitacion Externa','Control de Pulgas y Garrapatas',
+    'Cirugia General','Cirugia de Emergencia','Esterilizacion','Castracion','Cirugia Ortopedica','Extraccion Dental','Cirugia de Tumor',
+    'Limpieza Dental','Revision Dental','Extraccion de Diente',
+    'Radiografia','Ecografia','Electrocardiograma','Analisis de Sangre','Analisis de Orina','Analisis de Heces','Citologia','Biopsia',
+    'Grooming','Bano y Corte','Corte de Unas','Limpieza de Oidos','Limpieza de Glandulas Anales',
+    'Control de Peso','Revision Geriatrica','Chequeo Preventivo','Control Prenatal','Control Postparto',
+    'Revision Post-operatoria','Retiro de Puntos','Curacion de Heridas',
+    'Hospitalizacion','Quimioterapia','Fisioterapia','Aplicacion de Medicamentos','Nebulizacion',
+    'Microchip','Certificado de Salud','Eutanasia','Cremacion',
+  ];
+
+  // ─── State ──────────────────────────────────────────────────────────────────
+  let todasCitas: CitaConDetalles[] = [];
+  let reportCitas: CitaConDetalles[] = [];
+  let currentPage = 1;
+  const PAGE_SIZE = 15;
+  let chartEstadoInstance: any = null;
+  let chartFechaInstance: any = null;
+  let librariesReady = false;
+  const SPLIT_THRESHOLD = 500;
+
+  // ─── DOM ─────────────────────────────────────────────────────────────────────
+  const sidebar            = document.getElementById('sidebar')              as HTMLElement;
+  const sidebarOverlay     = document.getElementById('sidebarOverlay')       as HTMLDivElement;
+  const hamburgerBtn       = document.getElementById('hamburgerBtn')         as HTMLButtonElement;
+  const sidebarVetName     = document.getElementById('sidebarVetName')       as HTMLParagraphElement;
+  const userAvatarEl       = document.getElementById('userAvatar')           as HTMLDivElement;
+  const vetNameEl          = document.getElementById('vetName')              as HTMLSpanElement;
+  const logoutBtn          = document.getElementById('logoutBtn')            as HTMLButtonElement;
+  const fechaDesdeInput    = document.getElementById('fechaDesde')           as HTMLInputElement;
+  const fechaHastaInput    = document.getElementById('fechaHasta')           as HTMLInputElement;
+  const estadoReporteEl    = document.getElementById('estadoReporte')        as HTMLSelectElement;
+  const tipoReporteEl      = document.getElementById('tipoReporte')          as HTMLInputElement;
+  const tipoDropdown       = document.getElementById('tipoDropdown')         as HTMLDivElement;
+  const filterError        = document.getElementById('filterError')          as HTMLDivElement;
+  const filterErrorText    = document.getElementById('filterErrorText')      as HTMLParagraphElement;
+  const generarBtn         = document.getElementById('generarReporteBtn')    as HTMLButtonElement;
+  const limpiarBtn         = document.getElementById('limpiarFiltrosBtn')    as HTMLButtonElement;
+  const reportSection      = document.getElementById('reportSection')        as HTMLDivElement;
+  const placeholderSection = document.getElementById('placeholderSection')   as HTMLDivElement;
+  const dataLoadingState   = document.getElementById('dataLoadingState')     as HTMLDivElement;
+  const reportInfoText     = document.getElementById('reportInfoText')       as HTMLParagraphElement;
+  const exportPDFBtn       = document.getElementById('exportPDFBtn')         as HTMLButtonElement;
+  const exportExcelBtn     = document.getElementById('exportExcelBtn')       as HTMLButtonElement;
+  const statTotal          = document.getElementById('statTotal')            as HTMLParagraphElement;
+  const statConfirmado     = document.getElementById('statConfirmado')       as HTMLParagraphElement;
+  const statRechazado      = document.getElementById('statRechazado')        as HTMLParagraphElement;
+  const chartSection       = document.getElementById('chartSection')         as HTMLDivElement;
+  const reportEmptyState   = document.getElementById('reportEmptyState')     as HTMLDivElement;
+  const reportTableSection = document.getElementById('reportTableSection')   as HTMLDivElement;
+  const reportTableBody    = document.getElementById('reportTableBody')      as HTMLTableSectionElement;
+  const tableCountBadge    = document.getElementById('tableCountBadge')      as HTMLSpanElement;
+  const paginationContainer = document.getElementById('reportPaginationContainer') as HTMLDivElement;
+  const prevPageBtn        = document.getElementById('prevPageBtn')          as HTMLButtonElement;
+  const nextPageBtn        = document.getElementById('nextPageBtn')          as HTMLButtonElement;
+  const currentPageDisp    = document.getElementById('currentPageDisp')      as HTMLSpanElement;
+  const totalPagesDisp     = document.getElementById('totalPagesDisp')       as HTMLSpanElement;
+  const showingFrom        = document.getElementById('showingFrom')          as HTMLSpanElement;
+  const showingTo          = document.getElementById('showingTo')            as HTMLSpanElement;
+  const showingTotal       = document.getElementById('showingTotal')         as HTMLSpanElement;
+  const toastEl            = document.getElementById('toastNotification')    as HTMLDivElement;
+  const toastText          = document.getElementById('toastText')            as HTMLSpanElement;
+  const exportOverlay      = document.getElementById('exportOverlay')        as HTMLDivElement;
+  const exportOverlayTitle = document.getElementById('exportOverlayTitle')   as HTMLHeadingElement;
+  const exportOverlayMsg   = document.getElementById('exportOverlayMsg')     as HTMLParagraphElement;
+  const exportOverlayProgress = document.getElementById('exportOverlayProgress') as HTMLDivElement;
+  const exportProgressBar  = document.getElementById('exportProgressBar')    as HTMLDivElement;
+  const exportProgressText = document.getElementById('exportProgressText')   as HTMLParagraphElement;
+
+  // ─── Constants ───────────────────────────────────────────────────────────────
+  const ESTADO_LABELS: Record<string,string> = {
+    confirmado: 'Confirmado', rechazado: 'Rechazado', pendiente: 'Pendiente'
+  };
+  const ESTADO_BADGES: Record<string,string> = {
+    confirmado: 'rpt-badge-confirmado',
+    rechazado:  'rpt-badge-rechazado',
+    pendiente:  'rpt-badge-pendiente'
+  };
+  const SPECIES_EMOJI: Record<string,string> = {
+    Perro:'🐕', Gato:'🐱', Ave:'🦜', Roedor:'🐹', Reptil:'🦎', Otro:'🐾'
+  };
+
+  // ─── Init ────────────────────────────────────────────────────────────────────
+  const vetName = getVetName() || 'Veterinaria';
+  vetNameEl.textContent = vetName;
+  if (sidebarVetName) sidebarVetName.textContent = vetName;
+  if (userAvatarEl) userAvatarEl.textContent = vetName.charAt(0).toUpperCase();
+
+  logoutBtn.addEventListener('click', () => { logout(); window.location.href = '/'; });
+
+  // Mobile sidebar toggle
+  hamburgerBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('-translate-x-full');
+    sidebarOverlay.classList.toggle('hidden');
+  });
+
+  sidebarOverlay.addEventListener('click', () => {
+    sidebar.classList.add('-translate-x-full');
+    sidebarOverlay.classList.add('hidden');
+  });
+
+  const today = new Date();
+  const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  fechaDesdeInput.value = firstOfMonth.toISOString().split('T')[0];
+  fechaHastaInput.value = today.toISOString().split('T')[0];
+
+  // ─── Tipo de Atencion dropdown ───────────────────────────────────────────────
+  function renderTipoDropdown() {
+    const term = tipoReporteEl.value.trim().toLowerCase();
+    const filtered = term.length === 0
+      ? TIPOS_ATENCION
+      : TIPOS_ATENCION.filter(t => t.toLowerCase().includes(term));
+
+    if (filtered.length === 0) {
+      tipoDropdown.innerHTML = '<div class="px-3 py-2 text-sm" style="color: #9a8b7c;">Sin coincidencias</div>';
+    } else {
+      tipoDropdown.innerHTML = filtered.map(t => {
+        const isSelected = t.toLowerCase() === tipoReporteEl.value.trim().toLowerCase();
+        return `<div class="px-3 py-2 hover:bg-black/5 cursor-pointer text-sm ${isSelected ? 'text-blue-400 bg-black/5' : ''}" style="${isSelected ? '' : 'color: #0f172a;'}" data-tipo="${t}">${t}</div>`;
+      }).join('');
+    }
+    tipoDropdown.classList.remove('hidden');
+  }
+
+  tipoReporteEl.addEventListener('focus', renderTipoDropdown);
+  tipoReporteEl.addEventListener('input', renderTipoDropdown);
+
+  tipoDropdown.addEventListener('click', (e) => {
+    const target = (e.target as HTMLElement).closest('[data-tipo]');
+    if (!target) return;
+    tipoReporteEl.value = target.getAttribute('data-tipo') || '';
+    tipoDropdown.classList.add('hidden');
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!tipoReporteEl.contains(e.target as Node) && !tipoDropdown.contains(e.target as Node)) {
+      tipoDropdown.classList.add('hidden');
+    }
+  });
+
+  // ─── Library loader ─────────────────────────────────────────────────────────
+  function loadScript(src: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
+      const s = document.createElement('script');
+      s.src = src;
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error(`No se pudo cargar: ${src}`));
+      document.head.appendChild(s);
+    });
+  }
+
+  async function ensureLibraries(): Promise<void> {
+    if (librariesReady) return;
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js');
+    await loadScript('https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js');
+    librariesReady = true;
+  }
+
+  // ─── Data ───────────────────────────────────────────────────────────────────
+  async function loadCitas() {
+    dataLoadingState.classList.remove('hidden');
+    placeholderSection.classList.add('hidden');
+    try {
+      todasCitas = await listarCitas();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      dataLoadingState.classList.add('hidden');
+      placeholderSection.classList.remove('hidden');
+    }
+  }
+
+  // ─── Helpers ─────────────────────────────────────────────────────────────────
+  function fmtDate(iso: string): string {
+    return new Date(iso).toLocaleDateString('es-ES', { day:'2-digit', month:'2-digit', year:'numeric' });
+  }
+  function fmtTime(iso: string): string {
+    return new Date(iso).toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit' });
+  }
+  function fmtDateLong(dateStr: string): string {
+    const [y,m,d] = dateStr.split('-');
+    return new Date(+y, +m - 1, +d).toLocaleDateString('es-ES', { day:'2-digit', month:'long', year:'numeric' });
+  }
+
+  function computeStats(citas: CitaConDetalles[]) {
+    return {
+      total: citas.length,
+      confirmado: citas.filter(c => c.estado === 'confirmado').length,
+      rechazado:  citas.filter(c => c.estado === 'rechazado').length,
+    };
+  }
+
+  // ─── Toast ───────────────────────────────────────────────────────────────────
+  function showToast(msg: string, type: 'success' | 'error' = 'success') {
+    toastText.textContent = msg;
+    toastEl.className = `fixed bottom-6 right-6 z-50 flex items-center gap-2 text-white px-4 py-3 rounded-xl shadow-xl ${type === 'success' ? 'bg-blue-600' : 'bg-red-600'}`;
+    toastEl.classList.remove('hidden');
+    setTimeout(() => toastEl.classList.add('hidden'), 3500);
+  }
+
+  // ─── Export Overlay ─────────────────────────────────────────────────────────
+  function showExportOverlay(title: string, message: string, showProgress = false) {
+    exportOverlayTitle.textContent = title;
+    exportOverlayMsg.textContent = message;
+    exportOverlayProgress.classList.toggle('hidden', !showProgress);
+    if (showProgress) {
+      exportProgressBar.style.width = '0%';
+      exportProgressText.textContent = 'Preparando archivos...';
+    }
+    exportOverlay.classList.remove('hidden');
+    exportOverlay.classList.add('flex');
+  }
+
+  function hideExportOverlay() {
+    exportOverlay.classList.add('hidden');
+    exportOverlay.classList.remove('flex');
+  }
+
+  function updateExportProgress(current: number, total: number, label?: string) {
+    const pct = Math.round((current / total) * 100);
+    exportProgressBar.style.width = `${pct}%`;
+    exportProgressText.textContent = label || `${current} de ${total} archivos generados`;
+  }
+
+  // ─── Data Splitting Helpers ─────────────────────────────────────────────────
+  function groupByMonth(citas: CitaConDetalles[]): Map<string, CitaConDetalles[]> {
+    const groups = new Map<string, CitaConDetalles[]>();
+    for (const c of citas) {
+      const key = c.fecha_hora.substring(0, 7); // "YYYY-MM"
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key)!.push(c);
+    }
+    return new Map([...groups.entries()].sort((a, b) => a[0].localeCompare(b[0])));
+  }
+
+  function monthLabel(yearMonth: string): string {
+    const [y, m] = yearMonth.split('-');
+    const date = new Date(+y, +m - 1, 1);
+    const label = date.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+    return label.charAt(0).toUpperCase() + label.slice(1);
+  }
+
+  async function ensureJSZip(): Promise<void> {
+    if (!(window as any).JSZip) {
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+    }
+  }
+
+  // ─── Filter & Generate ───────────────────────────────────────────────────────
+  function generarReporte() {
+    filterError.classList.add('hidden');
+    const desde = fechaDesdeInput.value;
+    const hasta = fechaHastaInput.value;
+
+    if (!desde || !hasta) {
+      filterErrorText.textContent = 'Por favor selecciona el rango de fechas (Desde y Hasta).';
+      filterError.classList.remove('hidden');
+      return;
+    }
+    if (desde > hasta) {
+      filterErrorText.textContent = 'La fecha "Desde" no puede ser posterior a la fecha "Hasta".';
+      filterError.classList.remove('hidden');
+      return;
+    }
+
+    const estado = estadoReporteEl.value;
+    const tipo   = tipoReporteEl.value.toLowerCase().trim();
+
+    reportCitas = todasCitas.filter(c => {
+      const fechaStr = c.fecha_hora.split('T')[0];
+      if (fechaStr < desde || fechaStr > hasta) return false;
+      if (estado && c.estado !== estado) return false;
+      if (tipo && !c.tipo_atencion.toLowerCase().includes(tipo)) return false;
+      return true;
+    });
+
+    reportCitas.sort((a,b) => new Date(a.fecha_hora).getTime() - new Date(b.fecha_hora).getTime());
+
+    const stats = computeStats(reportCitas);
+    reportInfoText.textContent = `${fmtDateLong(desde)} — ${fmtDateLong(hasta)}  ·  ${reportCitas.length} cita${reportCitas.length !== 1 ? 's' : ''} encontrada${reportCitas.length !== 1 ? 's' : ''}`;
+
+    statTotal.textContent      = stats.total.toString();
+    statConfirmado.textContent = stats.confirmado.toString();
+    statRechazado.textContent  = stats.rechazado.toString();
+
+    placeholderSection.classList.add('hidden');
+    reportSection.classList.remove('hidden');
+
+    currentPage = 1;
+    renderTable();
+    renderCharts(stats, desde, hasta);
+  }
+
+  // ─── Table ───────────────────────────────────────────────────────────────────
+  function renderTable() {
+    if (reportCitas.length === 0) {
+      reportEmptyState.classList.remove('hidden');
+      reportTableSection.classList.add('hidden');
+      chartSection.classList.add('hidden');
+      return;
+    }
+    reportEmptyState.classList.add('hidden');
+    reportTableSection.classList.remove('hidden');
+
+    const totalPages = Math.ceil(reportCitas.length / PAGE_SIZE);
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const end   = Math.min(start + PAGE_SIZE, reportCitas.length);
+    const items = reportCitas.slice(start, end);
+
+    tableCountBadge.textContent = `${reportCitas.length} citas`;
+
+    reportTableBody.innerHTML = items.map((c, idx) => {
+      const globalIdx = start + idx + 1;
+      const badge  = ESTADO_BADGES[c.estado]  || 'rpt-badge-default';
+      const label  = ESTADO_LABELS[c.estado]  || c.estado;
+      const emoji  = SPECIES_EMOJI[c.especie_mascota || ''] || '🐾';
+      return `
+        <tr class="hover:bg-black/[0.02] transition-colors">
+          <td class="px-4 py-3 text-sm" style="color: #94a3b8;">${globalIdx}</td>
+          <td class="px-4 py-3">
+            <div class="text-sm font-medium" style="color: #0f172a;">${fmtDate(c.fecha_hora)}</div>
+            <div class="text-xs" style="color: #9a8b7c;">${fmtTime(c.fecha_hora)}</div>
+          </td>
+          <td class="px-4 py-3">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">${emoji}</span>
+              <div>
+                <div class="text-sm font-medium" style="color: #0f172a;">${c.nombre_mascota || '-'}</div>
+                <div class="text-xs" style="color: #9a8b7c;">${c.especie_mascota || ''}</div>
+              </div>
+            </div>
+          </td>
+          <td class="px-4 py-3">
+            <div class="text-sm" style="color: #0f172a;">${c.nombre_cliente || '-'}</div>
+            ${c.telefono_cliente ? `<div class="text-xs" style="color: #9a8b7c;">${c.telefono_cliente}</div>` : ''}
+          </td>
+          <td class="px-4 py-3 text-sm" style="color: #0f172a;">${c.tipo_atencion}</td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-1 rounded-full text-xs font-medium ${badge}">${label}</span>
+          </td>
+          <td class="px-4 py-3 text-sm text-right" style="color: #0f172a;">${c.costo ? `$${parseFloat(c.costo).toFixed(2)}` : '-'}</td>
+        </tr>`;
+    }).join('');
+
+    if (totalPages > 1) {
+      paginationContainer.classList.remove('hidden');
+      currentPageDisp.textContent = currentPage.toString();
+      totalPagesDisp.textContent  = totalPages.toString();
+      showingFrom.textContent     = (start + 1).toString();
+      showingTo.textContent       = end.toString();
+      showingTotal.textContent    = reportCitas.length.toString();
+      prevPageBtn.disabled = currentPage === 1;
+      nextPageBtn.disabled = currentPage === totalPages;
+    } else {
+      paginationContainer.classList.add('hidden');
+    }
+  }
+
+  prevPageBtn.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderTable(); } });
+  nextPageBtn.addEventListener('click', () => {
+    const tp = Math.ceil(reportCitas.length / PAGE_SIZE);
+    if (currentPage < tp) { currentPage++; renderTable(); }
+  });
+
+  // ─── Charts ──────────────────────────────────────────────────────────────────
+  function renderCharts(stats: ReturnType<typeof computeStats>, desde: string, hasta: string) {
+    const Chart = (window as any).Chart;
+    if (!Chart || reportCitas.length === 0) {
+      chartSection.classList.add('hidden');
+      return;
+    }
+
+    chartSection.classList.remove('hidden');
+
+    // Doughnut: confirmado vs rechazado
+    const dCanvas = document.getElementById('chartEstado') as HTMLCanvasElement;
+    if (chartEstadoInstance) chartEstadoInstance.destroy();
+    chartEstadoInstance = new Chart(dCanvas, {
+      type: 'doughnut',
+      data: {
+        labels: ['Confirmado', 'Rechazado'],
+        datasets: [{
+          data: [stats.confirmado, stats.rechazado],
+          backgroundColor: ['rgba(16,185,129,0.8)','rgba(239,68,68,0.8)'],
+          borderColor: ['rgba(16,185,129,1)','rgba(239,68,68,1)'],
+          borderWidth: 1,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: { position: 'bottom', labels: { color: '#9a8b7c', font: { size: 11 }, padding: 8 } },
+        },
+        cutout: '65%',
+      }
+    });
+
+    // Bar chart: citas per date
+    const dateMap = new Map<string, number>();
+    reportCitas.forEach(c => {
+      const d = c.fecha_hora.split('T')[0];
+      dateMap.set(d, (dateMap.get(d) || 0) + 1);
+    });
+
+    const sortedDates = Array.from(dateMap.keys()).sort();
+    let labels: string[];
+    let values: number[];
+
+    if (sortedDates.length > 30) {
+      const weekMap = new Map<string, number>();
+      sortedDates.forEach(d => {
+        const dt = new Date(d + 'T12:00:00');
+        const monday = new Date(dt);
+        monday.setDate(dt.getDate() - dt.getDay() + 1);
+        const key = monday.toISOString().split('T')[0];
+        weekMap.set(key, (weekMap.get(key) || 0) + (dateMap.get(d) || 0));
+      });
+      const sortedWeeks = Array.from(weekMap.keys()).sort();
+      labels = sortedWeeks.map(w => `Sem. ${fmtDate(w)}`);
+      values = sortedWeeks.map(w => weekMap.get(w) || 0);
+    } else {
+      labels = sortedDates.map(d => fmtDate(d));
+      values = sortedDates.map(d => dateMap.get(d) || 0);
+    }
+
+    const bCanvas = document.getElementById('chartFecha') as HTMLCanvasElement;
+    if (chartFechaInstance) chartFechaInstance.destroy();
+    chartFechaInstance = new Chart(bCanvas, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Citas',
+          data: values,
+          backgroundColor: 'rgba(16,185,129,0.6)',
+          borderColor: 'rgba(16,185,129,1)',
+          borderWidth: 1,
+          borderRadius: 4,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: '#9a8b7c', font: { size: 10 }, maxRotation: 45 }, grid: { color: 'rgba(0,0,0,0.06)' } },
+          y: { ticks: { color: '#9a8b7c', stepSize: 1 }, grid: { color: 'rgba(0,0,0,0.06)' }, beginAtZero: true },
+        },
+      }
+    });
+  }
+
+  // ─── PDF Export ──────────────────────────────────────────────────────────────
+  function buildPDFDocument(
+    jsPDFClass: any,
+    citas: CitaConDetalles[],
+    clinicName: string,
+    periodLabel: string,
+    genDate: string
+  ): any {
+    const doc = new jsPDFClass({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    const W = doc.internal.pageSize.getWidth();
+    const H = doc.internal.pageSize.getHeight();
+    const stats = computeStats(citas);
+
+    // ── Header band ──
+    doc.setFillColor(15, 118, 110);
+    doc.rect(0, 0, W, 40, 'F');
+    doc.setFillColor(20, 184, 166);
+    doc.rect(0, 38, W, 2, 'F');
+
+    doc.setFontSize(17);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(255, 255, 255);
+    doc.text(clinicName, 12, 16);
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(167, 243, 208);
+    doc.text('REPORTE DE CITAS', 12, 24);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(204, 251, 241);
+    doc.text(`Período: ${periodLabel}`, 12, 32);
+    doc.text(`Generado: ${genDate}`, W - 10, 32, { align: 'right' });
+
+    // ── Stats row ──
+    const pdfStats = [
+      { label: 'TOTAL',       value: stats.total,      r: 15, g: 118, b: 110 },
+      { label: 'CONFIRMADOS', value: stats.confirmado, r: 5,   g: 150, b: 105 },
+      { label: 'RECHAZADOS',  value: stats.rechazado,  r: 220, g: 38,  b: 38  },
+    ];
+    const bw = (W - 20) / pdfStats.length;
+    pdfStats.forEach((s, i) => {
+      const bx = 10 + i * bw;
+      doc.setFillColor(s.r, s.g, s.b);
+      doc.roundedRect(bx, 44, bw - 2, 16, 1.5, 1.5, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(13);
+      doc.setFont('helvetica', 'bold');
+      doc.text(s.value.toString(), bx + (bw - 2) / 2, 50, { align: 'center' });
+      doc.setFontSize(6.5);
+      doc.setFont('helvetica', 'normal');
+      doc.text(s.label, bx + (bw - 2) / 2, 57, { align: 'center' });
+    });
+
+    // ── Table ──
+    const ESTADO_COLORS_PDF: Record<string, [number,number,number]> = {
+      confirmado: [  5, 150, 105],
+      rechazado:  [220,  38,  38],
+    };
+
+    const head = [['#', 'Fecha', 'Hora', 'Mascota', 'Especie', 'Cliente', 'Telefono', 'Tipo Atencion', 'Estado', 'Costo']];
+    const body = citas.map((c, i) => [
+      (i + 1).toString(),
+      fmtDate(c.fecha_hora),
+      fmtTime(c.fecha_hora),
+      c.nombre_mascota  || '-',
+      c.especie_mascota || '-',
+      c.nombre_cliente  || '-',
+      c.telefono_cliente|| '-',
+      c.tipo_atencion,
+      ESTADO_LABELS[c.estado] || c.estado,
+      c.costo ? `$${parseFloat(c.costo).toFixed(2)}` : '-',
+    ]);
+
+    const usableW = W - 20;
+    (doc as any).autoTable({
+      startY: 64,
+      head,
+      body,
+      theme: 'grid',
+      tableWidth: usableW,
+      styles: {
+        fontSize: 7.5,
+        cellPadding: { top: 2, right: 2, bottom: 2, left: 2 },
+        overflow: 'linebreak',
+        font: 'helvetica',
+        textColor: [30, 41, 59],
+        lineColor: [226, 232, 240],
+        lineWidth: 0.15,
+      },
+      headStyles: {
+        fillColor: [15, 118, 110],
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
+        fontSize: 7.5,
+        halign: 'center',
+        cellPadding: { top: 2.5, right: 2, bottom: 2.5, left: 2 },
+      },
+      alternateRowStyles: { fillColor: [248, 250, 252] },
+      columnStyles: {
+        0: { cellWidth: 8,  halign: 'center' },
+        1: { cellWidth: 20, halign: 'center' },
+        2: { cellWidth: 12, halign: 'center' },
+        3: { cellWidth: 30 },
+        4: { cellWidth: 16 },
+        5: { cellWidth: 35 },
+        6: { cellWidth: 22 },
+        7: { cellWidth: 40 },
+        8: { cellWidth: 20, halign: 'center' },
+        9: { cellWidth: 16, halign: 'right'  },
+      },
+      didParseCell: (data: any) => {
+        if (data.section === 'body' && data.column.index === 8) {
+          const cita = citas[data.row.index];
+          const col  = ESTADO_COLORS_PDF[cita?.estado];
+          if (col) { data.cell.styles.textColor = col; data.cell.styles.fontStyle = 'bold'; }
+        }
+      },
+      margin: { left: 10, right: 10 },
+      didDrawPage: (data: any) => {
+        const totalPages = (doc as any).internal.getNumberOfPages();
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(148, 163, 184);
+        doc.text(
+          `${clinicName}  ·  Reporte de Citas  ·  Página ${data.pageNumber} de ${totalPages}`,
+          W / 2, H - 5, { align: 'center' }
+        );
+        doc.setFillColor(15, 118, 110);
+        doc.rect(0, H - 3, W, 3, 'F');
+      },
+    });
+
+    return doc;
+  }
+
+  async function exportarPDFSplit(
+    jsPDFClass: any,
+    clinicName: string,
+    desde: string,
+    hasta: string,
+    genDate: string
+  ) {
+    await ensureJSZip();
+    const JSZip = (window as any).JSZip;
+    if (!JSZip) throw new Error('JSZip no disponible');
+
+    const monthGroups = groupByMonth(reportCitas);
+    const totalFiles = monthGroups.size;
+
+    showExportOverlay(
+      'Generando PDFs...',
+      `Se generarán ${totalFiles} archivo${totalFiles !== 1 ? 's' : ''} organizados por mes`,
+      true
+    );
+
+    const zip = new JSZip();
+    let fileIndex = 0;
+
+    for (const [yearMonth, citas] of monthGroups) {
+      fileIndex++;
+      updateExportProgress(fileIndex, totalFiles, `Generando ${monthLabel(yearMonth)}... (${fileIndex}/${totalFiles})`);
+
+      const periodLabel = monthLabel(yearMonth);
+      const doc = buildPDFDocument(jsPDFClass, citas, clinicName, periodLabel, genDate);
+      const pdfBuffer = doc.output('arraybuffer');
+      zip.file(`reporte-citas_${yearMonth}.pdf`, pdfBuffer);
+
+      await new Promise(resolve => setTimeout(resolve, 50));
+    }
+
+    updateExportProgress(totalFiles, totalFiles, 'Comprimiendo archivos ZIP...');
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+
+    const url = URL.createObjectURL(zipBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `reporte-citas_${desde}_${hasta}.zip`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showToast(`ZIP descargado con ${totalFiles} archivo${totalFiles !== 1 ? 's' : ''} PDF`);
+  }
+
+  async function exportarPDF() {
+    if (reportCitas.length === 0) { showToast('No hay datos para exportar', 'error'); return; }
+
+    exportPDFBtn.disabled = true;
+    exportExcelBtn.disabled = true;
+
+    try {
+      await ensureLibraries();
+      const { jsPDF } = (window as any).jspdf;
+      const clinicName = getVetName() || 'Veterinaria';
+      const desde = fechaDesdeInput.value;
+      const hasta = fechaHastaInput.value;
+      const genDate = new Date().toLocaleString('es-ES', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+
+      if (reportCitas.length > SPLIT_THRESHOLD) {
+        await exportarPDFSplit(jsPDF, clinicName, desde, hasta, genDate);
+      } else {
+        showExportOverlay('Generando PDF...', 'Por favor espera mientras se prepara tu reporte');
+        const periodLabel = `${fmtDateLong(desde)}  —  ${fmtDateLong(hasta)}`;
+        const doc = buildPDFDocument(jsPDF, reportCitas, clinicName, periodLabel, genDate);
+        const fname = `reporte-citas_${desde}_${hasta}.pdf`;
+        doc.save(fname);
+        showToast(`PDF descargado: ${fname}`);
+      }
+    } catch (err: any) {
+      console.error(err);
+      showToast('Error al generar el PDF', 'error');
+    } finally {
+      hideExportOverlay();
+      exportPDFBtn.disabled = false;
+      exportExcelBtn.disabled = false;
+      exportPDFBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg> Descargar PDF`;
+    }
+  }
+
+  // ─── Excel Export ────────────────────────────────────────────────────────────
+  function buildExcelWorksheet(
+    wb: any,
+    sheetName: string,
+    citas: CitaConDetalles[],
+    clinicName: string,
+    periodLabel: string,
+    genDate: string
+  ) {
+    const ws = wb.addWorksheet(sheetName, {
+      properties: { tabColor: { argb: 'FF0F766E' } },
+      pageSetup: {
+        paperSize: 9, orientation: 'landscape',
+        fitToPage: true, fitToWidth: 1, fitToHeight: 0,
+        margins: { left: 0.5, right: 0.5, top: 0.75, bottom: 0.75, header: 0.3, footer: 0.3 }
+      }
+    });
+
+    const stats = computeStats(citas);
+
+    ws.columns = [
+      { key: 'num',      width: 6  },
+      { key: 'fecha',    width: 14 },
+      { key: 'hora',     width: 8  },
+      { key: 'mascota',  width: 20 },
+      { key: 'especie',  width: 14 },
+      { key: 'cliente',  width: 26 },
+      { key: 'telefono', width: 16 },
+      { key: 'tipo',     width: 30 },
+      { key: 'estado',   width: 14 },
+      { key: 'costo',    width: 12 },
+    ];
+
+    function fill(cell: any, argb: string) {
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb } };
+    }
+    function font(cell: any, opts: any) {
+      cell.font = { name: 'Calibri', ...opts };
+    }
+
+    // Row 1: Clinic Name
+    ws.mergeCells('A1:J1');
+    const r1 = ws.getRow(1); r1.height = 34;
+    const c1 = ws.getCell('A1');
+    c1.value = clinicName;
+    fill(c1, 'FF0F766E');
+    font(c1, { bold: true, size: 18, color: { argb: 'FFFFFFFF' } });
+    c1.alignment = { vertical: 'middle', horizontal: 'left', indent: 1 };
+
+    // Row 2: Title
+    ws.mergeCells('A2:J2');
+    const r2 = ws.getRow(2); r2.height = 22;
+    const c2 = ws.getCell('A2');
+    c2.value = 'REPORTE DE CITAS';
+    fill(c2, 'FF0D9488');
+    font(c2, { bold: true, size: 12, color: { argb: 'FFFFFFFF' } });
+    c2.alignment = { vertical: 'middle', horizontal: 'left', indent: 1 };
+
+    // Row 3: Period + Generated
+    ws.mergeCells('A3:F3');
+    ws.mergeCells('G3:J3');
+    const r3 = ws.getRow(3); r3.height = 18;
+    const c3a = ws.getCell('A3');
+    c3a.value = `Período: ${periodLabel}`;
+    fill(c3a, 'FFF0FDFA');
+    font(c3a, { size: 10, color: { argb: 'FF134E4A' } });
+    c3a.alignment = { vertical: 'middle', indent: 1 };
+    const c3b = ws.getCell('G3');
+    c3b.value = `Generado: ${genDate}`;
+    fill(c3b, 'FFF0FDFA');
+    font(c3b, { size: 9, italic: true, color: { argb: 'FF64748B' } });
+    c3b.alignment = { vertical: 'middle', horizontal: 'right', indent: 1 };
+
+    // Row 4: spacer
+    ws.getRow(4).height = 6;
+
+    // Rows 5-6: Stats
+    const xlStats = [
+      { col:'A', label:'TOTAL',       value: stats.total,      bg:'FF0F766E', vfg:'FF0F766E' },
+      { col:'B', label:'CONFIRMADOS', value: stats.confirmado, bg:'FF10B981', vfg:'FF059669' },
+      { col:'C', label:'RECHAZADOS',  value: stats.rechazado,  bg:'FFEF4444', vfg:'FFDC2626' },
+    ];
+    ws.getRow(5).height = 16;
+    ws.getRow(6).height = 24;
+    xlStats.forEach(s => {
+      const lc = ws.getCell(`${s.col}5`);
+      lc.value = s.label;
+      fill(lc, s.bg);
+      font(lc, { bold: true, size: 8, color: { argb: 'FFFFFFFF' } });
+      lc.alignment = { vertical: 'middle', horizontal: 'center' };
+
+      const vc = ws.getCell(`${s.col}6`);
+      vc.value = s.value;
+      fill(vc, 'FFFCFCFC');
+      font(vc, { bold: true, size: 16, color: { argb: s.vfg } });
+      vc.alignment = { vertical: 'middle', horizontal: 'center' };
+      vc.border = { bottom: { style: 'medium', color: { argb: s.bg } } };
+    });
+
+    // Row 7: spacer
+    ws.getRow(7).height = 8;
+
+    // Row 8: Table Headers
+    const headers = ['#', 'Fecha', 'Hora', 'Mascota', 'Especie', 'Cliente', 'Telefono', 'Tipo Atencion', 'Estado', 'Costo'];
+    const r8 = ws.getRow(8); r8.height = 20;
+    headers.forEach((h, i) => {
+      const cell = r8.getCell(i + 1);
+      cell.value = h;
+      fill(cell, 'FF0F766E');
+      font(cell, { bold: true, size: 10, color: { argb: 'FFFFFFFF' } });
+      cell.alignment = { vertical: 'middle', horizontal: i === 0 || i === 2 ? 'center' : 'left', indent: i > 0 && i !== 2 ? 1 : 0 };
+      cell.border = { bottom: { style: 'medium', color: { argb: 'FF14B8A6' } } };
+    });
+
+    // Data rows
+    const ESTADO_ARGB: Record<string,string> = {
+      confirmado: 'FF059669', rechazado: 'FFDC2626'
+    };
+
+    citas.forEach((c, i) => {
+      const rowNum = 9 + i;
+      const row = ws.getRow(rowNum);
+      row.height = 15;
+      const isAlt = i % 2 === 1;
+      const bg = isAlt ? 'FFF8FAFC' : 'FFFFFFFF';
+
+      const vals: any[] = [
+        i + 1,
+        fmtDate(c.fecha_hora),
+        fmtTime(c.fecha_hora),
+        c.nombre_mascota  || '-',
+        c.especie_mascota || '-',
+        c.nombre_cliente  || '-',
+        c.telefono_cliente|| '-',
+        c.tipo_atencion,
+        ESTADO_LABELS[c.estado] || c.estado,
+        c.costo ? parseFloat(c.costo) : null,
+      ];
+
+      vals.forEach((v, j) => {
+        const cell = row.getCell(j + 1);
+        cell.value = v;
+        fill(cell, bg);
+        font(cell, { size: 9, color: { argb: 'FF1E293B' } });
+        cell.alignment = {
+          vertical: 'middle',
+          horizontal: j === 0 || j === 2 ? 'center' : j === 9 ? 'right' : 'left',
+          indent: (j > 0 && j !== 2 && j !== 9) ? 1 : 0,
+        };
+        cell.border = { bottom: { style: 'hair', color: { argb: 'FFE2E8F0' } } };
+
+        if (j === 8) {
+          const a = ESTADO_ARGB[c.estado];
+          if (a) font(cell, { size: 9, bold: true, color: { argb: a } });
+        }
+        if (j === 9 && v !== null) {
+          cell.numFmt = '"$"#,##0.00';
+        }
+      });
+    });
+
+    // Footer
+    const footerRow = 9 + citas.length;
+    ws.mergeCells(`A${footerRow}:J${footerRow}`);
+    const fc = ws.getCell(`A${footerRow}`);
+    fc.value = `Total: ${citas.length} cita${citas.length !== 1 ? 's' : ''}  ·  ${clinicName}  ·  Generado el ${genDate}`;
+    fill(fc, 'FFF1F5F9');
+    font(fc, { size: 8, italic: true, color: { argb: 'FF94A3B8' } });
+    fc.alignment = { horizontal: 'center', vertical: 'middle' };
+    ws.getRow(footerRow).height = 14;
+
+    return ws;
+  }
+
+  async function exportarExcel() {
+    if (reportCitas.length === 0) { showToast('No hay datos para exportar', 'error'); return; }
+
+    exportExcelBtn.disabled = true;
+    exportPDFBtn.disabled = true;
+
+    try {
+      await ensureLibraries();
+      const ExcelJS = (window as any).ExcelJS;
+      if (!ExcelJS) throw new Error('ExcelJS no disponible');
+
+      const clinicName = getVetName() || 'Veterinaria';
+      const desde = fechaDesdeInput.value;
+      const hasta = fechaHastaInput.value;
+      const genDate = new Date().toLocaleString('es-ES', { day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' });
+
+      const wb = new ExcelJS.Workbook();
+      wb.creator  = clinicName;
+      wb.created  = new Date();
+      wb.modified = new Date();
+
+      if (reportCitas.length > SPLIT_THRESHOLD) {
+        const monthGroups = groupByMonth(reportCitas);
+        const totalSheets = monthGroups.size;
+        showExportOverlay(
+          'Generando Excel...',
+          `Se crearán ${totalSheets} hojas organizadas por mes`,
+          true
+        );
+
+        let sheetIndex = 0;
+        for (const [yearMonth, citas] of monthGroups) {
+          sheetIndex++;
+          updateExportProgress(sheetIndex, totalSheets, `Generando ${monthLabel(yearMonth)}...`);
+          buildExcelWorksheet(wb, monthLabel(yearMonth), citas, clinicName, monthLabel(yearMonth), genDate);
+          await new Promise(resolve => setTimeout(resolve, 30));
+        }
+      } else {
+        showExportOverlay('Generando Excel...', 'Por favor espera mientras se prepara tu reporte');
+        const periodLabel = `${fmtDateLong(desde)}  —  ${fmtDateLong(hasta)}`;
+        buildExcelWorksheet(wb, 'Reporte de Citas', reportCitas, clinicName, periodLabel, genDate);
+      }
+
+      const buffer = await wb.xlsx.writeBuffer();
+      const blob   = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url    = URL.createObjectURL(blob);
+      const a      = document.createElement('a');
+      a.href       = url;
+      a.download   = `reporte-citas_${desde}_${hasta}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      const sheetInfo = reportCitas.length > SPLIT_THRESHOLD
+        ? ` (${groupByMonth(reportCitas).size} hojas)`
+        : '';
+      showToast(`Excel descargado: reporte-citas_${desde}_${hasta}.xlsx${sheetInfo}`);
+    } catch (err: any) {
+      console.error('Error Excel:', err);
+      showToast('Error al generar el Excel: ' + (err.message || err), 'error');
+    } finally {
+      hideExportOverlay();
+      exportExcelBtn.disabled = false;
+      exportPDFBtn.disabled = false;
+      exportExcelBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg> Descargar Excel`;
+    }
+  }
+
+  // ─── Event listeners ─────────────────────────────────────────────────────────
+  generarBtn.addEventListener('click', generarReporte);
+  exportPDFBtn.addEventListener('click', exportarPDF);
+  exportExcelBtn.addEventListener('click', exportarExcel);
+
+  limpiarBtn.addEventListener('click', () => {
+    fechaDesdeInput.value = firstOfMonth.toISOString().split('T')[0];
+    fechaHastaInput.value = today.toISOString().split('T')[0];
+    estadoReporteEl.value = '';
+    tipoReporteEl.value   = '';
+    filterError.classList.add('hidden');
+    reportSection.classList.add('hidden');
+    placeholderSection.classList.remove('hidden');
+  });
+
+  [fechaDesdeInput, fechaHastaInput, tipoReporteEl].forEach(el => {
+    el.addEventListener('keydown', (e) => { if ((e as KeyboardEvent).key === 'Enter') generarReporte(); });
+  });
+
+  // ─── Bootstrap ───────────────────────────────────────────────────────────────
+  loadCitas();
+</script>

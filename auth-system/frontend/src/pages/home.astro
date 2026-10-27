@@ -1,0 +1,2604 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Sidebar from '../components/Sidebar.astro';
+---
+
+<Layout title="Inicio - VetPets">
+  <div class="min-h-screen" style="background: #f1f5f9;">
+
+    <Sidebar />
+
+    <!-- Main Content -->
+    <div class="lg:ml-64 min-h-screen transition-[margin] duration-200" data-main-content>
+
+      <!-- Top bar -->
+      <header class="bg-white/80 backdrop-blur-xl sticky top-0 z-30" style="border-bottom: 1px solid #e2e8f0;">
+        <div class="px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
+          <div class="flex items-center space-x-3 flex-shrink-0">
+            <!-- Hamburger mobile -->
+            <button id="hamburgerBtn" class="lg:hidden p-2 rounded-lg transition-colors hover:bg-slate-100" style="color: #334155;">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+            </button>
+            <div>
+              <h1 class="text-xl md:text-2xl font-bold tracking-tight" style="color: #0f172a;">Panel de Control</h1>
+              <p class="text-sm font-medium" style="color: #94a3b8;" id="todayDate"></p>
+            </div>
+          </div>
+
+          <!-- Omnisearch Bar -->
+          <div class="hidden sm:flex flex-1 max-w-xl">
+            <div class="omnisearch-wrapper relative w-full group">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                <svg class="w-4 h-4 transition-colors duration-200" style="color: #94a3b8;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+              </div>
+              <input
+                id="omnisearchInput"
+                type="text"
+                class="omnisearch-input w-full pl-10 pr-20 py-2.5 rounded-xl text-sm transition-all duration-200 outline-none"
+                style="background: #f1f5f9; border: 1px solid #e2e8f0; color: #1e293b;"
+                placeholder="Buscar paciente (ej. Maximus) o cliente (ej. Juan Antonio)..."
+              />
+              <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                <span class="omnisearch-kbd flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-semibold" style="background: #e2e8f0; color: #64748b; border: 1px solid #cbd5e1;">
+                  <span>Ctrl</span><span>+</span><span>K</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center space-x-3 flex-shrink-0">
+            <!-- TODO: Activar en Avance 2 / Avance 3 (Calendario de citas) - Calendar Popup Button
+            <div class="relative">
+              <button id="calendarPopupBtn" class="relative p-2.5 rounded-xl transition-all duration-200 hover:bg-slate-100" style="color: #64748b;" title="Calendario de citas">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+              </button>
+            </div>
+            -->
+
+            <!-- Tasks Popup Button -->
+            <div class="relative">
+              <button id="tasksPopupBtn" class="relative p-2.5 rounded-xl transition-all duration-200 hover:bg-slate-100" style="color: #64748b;" title="Tareas Pendientes">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                </svg>
+                <span id="todoCountBadge" class="absolute top-1 right-1 min-w-[18px] h-[18px] rounded-full text-[10px] text-white flex items-center justify-center font-bold ring-2 ring-white" style="background: #3b82f6;">0</span>
+              </button>
+              <!-- Tasks Popup Panel -->
+              <div id="tasksPopupPanel" class="tasks-popup-panel hidden absolute right-0 top-full mt-2 bg-white rounded-2xl shadow-2xl z-50 overflow-hidden" style="border: 1px solid #e2e8f0; width: 520px;">
+                <!-- Header -->
+                <div class="px-5 py-3.5 flex items-center justify-between" style="border-bottom: 1px solid #e2e8f0; background: linear-gradient(135deg, #f8fafc, #ffffff);">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                      <svg class="w-4 h-4" style="color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 class="text-[13px] font-bold" style="color: #0f172a;">Mis Tareas</h3>
+                      <p class="text-[10px]" style="color: #94a3b8;"><span id="todoPopupCount">0</span> pendientes</p>
+                    </div>
+                  </div>
+                  <button id="closeTasksPopup" class="p-1.5 rounded-lg transition-colors hover:bg-slate-100" style="color: #94a3b8;">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                  </button>
+                </div>
+                <!-- Filter Tabs + Search -->
+                <div class="px-4 pt-3 pb-2" style="border-bottom: 1px solid #f1f5f9;">
+                  <div class="flex items-center gap-1.5 mb-2.5">
+                    <button class="todo-filter-tab active" data-filter="all">Todas</button>
+                    <button class="todo-filter-tab" data-filter="pending">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                      Pendientes
+                    </button>
+                    <button class="todo-filter-tab" data-filter="completed">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                      Completadas
+                    </button>
+                    <button class="todo-filter-tab" data-filter="cancelled">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                      Canceladas
+                    </button>
+                  </div>
+                  <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg class="w-3.5 h-3.5" style="color: #94a3b8;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                      </svg>
+                    </div>
+                    <input id="todoSearchInput" type="text" class="w-full pl-9 pr-3 py-2 rounded-lg text-xs outline-none transition-all duration-200" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #334155;" placeholder="Buscar tarea..." />
+                  </div>
+                </div>
+                <!-- Todo List -->
+                <div id="todoList" class="todo-list-container"></div>
+                <!-- Add Task -->
+                <div class="px-4 py-3" style="border-top: 1px solid #e2e8f0; background: #fafbfc;">
+                  <div class="flex items-center gap-2">
+                    <input id="todoNewInput" type="text" class="flex-1 px-3 py-2 rounded-lg text-xs outline-none transition-all duration-200" style="background: #ffffff; border: 1px solid #e2e8f0; color: #334155;" placeholder="Escribe una nueva tarea..." />
+                    <button id="todoAddBtn" class="px-3.5 py-2 rounded-lg text-[11px] font-semibold text-white transition-all duration-200 hover:shadow-md active:scale-95 flex items-center gap-1.5" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                      Añadir
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- TODO: Activar en Avance 2 / Avance 3 (Notificaciones) - Notification Bell
+            <button id="notificationBtn" class="relative p-2.5 rounded-xl transition-all duration-200 hover:bg-slate-100" style="color: #64748b;">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+              </svg>
+              <span id="notificationBadge" class="absolute top-1 right-1 w-4.5 h-4.5 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center font-bold ring-2 ring-white" style="display: none;">0</span>
+            </button>
+            -->
+            <!-- User avatar in header -->
+            <div class="hidden sm:flex items-center space-x-2 pl-3" style="border-left: 1px solid #e2e8f0;">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white" style="background: linear-gradient(135deg, #3b82f6, #60a5fa);" id="headerAvatar">V</div>
+              <div class="hidden md:block">
+                <p class="text-xs font-semibold" style="color: #1e293b;" id="headerVetName">Veterinaria</p>
+                <p class="text-[10px]" style="color: #94a3b8;">Administrador</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Dashboard Content -->
+      <main class="px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto">
+
+        <!-- Welcome Banner -->
+        <div class="dash-card rounded-2xl p-6 sm:p-8 mb-6 relative overflow-hidden" style="background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 60%, #162033 100%);">
+          <!-- Decorative floating shapes -->
+          <div class="absolute top-0 right-0 w-72 h-72 rounded-full" style="background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%); transform: translate(30%, -40%);"></div>
+          <div class="absolute bottom-0 left-0 w-40 h-40 rounded-full" style="background: radial-gradient(circle, rgba(96,165,250,0.1) 0%, transparent 70%); transform: translate(-20%, 30%);"></div>
+          <div class="absolute top-1/2 right-1/4 w-2 h-2 rounded-full" style="background: rgba(96,165,250,0.4);"></div>
+          <div class="absolute top-1/3 right-1/3 w-1.5 h-1.5 rounded-full" style="background: rgba(148,196,255,0.3);"></div>
+          <div class="absolute bottom-1/4 right-1/5 w-1 h-1 rounded-full" style="background: rgba(59,130,246,0.5);"></div>
+
+          <div class="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center space-x-2 mb-2">
+                <div class="w-2 h-2 rounded-full animate-pulse" style="background: #60a5fa;"></div>
+                <p class="text-[11px] font-semibold uppercase tracking-[0.15em]" style="color: rgba(148,196,255,0.7);">Panel Veterinario</p>
+              </div>
+              <h2 class="text-xl sm:text-2xl font-bold mb-1 text-white leading-tight" id="welcomeMessage">¡Hola! Estamos listos para otro gran día.</h2>
+              <p class="text-sm" style="color: rgba(148,196,255,0.6);">Gestiona tu veterinaria de forma eficiente y profesional</p>
+            </div>
+            <div class="flex items-center gap-3 flex-shrink-0">
+              <div class="flex items-center space-x-2 rounded-xl px-4 py-2" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(8px);">
+                <svg class="w-4 h-4" style="color: #60a5fa;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <span class="text-xs font-medium text-white/80" id="bannerDate"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+        <!-- Quick Access Shortcuts -->
+        <div class="dash-card mb-6" style="animation-delay: 0.25s;">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-bold tracking-tight" style="color: #0f172a;">Accesos Rápidos</h3>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <!-- Nuevo Cliente -->
+            <a href="/clientes" data-only-secretaria class="shortcut-btn group flex flex-col items-center gap-2.5 p-4 rounded-xl bg-white transition-all duration-200 hover:shadow-md" style="border: 1px solid #e2e8f0;">
+              <div class="w-11 h-11 rounded-xl flex items-center justify-center transition-transform duration-200 group-hover:scale-110" style="background: linear-gradient(135deg, #eff6ff, #dbeafe);">
+                <svg class="w-5 h-5" style="color: #3b82f6;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+              </div>
+              <span class="text-xs font-semibold" style="color: #334155;">Nuevo Cliente</span>
+            </a>
+            <!-- Nueva Mascota -->
+            <a href="/mascotas" data-only-secretaria class="shortcut-btn group flex flex-col items-center gap-2.5 p-4 rounded-xl bg-white transition-all duration-200 hover:shadow-md" style="border: 1px solid #e2e8f0;">
+              <div class="w-11 h-11 rounded-xl flex items-center justify-center transition-transform duration-200 group-hover:scale-110" style="background: linear-gradient(135deg, #eff6ff, #dbeafe);">
+                <svg class="w-5 h-5" style="color: #3b82f6;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              </div>
+              <span class="text-xs font-semibold" style="color: #334155;">Nueva Mascota</span>
+            </a>
+            <!-- TODO: Activar en Avance 2 / Avance 3 (acceso rapido a Citas y Reportes; restaurar sm:grid-cols-4 en el grid) - Agendar Cita
+            <a href="/citas" class="shortcut-btn group flex flex-col items-center gap-2.5 p-4 rounded-xl bg-white transition-all duration-200 hover:shadow-md" style="border: 1px solid #e2e8f0;">
+              <div class="w-11 h-11 rounded-xl flex items-center justify-center transition-transform duration-200 group-hover:scale-110" style="background: linear-gradient(135deg, #eff6ff, #dbeafe);">
+                <svg class="w-5 h-5" style="color: #3b82f6;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+              </div>
+              <span class="text-xs font-semibold" style="color: #334155;">Agendar Cita</span>
+            </a>
+            Ver Reportes
+            <a href="/reportes" data-only-secretaria class="shortcut-btn group flex flex-col items-center gap-2.5 p-4 rounded-xl bg-white transition-all duration-200 hover:shadow-md" style="border: 1px solid #e2e8f0;">
+              <div class="w-11 h-11 rounded-xl flex items-center justify-center transition-transform duration-200 group-hover:scale-110" style="background: linear-gradient(135deg, #eff6ff, #dbeafe);">
+                <svg class="w-5 h-5" style="color: #3b82f6;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+              </div>
+              <span class="text-xs font-semibold" style="color: #334155;">Ver Reportes</span>
+            </a>
+            -->
+          </div>
+        </div>
+
+        <!-- Search Results Dropdown -->
+        <div id="searchDropdown" class="hidden fixed z-50 bg-white rounded-xl shadow-2xl overflow-hidden" style="border: 1px solid #e2e8f0; max-height: 400px; overflow-y: auto;">
+        </div>
+
+        <!-- Resumen: Usuarios, Clientes y Mascotas -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <a href="/usuarios" data-only-secretaria class="metric-card dash-card bg-white rounded-2xl p-5 flex items-center justify-between" style="border: 1px solid #e2e8f0; animation-delay: 0.3s;">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wide" style="color: #94a3b8;">Usuarios</p>
+              <p class="text-3xl font-bold mt-1" style="color: #0f172a;" id="metricUsuarios">--</p>
+              <p class="text-xs mt-1" style="color: #94a3b8;"><span id="metricUsuariosDetalle">Activos en la veterinaria</span></p>
+            </div>
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, #eff6ff, #dbeafe);">
+              <svg class="w-6 h-6" style="color: #3b82f6;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+            </div>
+          </a>
+          <a href="/clientes" class="metric-card dash-card bg-white rounded-2xl p-5 flex items-center justify-between" style="border: 1px solid #e2e8f0; animation-delay: 0.35s;">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wide" style="color: #94a3b8;">Clientes</p>
+              <p class="text-3xl font-bold mt-1" style="color: #0f172a;" id="metricClientes">--</p>
+              <p class="text-xs mt-1" style="color: #94a3b8;">Dueños registrados</p>
+            </div>
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, #eff6ff, #dbeafe);">
+              <svg class="w-6 h-6" style="color: #3b82f6;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            </div>
+          </a>
+          <a href="/mascotas" class="metric-card dash-card bg-white rounded-2xl p-5 flex items-center justify-between" style="border: 1px solid #e2e8f0; animation-delay: 0.4s;">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wide" style="color: #94a3b8;">Mascotas</p>
+              <p class="text-3xl font-bold mt-1" style="color: #0f172a;" id="metricMascotas">--</p>
+              <p class="text-xs mt-1" style="color: #94a3b8;">Pacientes registrados</p>
+            </div>
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, #eff6ff, #dbeafe);">
+              <svg class="w-6 h-6" style="color: #3b82f6;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+            </div>
+          </a>
+        </div>
+
+        <!-- TODO: Activar en Avance 2 / Avance 3 (Citas pendientes y Citas de hoy) - Citas Grid: Side by Side
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          Citas Pendientes por Confirmar
+          <div class="dash-card" style="animation-delay: 0.3s;">
+            <div class="bg-white rounded-2xl overflow-hidden h-full flex flex-col" style="border: 1px solid #e2e8f0;">
+              <div class="px-5 py-4 flex items-center justify-between flex-shrink-0" style="border-bottom: 1px solid #f1f5f9;">
+                <div class="flex items-center space-x-2">
+                  <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background: linear-gradient(135deg, #fef3c7, #fde68a);">
+                    <svg class="w-3.5 h-3.5" style="color: #d97706;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                  </div>
+                  <h3 class="text-sm font-bold" style="color: #0f172a;">Citas Pendientes por Confirmar</h3>
+                  <span id="pendientesCount" class="hidden text-[10px] font-bold px-2 py-0.5 rounded-full text-white" style="background: #d97706;">0</span>
+                </div>
+                <a href="/citas" class="text-xs font-semibold flex items-center space-x-1 transition-colors hover:opacity-80 flex-shrink-0" style="color: #3b82f6;">
+                  <span>Ir a citas</span>
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </a>
+              </div>
+              Loading
+              <div id="pendientesLoading" class="p-8 text-center">
+                <div class="w-8 h-8 rounded-full border-2 border-amber-200 border-t-amber-500 animate-spin mx-auto"></div>
+                <p class="text-xs mt-3" style="color: #94a3b8;">Cargando citas pendientes...</p>
+              </div>
+              Empty
+              <div id="pendientesEmpty" class="px-5 py-8 text-center hidden">
+                <div class="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-3" style="background: #f1f5f9;">
+                  <svg class="w-7 h-7" style="color: #cbd5e1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <p class="text-sm font-medium" style="color: #64748b;">Todas las citas están confirmadas</p>
+                <p class="text-xs mt-1" style="color: #94a3b8;">No hay citas pendientes de confirmar</p>
+              </div>
+              List
+              <div id="pendientesList" class="hidden flex-1 overflow-y-auto" style="max-height: 400px;"></div>
+            </div>
+          </div>
+
+          Citas de Hoy
+          <div class="dash-card" style="animation-delay: 0.35s;">
+            <div class="bg-white rounded-2xl overflow-hidden h-full flex flex-col" style="border: 1px solid #e2e8f0;">
+              <div class="px-5 py-4 flex items-center justify-between flex-shrink-0" style="border-bottom: 1px solid #f1f5f9;">
+                <div class="flex items-center space-x-2">
+                  <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background: linear-gradient(135deg, #eff6ff, #dbeafe);">
+                    <svg class="w-3.5 h-3.5" style="color: #3b82f6;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                  </div>
+                  <h3 class="text-sm font-bold" style="color: #0f172a;">Citas de Hoy</h3>
+                  <span id="citasHoyCount" class="hidden text-[10px] font-bold px-2 py-0.5 rounded-full text-white" style="background: #3b82f6;">0</span>
+                </div>
+                <a href="/citas" class="text-xs font-semibold flex items-center space-x-1 transition-colors hover:opacity-80 flex-shrink-0" style="color: #3b82f6;">
+                  <span>Ver todas</span>
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </a>
+              </div>
+              <div id="citasHoyContainer" class="flex-1 flex flex-col">
+                <div id="citasHoyLoading" class="p-8 text-center">
+                  <div class="w-8 h-8 rounded-full border-2 border-blue-200 border-t-blue-500 animate-spin mx-auto"></div>
+                  <p class="text-sm mt-3" style="color: #94a3b8;">Cargando citas...</p>
+                </div>
+                <div id="citasHoyEmpty" class="px-5 py-8 text-center hidden">
+                  <div class="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-3" style="background: #f1f5f9;">
+                    <span class="text-2xl">📋</span>
+                  </div>
+                  <p class="text-sm font-medium" style="color: #64748b;">No hay citas programadas para hoy</p>
+                  <a href="/citas" class="inline-flex items-center text-xs font-semibold mt-2 transition-colors hover:opacity-80" style="color: #3b82f6;">
+                    Agendar una cita
+                    <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                  </a>
+                </div>
+                <div id="citasHoyList" class="hidden flex-1 overflow-y-auto" style="max-height: 400px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+      -->
+      </main>
+    </div>
+
+    <!-- TODO: Activar en Avance 2 / Avance 3 (Panel de notificaciones) - Notification Panel
+    <div id="notificationPanel" class="fixed inset-y-0 right-0 w-96 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50 flex flex-col" style="border-left: 1px solid #e2e8f0;">
+      <div class="p-4 flex items-center justify-between" style="border-bottom: 1px solid #f1f5f9;">
+        <div class="flex items-center space-x-2">
+          <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background: #fef2f2;">
+            <svg class="w-3.5 h-3.5" style="color: #ef4444;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+            </svg>
+          </div>
+          <h3 class="text-sm font-bold" style="color: #0f172a;">Notificaciones</h3>
+        </div>
+        <button id="closeNotifications" class="p-1.5 rounded-lg transition-colors hover:bg-slate-100" style="color: #94a3b8;">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="px-4 py-3" style="border-bottom: 1px solid #f1f5f9; background:#fafbfc;">
+        <div class="flex items-center justify-between mb-2">
+          <p class="text-xs font-semibold" style="color:#64748b;">No leidas: <span id="notificationUnreadCount" style="color:#0f172a;">0</span></p>
+          <button id="markAllNotificationsRead" class="text-xs font-semibold px-2 py-1 rounded-md hover:bg-slate-100 transition-colors" style="color:#3b82f6;">Marcar todas</button>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="notifFilterUnread" class="px-3 py-1.5 text-xs font-semibold rounded-lg" style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;">No leidas</button>
+          <button id="notifFilterAll" class="px-3 py-1.5 text-xs font-semibold rounded-lg" style="background:#f8fafc;color:#64748b;border:1px solid #e2e8f0;">Todas</button>
+        </div>
+        <div class="mt-2 grid grid-cols-[1fr_auto] gap-2">
+          <input id="notifSearchInput" type="text" placeholder="Buscar cliente o texto..." class="px-3 py-2 rounded-lg text-xs outline-none" style="background:#ffffff;border:1px solid #e2e8f0;color:#334155;" />
+          <input id="notifDateInput" type="date" class="px-2 py-2 rounded-lg text-xs outline-none" style="background:#ffffff;border:1px solid #e2e8f0;color:#334155;" />
+        </div>
+        <div class="mt-2 flex justify-end">
+          <button id="notifClearFilters" class="text-xs font-semibold px-2.5 py-1.5 rounded-md hover:bg-slate-100 transition-colors" style="color:#64748b;border:1px solid #e2e8f0;">Limpiar filtros</button>
+        </div>
+      </div>
+
+      <div id="notificationList" class="overflow-y-auto flex-1 pb-20">
+        Notifications will be inserted here
+      </div>
+    </div>
+    -->
+
+    <!-- Custom Confirm Modal -->
+    <div id="confirmModal" class="confirm-modal-overlay hidden">
+      <div class="confirm-modal">
+        <div class="confirm-modal-icon">
+          <svg style="width:28px;height:28px;color:#ef4444;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+        </div>
+        <h3 class="confirm-modal-title">Eliminar tarea</h3>
+        <p class="confirm-modal-msg" id="confirmModalMsg">¿Estás seguro de que deseas eliminar esta tarea? Esta acción no se puede deshacer.</p>
+        <div class="confirm-modal-actions">
+          <button id="confirmModalCancel" class="confirm-modal-btn cancel">Cancelar</button>
+          <button id="confirmModalOk" class="confirm-modal-btn confirm">Sí, eliminar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TODO: Activar en Avance 2 / Avance 3 (Calendario de citas) - Calendar Modal Overlay (outside dashboard flow)
+    <div id="calendarOverlay" class="calendar-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" data-open="false" aria-hidden="true">
+      <div id="calendarPopupPanel" class="calendar-popup-panel relative w-full max-w-5xl max-h-[90vh] bg-white rounded-xl shadow-2xl flex overflow-hidden" style="border: 1px solid #e2e8f0;">
+        <div class="px-4 py-3.5 flex items-center justify-between" style="border-bottom: 1px solid #e2e8f0; background: linear-gradient(135deg, #f8fafc, #ffffff);">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+              <svg class="w-4 h-4" style="color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-[13px] font-bold" style="color: #0f172a;">Calendario de Citas</h3>
+              <p id="calendarSummaryText" class="text-[10px]" style="color: #94a3b8;">Mes actual</p>
+            </div>
+          </div>
+          <button id="closeCalendarPopup" class="p-1.5 rounded-lg transition-colors hover:bg-slate-100" style="color: #94a3b8;">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div class="calendar-modal-body">
+          <div class="calendar-left-col h-full overflow-y-auto">
+            <div class="flex items-center justify-between mb-2.5">
+              <button id="calendarPrevMonth" class="p-1.5 rounded-lg hover:bg-slate-100 transition-colors" style="color: #64748b;" title="Mes anterior">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+              </button>
+              <p id="calendarMonthLabel" class="text-xs font-bold uppercase tracking-wide" style="color: #0f172a;"></p>
+              <button id="calendarNextMonth" class="p-1.5 rounded-lg hover:bg-slate-100 transition-colors" style="color: #64748b;" title="Mes siguiente">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+              </button>
+            </div>
+
+            <div class="grid grid-cols-7 gap-1 mb-1">
+              <span class="calendar-weekday">Lun</span>
+              <span class="calendar-weekday">Mar</span>
+              <span class="calendar-weekday">Mie</span>
+              <span class="calendar-weekday">Jue</span>
+              <span class="calendar-weekday">Vie</span>
+              <span class="calendar-weekday">Sab</span>
+              <span class="calendar-weekday">Dom</span>
+            </div>
+            <div id="calendarGrid" class="grid grid-cols-7 gap-1"></div>
+          </div>
+
+          <div class="calendar-right-col h-full overflow-y-auto" style="background: #fafbfc;">
+            <div class="flex items-center justify-between mb-2">
+              <p id="calendarDayTitle" class="text-xs font-semibold" style="color: #0f172a;">Selecciona un dia</p>
+              <span id="calendarDayCount" class="text-[10px] px-2 py-0.5 rounded-full" style="background: #e2e8f0; color: #64748b;">0 citas</span>
+            </div>
+            <div class="relative mb-2">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="w-3.5 h-3.5" style="color: #94a3b8;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+              </div>
+              <input id="calendarDaySearchInput" type="text" class="w-full pl-9 pr-3 py-2 rounded-lg text-xs outline-none transition-all duration-200" style="background: #ffffff; border: 1px solid #e2e8f0; color: #334155;" placeholder="Buscar por nombre o telefono..." />
+            </div>
+            <div id="calendarDayList" class="calendar-day-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    -->
+
+  </div>
+</Layout>
+
+<style>
+  :global(body) {
+    background: #f1f5f9 !important;
+  }
+
+  /* Staggered card entrance animation */
+  @keyframes dashCardIn {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .dash-card {
+    animation: dashCardIn 0.5s ease-out both;
+  }
+
+  /* Metric card hover */
+  .metric-card {
+    transition: transform 200ms ease, box-shadow 200ms ease;
+  }
+  .metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.08), 0 4px 10px -6px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Shortcut buttons hover */
+  .shortcut-btn:hover {
+    border-color: #cbd5e1 !important;
+  }
+
+  /* Omnisearch */
+  .omnisearch-input:focus {
+    background: #ffffff !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+  .omnisearch-input:focus + .omnisearch-kbd-wrapper .omnisearch-kbd,
+  .omnisearch-input:focus ~ div .omnisearch-kbd {
+    opacity: 0;
+  }
+  .omnisearch-input::placeholder {
+    color: #94a3b8;
+    font-size: 13px;
+  }
+
+  /* Tasks Popup Panel */
+  .tasks-popup-panel {
+    animation: popupIn 0.2s ease-out;
+  }
+  .calendar-overlay {
+    background: rgba(15, 23, 42, 0.38);
+    backdrop-filter: blur(2px);
+  }
+  .calendar-overlay[data-open='false'] {
+    display: none;
+  }
+  .calendar-popup-panel {
+    animation: popupIn 0.2s ease-out;
+    flex-direction: column;
+    max-height: 90vh;
+  }
+  .calendar-modal-body {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .calendar-left-col {
+    width: 58%;
+    padding: 12px 14px 14px;
+    border-right: 1px solid #e5e7eb;
+    height: 100%;
+    overflow-y: auto;
+  }
+  .calendar-right-col {
+    width: 42%;
+    padding: 12px;
+    height: 100%;
+    overflow-y: hidden;
+  }
+  .calendar-right-col::-webkit-scrollbar {
+    width: 5px;
+  }
+  .calendar-right-col::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 9999px;
+  }
+
+  .calendar-bottom-section {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  @keyframes popupIn {
+    from { opacity: 0; transform: translateY(-8px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* ===== Todo dynamic content: must be :global since rendered via JS innerHTML ===== */
+  :global(.todo-list-container) {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  :global(.todo-list-container::-webkit-scrollbar) {
+    width: 4px;
+  }
+  :global(.todo-list-container::-webkit-scrollbar-track) {
+    background: transparent;
+  }
+  :global(.todo-list-container::-webkit-scrollbar-thumb) {
+    background: #e2e8f0;
+    border-radius: 4px;
+  }
+
+  /* Filter Tabs */
+  .todo-filter-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    background: #f1f5f9;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 150ms ease;
+    white-space: nowrap;
+  }
+  .todo-filter-tab:hover {
+    background: #e2e8f0;
+    color: #334155;
+  }
+  .todo-filter-tab.active {
+    background: #eff6ff;
+    color: #2563eb;
+    border-color: #bfdbfe;
+  }
+
+  /* Todo Items — :global for JS-rendered content */
+  :global(.todo-item) {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    transition: background 150ms ease;
+    border-bottom: 1px solid #f1f5f9;
+    position: relative;
+  }
+  :global(.todo-item:last-child) {
+    border-bottom: none;
+  }
+  :global(.todo-item:hover) {
+    background: #f8fafc;
+  }
+
+  /* Native checkbox styling */
+  :global(.todo-cb) {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    border: 2px solid #cbd5e1;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 150ms ease;
+    position: relative;
+    flex-shrink: 0;
+    background: white;
+  }
+  :global(.todo-cb:hover) {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
+  }
+  :global(.todo-cb:checked) {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    border-color: #22c55e;
+  }
+  :global(.todo-cb:checked::after) {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 1px;
+    width: 6px;
+    height: 11px;
+    border: solid white;
+    border-width: 0 2.5px 2.5px 0;
+    transform: rotate(45deg);
+  }
+  :global(.todo-cb.cancelled) {
+    background: #fee2e2;
+    border-color: #fca5a5;
+    cursor: default;
+  }
+  :global(.todo-cb.cancelled::before),
+  :global(.todo-cb.cancelled::after) {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 2px;
+    background: #ef4444;
+    border: none;
+    border-radius: 1px;
+  }
+  :global(.todo-cb.cancelled::before) {
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+  :global(.todo-cb.cancelled::after) {
+    transform: translate(-50%, -50%) rotate(-45deg);
+  }
+
+  :global(.todo-content) {
+    flex: 1;
+    min-width: 0;
+  }
+  :global(.todo-text) {
+    font-size: 13px;
+    color: #1e293b;
+    line-height: 1.4;
+    word-break: break-word;
+  }
+  :global(.todo-text.truncated) {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  :global(.todo-text.expanded) {
+    display: block;
+    -webkit-line-clamp: unset;
+    overflow: visible;
+  }
+  :global(.todo-expand-btn) {
+    font-size: 10px;
+    color: #3b82f6;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    margin-top: 2px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+  }
+  :global(.todo-expand-btn:hover) {
+    color: #2563eb;
+    text-decoration: underline;
+  }
+  :global(.todo-text.completed) {
+    text-decoration: line-through;
+    color: #94a3b8;
+  }
+  :global(.todo-text.cancelled) {
+    text-decoration: line-through;
+    color: #d4a0a0;
+  }
+  :global(.todo-meta) {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  :global(.todo-date) {
+    font-size: 10px;
+    color: #b0b8c4;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  :global(.todo-date svg) {
+    width: 10px;
+    height: 10px;
+    flex-shrink: 0;
+  }
+  :global(.todo-status-badge) {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 7px;
+    border-radius: 6px;
+    letter-spacing: 0.01em;
+  }
+  :global(.todo-status-badge.pending) {
+    background: #fef3c7;
+    color: #92400e;
+  }
+  :global(.todo-status-badge.completed) {
+    background: #dcfce7;
+    color: #166534;
+  }
+  :global(.todo-status-badge.cancelled) {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  /* Action buttons */
+  :global(.todo-actions) {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  :global(.todo-action-btn) {
+    padding: 6px;
+    border-radius: 8px;
+    transition: all 150ms ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    background: none;
+  }
+  :global(.todo-action-btn.edit-btn) {
+    color: #3b82f6;
+    background: #eff6ff;
+    border-color: #bfdbfe;
+  }
+  :global(.todo-action-btn.edit-btn:hover) {
+    color: #1d4ed8;
+    background: #dbeafe;
+    border-color: #93c5fd;
+  }
+  :global(.todo-action-btn.cancel-btn) {
+    color: #f59e0b;
+    background: #fffbeb;
+    border-color: #fde68a;
+  }
+  :global(.todo-action-btn.cancel-btn:hover) {
+    color: #d97706;
+    background: #fef3c7;
+    border-color: #fcd34d;
+  }
+  :global(.todo-action-btn.delete-btn) {
+    color: #ef4444;
+    background: #fef2f2;
+    border-color: #fecaca;
+  }
+  :global(.todo-action-btn.delete-btn:hover) {
+    color: #dc2626;
+    background: #fee2e2;
+    border-color: #fca5a5;
+  }
+  :global(.todo-action-btn.restore-btn) {
+    color: #8b5cf6;
+    background: #f5f3ff;
+    border-color: #ddd6fe;
+  }
+  :global(.todo-action-btn.restore-btn:hover) {
+    color: #7c3aed;
+    background: #ede9fe;
+    border-color: #c4b5fd;
+  }
+
+  /* Edit mode input */
+  :global(.todo-edit-input) {
+    width: 100%;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+    border: 1px solid #3b82f6;
+    background: white;
+    color: #1e293b;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  #todoNewInput:focus, #todoSearchInput:focus {
+    background: #ffffff !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
+  }
+
+  /* Responsive: on small screens make popup full-width */
+  @media (max-width: 576px) {
+    .tasks-popup-panel {
+      width: calc(100vw - 24px) !important;
+      right: -60px;
+    }
+    .calendar-popup-panel {
+      width: calc(100vw - 20px) !important;
+      max-height: 92vh;
+    }
+    .calendar-modal-body {
+      flex-direction: column;
+    }
+    .calendar-left-col,
+    .calendar-right-col {
+      width: 100%;
+    }
+    .calendar-left-col {
+      border-right: none;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .calendar-right-col {
+      max-height: 42vh;
+    }
+  }
+
+  .calendar-weekday {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    height: 18px;
+  }
+
+  #calendarGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+
+  :global(.calendar-day-empty) {
+    min-height: 52px;
+  }
+
+  :global(.calendar-day-btn) {
+    width: 100%;
+    min-height: 52px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    color: #334155;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 4px 2px;
+    transition: all 160ms ease;
+  }
+  :global(.calendar-day-btn:hover) {
+    border-color: #93c5fd;
+    background: #f8fbff;
+  }
+  :global(.calendar-day-btn.has-citas) {
+    border-color: #bfdbfe;
+    background: #f8fbff;
+  }
+  :global(.calendar-day-number-wrap) {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  :global(.calendar-day-number) {
+    min-width: 24px;
+    height: 24px;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1;
+  }
+  :global(.calendar-day-number.selected) {
+    background: #2563eb;
+    color: #ffffff;
+  }
+  :global(.calendar-today-dot) {
+    position: absolute;
+    right: -2px;
+    top: -1px;
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background: #22c55e;
+    box-shadow: 0 0 0 1px #ffffff;
+  }
+  :global(.calendar-day-count-badge) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background: #dbeafe;
+    color: #1d4ed8;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+    padding: 2px 6px;
+    white-space: nowrap;
+  }
+
+  .calendar-day-list {
+    min-height: 140px;
+    max-height: 380px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+  }
+  .calendar-day-list::-webkit-scrollbar {
+    width: 6px;
+  }
+  .calendar-day-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 9999px;
+  }
+  :global(.calendar-day-item) {
+    padding: 12px 11px;
+    border-bottom: 1px solid #f3f4f6;
+    cursor: pointer;
+    transition: background 150ms ease;
+  }
+  :global(.calendar-day-item:last-child) {
+    border-bottom: none;
+  }
+  :global(.calendar-day-item:hover) {
+    background: #f8fafc;
+  }
+  :global(.calendar-day-item-row) {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+  }
+  :global(.calendar-day-time) {
+    font-size: 12px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.2;
+    min-width: 64px;
+    flex-shrink: 0;
+  }
+  :global(.calendar-day-main) {
+    min-width: 0;
+  }
+  :global(.calendar-day-pet-owner) {
+    font-size: 12px;
+    margin: 0;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  :global(.calendar-day-pet) {
+    font-weight: 700;
+    color: #0f172a;
+  }
+  :global(.calendar-day-owner) {
+    color: #64748b;
+    font-weight: 500;
+  }
+  :global(.calendar-day-service) {
+    margin: 3px 0 0;
+    font-size: 11px;
+    color: #94a3b8;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  :global(.calendar-day-status) {
+    margin-left: auto;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    border: 1px solid transparent;
+  }
+  :global(.calendar-day-status.pendiente) {
+    background: #fef3c7;
+    color: #92400e;
+    border-color: #fde68a;
+  }
+  :global(.calendar-day-status.confirmado) {
+    background: #dcfce7;
+    color: #166534;
+    border-color: #86efac;
+  }
+  :global(.calendar-day-status.rechazado) {
+    background: #fee2e2;
+    color: #991b1b;
+    border-color: #fca5a5;
+  }
+  :global(.calendar-day-status.en_espera),
+  :global(.calendar-day-status.completado),
+  :global(.calendar-day-status.sin_cita) {
+    background: #e2e8f0;
+    color: #475569;
+    border-color: #cbd5e1;
+  }
+
+  :global(.search-result-item) {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin: 0 6px 8px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    box-shadow: 0 8px 20px -16px rgba(15, 23, 42, 0.35);
+    cursor: pointer;
+    transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+  }
+  :global(.search-result-item:hover) {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    box-shadow: 0 12px 24px -18px rgba(15, 23, 42, 0.45);
+  }
+  :global(.search-result-left) {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 0;
+    flex: 1;
+  }
+  :global(.search-avatar) {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 16px;
+  }
+  :global(.search-result-info) {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 3px;
+  }
+  :global(.search-title-row) {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    min-width: 0;
+  }
+  :global(.search-pet-name) {
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.15;
+    color: #0f172a;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  :global(.search-title-separator) {
+    color: #94a3b8;
+    font-size: 12px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  :global(.search-owner-name) {
+    font-size: 11px;
+    color: #64748b;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  :global(.search-meta-row) {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+  :global(.search-meta-chip) {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #64748b;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  :global(.search-meta-icon) {
+    font-size: 11px;
+    line-height: 1;
+    color: #94a3b8;
+    flex-shrink: 0;
+  }
+  :global(.search-result-right) {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-left: 6px;
+    flex-shrink: 0;
+  }
+  :global(.search-right-meta) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+  :global(.search-date-label) {
+    font-size: 11px;
+    font-weight: 700;
+    color: #334155;
+    line-height: 1;
+  }
+  :global(.search-time-label) {
+    font-size: 10px;
+    color: #94a3b8;
+    line-height: 1;
+  }
+  :global(.search-status-badge) {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: capitalize;
+    border-radius: 9999px;
+    padding: 2px 8px;
+    border: 1px solid transparent;
+    white-space: nowrap;
+  }
+  :global(.search-status-badge.confirmado) {
+    background: #dcfce7;
+    color: #166534;
+    border-color: #86efac;
+  }
+  :global(.search-status-badge.pendiente) {
+    background: #fef3c7;
+    color: #92400e;
+    border-color: #fcd34d;
+  }
+  :global(.search-status-badge.rechazado) {
+    background: #fee2e2;
+    color: #991b1b;
+    border-color: #fca5a5;
+  }
+  :global(.search-status-badge.en_espera) {
+    background: #e0f2fe;
+    color: #075985;
+    border-color: #7dd3fc;
+  }
+  :global(.search-status-badge.completado) {
+    background: #e2e8f0;
+    color: #334155;
+    border-color: #cbd5e1;
+  }
+  :global(.search-status-badge.sin_cita) {
+    background: #f1f5f9;
+    color: #64748b;
+    border-color: #e2e8f0;
+  }
+  :global(.search-detail-btn) {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 10px;
+    padding: 6px 10px;
+    border: 1px solid #cbd5e1;
+    background: transparent;
+    color: #0f172a;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 140ms ease;
+  }
+  :global(.search-detail-btn:hover) {
+    background: #f1f5f9;
+  }
+  :global(.search-detail-eye) {
+    font-size: 12px;
+    line-height: 1;
+  }
+
+  /* Custom Confirm Modal */
+  :global(.confirm-modal-overlay) {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: confirmFadeIn 0.15s ease-out;
+  }
+  :global(.confirm-modal-overlay.hidden) {
+    display: none;
+  }
+  @keyframes confirmFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes confirmSlideIn {
+    from { opacity: 0; transform: scale(0.95) translateY(-8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  :global(.confirm-modal) {
+    background: white;
+    border-radius: 20px;
+    padding: 28px 24px 20px;
+    width: 380px;
+    max-width: calc(100vw - 32px);
+    text-align: center;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    animation: confirmSlideIn 0.2s ease-out;
+  }
+  :global(.confirm-modal-icon) {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+  }
+  :global(.confirm-modal-title) {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 6px;
+  }
+  :global(.confirm-modal-msg) {
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.5;
+    margin-bottom: 20px;
+  }
+  :global(.confirm-modal-actions) {
+    display: flex;
+    gap: 10px;
+  }
+  :global(.confirm-modal-btn) {
+    flex: 1;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 150ms ease;
+    border: none;
+  }
+  :global(.confirm-modal-btn.cancel) {
+    background: #f1f5f9;
+    color: #475569;
+  }
+  :global(.confirm-modal-btn.cancel:hover) {
+    background: #e2e8f0;
+  }
+  :global(.confirm-modal-btn.confirm) {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+  }
+  :global(.confirm-modal-btn.confirm:hover) {
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+  }
+
+  /* Search Dropdown */
+  .search-no-results {
+    padding: 24px 16px;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 13px;
+  }
+</style>
+
+<script>
+  import { getVeterinaria, getUsuario, clearSession, isAuthenticated } from '../services/authService';
+  // TODO: Activar en Avance 2 / Avance 3 (Citas, Notificaciones y Lista de espera)
+  // import { listarCitas, type CitaConDetalles } from '../services/citaService';
+  // import { listarNotificaciones, marcarNotificacionLeida, eliminarNotificacion, type Notificacion } from '../services/notificacionService';
+  // import { convertirListaEsperaEnCita } from '../services/listaEsperaService';
+  import { listarClientes, type Cliente } from '../services/clienteService';
+  import { listarMascotas, type MascotaConDueno } from '../services/mascotaService';
+  import { listarUsuarios } from '../services/usuarioService';
+
+  type CitaConDetalles = any;
+  type Notificacion = any;
+
+  if (!isAuthenticated()) { window.location.href = '/'; }
+  const vet = getVeterinaria();
+  if (!vet) { window.location.href = '/'; }
+  const usuario = getUsuario();
+  const userRol = usuario?.rol ?? 'secretaria';
+
+  // Hide secretaria-only elements for veterinarios
+  if (userRol === 'veterinario') {
+    document.querySelectorAll('[data-only-secretaria]').forEach(el => {
+      (el as HTMLElement).style.display = 'none';
+    });
+  }
+
+  // Elements
+  const welcomeMessage = document.getElementById('welcomeMessage') as HTMLHeadingElement;
+  const logoutBtn = document.getElementById('logoutBtn') as HTMLButtonElement;
+  const notificationBtn = document.getElementById('notificationBtn') as HTMLButtonElement;
+  const notificationBadge = document.getElementById('notificationBadge') as HTMLSpanElement;
+  const notificationPanel = document.getElementById('notificationPanel') as HTMLDivElement;
+  const closeNotifications = document.getElementById('closeNotifications') as HTMLButtonElement;
+  const notificationList = document.getElementById('notificationList') as HTMLDivElement;
+  const notificationUnreadCount = document.getElementById('notificationUnreadCount') as HTMLSpanElement;
+  const markAllNotificationsRead = document.getElementById('markAllNotificationsRead') as HTMLButtonElement;
+  const notifFilterUnread = document.getElementById('notifFilterUnread') as HTMLButtonElement;
+  const notifFilterAll = document.getElementById('notifFilterAll') as HTMLButtonElement;
+  const notifSearchInput = document.getElementById('notifSearchInput') as HTMLInputElement;
+  const notifDateInput = document.getElementById('notifDateInput') as HTMLInputElement;
+  const notifClearFilters = document.getElementById('notifClearFilters') as HTMLButtonElement;
+  const sidebar = document.getElementById('sidebar') as HTMLElement;
+  const sidebarOverlay = document.getElementById('sidebarOverlay') as HTMLDivElement;
+  const hamburgerBtn = document.getElementById('hamburgerBtn') as HTMLButtonElement;
+  const todayDateEl = document.getElementById('todayDate') as HTMLParagraphElement;
+  const bannerDateEl = document.getElementById('bannerDate') as HTMLSpanElement;
+  const headerAvatar = document.getElementById('headerAvatar') as HTMLDivElement;
+  const headerVetName = document.getElementById('headerVetName') as HTMLParagraphElement;
+  const vetNameEl = document.getElementById('vetName') as HTMLSpanElement;
+  const userAvatar = document.getElementById('userAvatar') as HTMLDivElement;
+  const calendarPopupBtn = document.getElementById('calendarPopupBtn') as HTMLButtonElement;
+  const calendarOverlay = document.getElementById('calendarOverlay') as HTMLDivElement;
+  const calendarPopupPanel = document.getElementById('calendarPopupPanel') as HTMLDivElement;
+  const closeCalendarPopup = document.getElementById('closeCalendarPopup') as HTMLButtonElement;
+  const calendarMonthLabel = document.getElementById('calendarMonthLabel') as HTMLParagraphElement;
+  const calendarSummaryText = document.getElementById('calendarSummaryText') as HTMLParagraphElement;
+  const calendarPrevMonth = document.getElementById('calendarPrevMonth') as HTMLButtonElement;
+  const calendarNextMonth = document.getElementById('calendarNextMonth') as HTMLButtonElement;
+  const calendarGrid = document.getElementById('calendarGrid') as HTMLDivElement;
+  const calendarDayTitle = document.getElementById('calendarDayTitle') as HTMLParagraphElement;
+  const calendarDayCount = document.getElementById('calendarDayCount') as HTMLSpanElement;
+  const calendarDayList = document.getElementById('calendarDayList') as HTMLDivElement;
+  const calendarDaySearchInput = document.getElementById('calendarDaySearchInput') as HTMLInputElement;
+  if (calendarOverlay) calendarOverlay.dataset.open = 'false';
+
+  // Date
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const capitalizedDate = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+  if (todayDateEl) todayDateEl.textContent = capitalizedDate;
+  if (bannerDateEl) bannerDateEl.textContent = capitalizedDate;
+
+  // Vet name
+  if (vet) {
+    vetNameEl.textContent = vet.nombre;
+    const displayName = usuario?.nombre || vet.nombre;
+    userAvatar.textContent = displayName.charAt(0).toUpperCase();
+    const greeting = userRol === 'veterinario'
+      ? `¡Hola, Dr. ${usuario?.nombre || vet.nombre}! Bienvenido al panel.`
+      : `¡Hola, ${vet.nombre}! Estamos listos para otro gran día.`;
+    welcomeMessage.textContent = greeting;
+    if (headerAvatar) headerAvatar.textContent = displayName.charAt(0).toUpperCase();
+    if (headerVetName) headerVetName.textContent = vet.nombre;
+  }
+
+  // Mobile sidebar
+  hamburgerBtn.addEventListener('click', () => { sidebar.classList.toggle('-translate-x-full'); sidebarOverlay.classList.toggle('hidden'); });
+  sidebarOverlay.addEventListener('click', () => { sidebar.classList.add('-translate-x-full'); sidebarOverlay.classList.add('hidden'); });
+
+  // Logout
+  logoutBtn.addEventListener('click', () => { clearSession(); window.location.href = '/'; });
+
+  // Notifications panel (TODO: Activar en Avance 2 / Avance 3)
+  notificationBtn?.addEventListener('click', () => {
+    notificationPanel?.classList.toggle('translate-x-full');
+    if (notificationPanel && !notificationPanel.classList.contains('translate-x-full')) {
+      loadNotifications();
+    }
+  });
+  closeNotifications?.addEventListener('click', () => { notificationPanel?.classList.add('translate-x-full'); });
+  let notificationItems: Notificacion[] = [];
+  let notificationFilter: 'unread' | 'all' = 'unread';
+  let notificationSearchTerm = '';
+  let notificationDateFilter = '';
+  let notificationsPollingId: ReturnType<typeof setInterval> | null = null;
+  let notificationsFetchInFlight = false;
+  let waitlistConversionInFlight = false;
+  let convertingNotificationId: number | null = null;
+
+  // Species helpers
+  const speciesEmoji: Record<string, string> = { 'Perro': '🐕', 'Gato': '🐱', 'Ave': '🦜', 'Roedor': '🐹', 'Reptil': '🦎', 'Pez': '🐠', 'Anfibio': '🐸', 'Exotico': '🦥' };
+  const speciesAvatarBg: Record<string, string> = { 'Perro': 'background:#fef3c7;', 'Gato': 'background:#ede9fe;', 'Ave': 'background:#e0f2fe;', 'Roedor': 'background:#fce7f3;', 'Reptil': 'background:#ecfccb;', 'Pez': 'background:#cffafe;', 'Anfibio': 'background:#dcfce7;', 'Exotico': 'background:#ffedd5;' };
+  const estadoStyles: Record<string, string> = { 'pendiente': 'background:#fef3c7;color:#92400e;', 'confirmado': 'background:#d1fae5;color:#065f46;', 'en_espera': 'background:#dbeafe;color:#1e40af;', 'completado': 'background:#f3f4f6;color:#4b5563;', 'rechazado': 'background:#fee2e2;color:#991b1b;' };
+
+  function timeAgo(dateStr: string): string {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'ahora';
+    if (mins < 60) return `hace ${mins} min`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `hace ${hrs}h`;
+    const days = Math.floor(hrs / 24);
+    if (days === 1) return 'ayer';
+    return `hace ${days} días`;
+  }
+
+  // ==========================================
+  // DATA CACHE for search
+  // ==========================================
+  let allCitas: CitaConDetalles[] = [];
+  let allClientes: Cliente[] = [];
+  let allMascotas: MascotaConDueno[] = [];
+
+  // ==========================================
+  // CITAS PENDIENTES
+  // ==========================================
+  function renderPendientes(citas: CitaConDetalles[]) {
+    const pendientesLoading = document.getElementById('pendientesLoading')!;
+    const pendientesEmpty = document.getElementById('pendientesEmpty')!;
+    const pendientesList = document.getElementById('pendientesList')!;
+    const pendientesCount = document.getElementById('pendientesCount')!;
+
+    pendientesLoading.classList.add('hidden');
+    const pending = citas.filter(c => c.estado === 'pendiente');
+
+    if (pending.length === 0) {
+      pendientesEmpty.classList.remove('hidden');
+      return;
+    }
+
+    pendientesCount.textContent = pending.length.toString();
+    pendientesCount.classList.remove('hidden');
+
+    const sorted = [...pending].sort((a, b) => new Date(b.fecha_creacion).getTime() - new Date(a.fecha_creacion).getTime());
+
+    pendientesList.classList.remove('hidden');
+    pendientesList.innerHTML = sorted.map((c, i) => {
+      const emoji = speciesEmoji[c.especie_mascota] || '🐾';
+      const avatarBg = speciesAvatarBg[c.especie_mascota] || 'background:#f1f5f9;';
+      const isLast = i === sorted.length - 1;
+      const hora = new Date(c.fecha_hora).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+      const fecha = new Date(c.fecha_hora).toLocaleDateString('es-MX', { day: '2-digit', month: 'short' });
+      return `
+        <div class="px-5 py-3.5 flex items-center justify-between cursor-pointer transition-colors hover:bg-slate-50/80" style="${isLast ? '' : 'border-bottom:1px solid #f1f5f9;'}" onclick="window.location.href='/citas'">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="${avatarBg}">
+              <span class="text-base">${emoji}</span>
+            </div>
+            <div class="min-w-0">
+              <p class="text-sm font-semibold truncate" style="color:#1e293b;">${c.nombre_mascota} <span style="color:#94a3b8;font-weight:400;">— ${c.nombre_cliente}</span></p>
+              <div class="flex items-center gap-2 mt-0.5">
+                <span class="text-[10px] px-2 py-0.5 rounded-md font-semibold" style="${estadoStyles['pendiente']}">${c.estado}</span>
+                <span class="text-[10px]" style="color:#cbd5e1;">${timeAgo(c.fecha_creacion)}</span>
+              </div>
+            </div>
+          </div>
+          <div class="text-right flex-shrink-0 ml-3">
+            <p class="text-xs font-bold" style="color:#0f172a;">${hora}</p>
+            <p class="text-[10px]" style="color:#94a3b8;">${fecha}</p>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // ==========================================
+  // CITAS DE HOY
+  // ==========================================
+  function renderCitasHoy(citas: CitaConDetalles[]) {
+    const citasHoyLoading = document.getElementById('citasHoyLoading')!;
+    const citasHoyEmpty = document.getElementById('citasHoyEmpty')!;
+    const citasHoyList = document.getElementById('citasHoyList')!;
+    const citasHoyCountEl = document.getElementById('citasHoyCount')!;
+
+    const today = new Date(); today.setHours(0,0,0,0);
+    const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate()+1);
+    const citasHoy = citas.filter(c => { const d = new Date(c.fecha_hora); return d >= today && d < tomorrow && c.estado !== 'rechazado'; });
+
+    citasHoyLoading.classList.add('hidden');
+
+    if (citasHoy.length > 0) { citasHoyCountEl.textContent = citasHoy.length.toString(); citasHoyCountEl.classList.remove('hidden'); }
+
+    if (citasHoy.length === 0) { citasHoyEmpty.classList.remove('hidden'); return; }
+
+    citasHoyList.classList.remove('hidden');
+    citasHoyList.innerHTML = citasHoy.map(c => {
+      const hora = new Date(c.fecha_hora).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+      const avatarBg = speciesAvatarBg[c.especie_mascota] || 'background:#f1f5f9;';
+      const emoji = speciesEmoji[c.especie_mascota] || '🐾';
+      return `
+        <div class="px-5 py-3.5 flex items-center justify-between cursor-pointer transition-colors hover:bg-slate-50/80" style="border-bottom:1px solid #f1f5f9;" onclick="window.location.href='/citas'">
+          <div class="flex items-center space-x-3">
+            <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style="${avatarBg}"><span class="text-lg">${emoji}</span></div>
+            <div class="min-w-0">
+              <p class="text-sm font-semibold truncate" style="color:#1e293b;">${c.nombre_mascota}</p>
+              <p class="text-xs truncate" style="color:#94a3b8;">${c.nombre_cliente} · ${c.tipo_atencion}</p>
+            </div>
+          </div>
+          <div class="text-right flex-shrink-0 ml-3">
+            <p class="text-sm font-bold" style="color:#0f172a;">${hora}</p>
+            <span class="inline-block px-2 py-0.5 rounded-md text-[10px] font-semibold mt-0.5" style="${estadoStyles[c.estado] || estadoStyles['pendiente']}">${c.estado}</span>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // ==========================================
+  // LOAD DATA
+  // ==========================================
+  async function loadData() {
+    try {
+      // TODO: Activar en Avance 2 / Avance 3 (carga de citas y notificaciones)
+      // const citas = await listarCitas();
+      // allCitas = citas;
+      // renderPendientes(citas);
+      // renderCitasHoy(citas);
+      // loadNotifications();
+
+      const metricClientes = document.getElementById('metricClientes');
+      const metricMascotas = document.getElementById('metricMascotas');
+      const metricUsuarios = document.getElementById('metricUsuarios');
+
+      try {
+        allClientes = await listarClientes();
+        if (metricClientes) metricClientes.textContent = allClientes.length.toString();
+      } catch {}
+
+      try {
+        allMascotas = await listarMascotas();
+        if (metricMascotas) metricMascotas.textContent = allMascotas.length.toString();
+      } catch {}
+
+      if (userRol === 'secretaria') {
+        try {
+          const usuarios = await listarUsuarios();
+          const activos = usuarios.filter(u => u.activo === 1).length;
+          if (metricUsuarios) metricUsuarios.textContent = activos.toString();
+        } catch {}
+      }
+    } catch (error) {
+      console.error('Error loading data:', error);
+    }
+  }
+
+  // ==========================================
+  // NOTIFICATIONS
+  // ==========================================
+  /* TODO: Activar en Avance 2 / Avance 3 (Notificaciones y llamadas a notificacionService / listaEsperaService)
+  function setNotificationFilterUI() {
+    const unreadActive = notificationFilter === 'unread';
+    notifFilterUnread.style.background = unreadActive ? '#eff6ff' : '#f8fafc';
+    notifFilterUnread.style.color = unreadActive ? '#1d4ed8' : '#64748b';
+    notifFilterUnread.style.borderColor = unreadActive ? '#bfdbfe' : '#e2e8f0';
+    notifFilterAll.style.background = !unreadActive ? '#eff6ff' : '#f8fafc';
+    notifFilterAll.style.color = !unreadActive ? '#1d4ed8' : '#64748b';
+    notifFilterAll.style.borderColor = !unreadActive ? '#bfdbfe' : '#e2e8f0';
+  }
+
+  function getNotificationTypeMeta(tipo: string): { bg: string; color: string; label: string; icon: string } {
+    if (tipo === 'cita_asignada') return { bg: '#dbeafe', color: '#1d4ed8', label: 'Asignacion', icon: '📅' };
+    if (tipo === 'recordatorio_cita') return { bg: '#fef3c7', color: '#92400e', label: 'Recordatorio', icon: '⏰' };
+    if (tipo === 'lista_espera_sugerencia') return { bg: '#ede9fe', color: '#5b21b6', label: 'Lista de Espera', icon: '🧠' };
+    return { bg: '#e2e8f0', color: '#475569', label: 'Sistema', icon: '🔔' };
+  }
+
+  function extractFirstWaitlistId(message: string): number | null {
+    const match = message.match(/LE#(\d+)/i);
+    if (!match) return null;
+    const parsed = parseInt(match[1], 10);
+    return Number.isNaN(parsed) ? null : parsed;
+  }
+
+  function formatRelativeDate(dateStr: string): string {
+    const diffMs = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diffMs / 60000);
+    if (mins < 1) return 'ahora';
+    if (mins < 60) return `hace ${mins} min`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `hace ${hrs} h`;
+    const days = Math.floor(hrs / 24);
+    if (days === 1) return 'ayer';
+    return `${days} dias`;
+  }
+
+  function renderNotifications() {
+    const unreadItems = notificationItems.filter(n => n.leida === 0);
+    const base = notificationFilter === 'unread' ? unreadItems : notificationItems;
+    const term = notificationSearchTerm.trim().toLowerCase();
+    const visible = base.filter(n => {
+      const matchesText = !term
+        || n.mensaje.toLowerCase().includes(term)
+        || n.tipo.toLowerCase().includes(term);
+      const matchesDate = !notificationDateFilter
+        || toDateKey(new Date(n.fecha_creacion)) === notificationDateFilter;
+      return matchesText && matchesDate;
+    });
+
+    notificationUnreadCount.textContent = unreadItems.length.toString();
+    if (unreadItems.length > 0) {
+      notificationBadge.textContent = unreadItems.length.toString();
+      notificationBadge.style.display = 'flex';
+    } else {
+      notificationBadge.style.display = 'none';
+    }
+    markAllNotificationsRead.style.display = unreadItems.length > 0 ? 'inline-flex' : 'none';
+
+    if (notificationItems.length === 0) {
+      notificationList.innerHTML = '<div class="p-8 text-center"><div class="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3" style="background:#f1f5f9;"><span style="font-size:20px;">🔕</span></div><p class="text-sm font-medium" style="color:#64748b;">Sin notificaciones</p><p class="text-xs mt-1" style="color:#94a3b8;">Cuando haya actividad te avisaremos aquí</p></div>';
+      return;
+    }
+
+    if (visible.length === 0) {
+      notificationList.innerHTML = '<div class="p-8 text-center"><div class="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3" style="background:#f1f5f9;"><span style="font-size:20px;">✅</span></div><p class="text-sm font-medium" style="color:#64748b;">Sin resultados</p><p class="text-xs mt-1" style="color:#94a3b8;">Ajusta el buscador o la fecha</p></div>';
+      return;
+    }
+
+    notificationList.innerHTML = visible.map((n, idx) => {
+      const meta = getNotificationTypeMeta(n.tipo);
+      const waitlistId = n.tipo === 'lista_espera_sugerencia' ? extractFirstWaitlistId(n.mensaje) : null;
+      const isConverting = convertingNotificationId === n.id;
+      const rowBg = n.leida ? '#ffffff' : '#f8fbff';
+      const rowBorder = idx === visible.length - 1 ? 'none' : '1px solid #f1f5f9';
+      return `
+        <div data-notif-id="${n.id}" data-cita-id="${n.cita_id || ''}" data-waitlist-id="${waitlistId || ''}" data-notif-action="open" class="px-4 py-3 transition-colors cursor-pointer hover:bg-slate-50" style="background:${rowBg};border-bottom:${rowBorder};">
+          <div class="flex items-start gap-3">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style="background:${meta.bg};color:${meta.color};font-size:14px;">${meta.icon}</div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between gap-2 mb-1">
+                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full" style="background:${meta.bg};color:${meta.color};">${meta.label}</span>
+                <span class="text-[11px]" style="color:#94a3b8;">${formatRelativeDate(n.fecha_creacion)}</span>
+              </div>
+              <p class="text-sm leading-5" style="color:#1e293b;">${n.mensaje}</p>
+              <p class="text-xs mt-1" style="color:#94a3b8;">${formatDate(n.fecha_creacion)}</p>
+              <div class="flex items-center gap-2 mt-2">
+                ${n.leida === 0 ? '<button data-notif-action="read" class="text-[11px] font-semibold px-2 py-1 rounded-md hover:bg-slate-100" style="color:#2563eb;">Marcar leida</button>' : ''}
+                <button data-notif-action="delete" class="text-[11px] font-semibold px-2 py-1 rounded-md hover:bg-red-50" style="color:#dc2626;">Eliminar</button>
+                ${waitlistId && userRol === 'secretaria' ? `<button data-notif-action="convert-waitlist" ${isConverting ? 'disabled' : ''} class="text-[11px] font-semibold px-2 py-1 rounded-md ${isConverting ? '' : 'hover:bg-emerald-50'}" style="color:#047857;${isConverting ? 'opacity:0.65;cursor:not-allowed;background:#ecfdf5;' : ''}">${isConverting ? 'Convirtiendo...' : 'Convertir ahora'}</button>` : ''}
+                ${waitlistId ? '<button data-notif-action="prefill-waitlist" class="text-[11px] font-semibold px-2 py-1 rounded-md hover:bg-blue-50" style="color:#1d4ed8;">Prefill cita</button>' : ''}
+                ${n.cita_id ? '<span class="text-[11px]" style="color:#94a3b8;">Abrir cita</span>' : ''}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function loadNotifications() {
+    if (notificationsFetchInFlight) return;
+    notificationsFetchInFlight = true;
+    try {
+      notificationItems = await listarNotificaciones();
+      renderNotifications();
+    } catch (error) {
+      console.error('Error loading notifications:', error);
+      notificationBadge.style.display = 'none';
+      notificationList.innerHTML = '<div class="p-8 text-center"><p class="text-sm font-medium" style="color:#64748b;">No se pudieron cargar las notificaciones</p><p class="text-xs mt-1" style="color:#94a3b8;">Intenta abrir el panel nuevamente</p></div>';
+    } finally {
+      notificationsFetchInFlight = false;
+    }
+  }
+
+  function startNotificationsPolling() {
+    if (notificationsPollingId) clearInterval(notificationsPollingId);
+    notificationsPollingId = setInterval(() => {
+      loadNotifications();
+    }, 25000);
+  }
+
+  function stopNotificationsPolling() {
+    if (notificationsPollingId) {
+      clearInterval(notificationsPollingId);
+      notificationsPollingId = null;
+    }
+  }
+
+  notifFilterUnread?.addEventListener('click', () => {
+    notificationFilter = 'unread';
+    setNotificationFilterUI();
+    renderNotifications();
+  });
+
+  notifFilterAll?.addEventListener('click', () => {
+    notificationFilter = 'all';
+    setNotificationFilterUI();
+    renderNotifications();
+  });
+
+  markAllNotificationsRead?.addEventListener('click', async () => {
+    const unread = notificationItems.filter(n => n.leida === 0);
+    if (!unread.length) return;
+    try {
+      await Promise.all(unread.map(n => marcarNotificacionLeida(n.id)));
+      await loadNotifications();
+    } catch (error) {
+      console.error('Error marking all as read:', error);
+    }
+  });
+
+  notificationList?.addEventListener('click', async (e) => {
+    const target = e.target as HTMLElement;
+    const actionEl = target.closest('[data-notif-action]') as HTMLElement | null;
+    const rowEl = target.closest('[data-notif-id]') as HTMLElement | null;
+    if (!rowEl || !actionEl) return;
+
+    const notifId = parseInt(rowEl.dataset.notifId || '', 10);
+    const citaId = parseInt(rowEl.dataset.citaId || '', 10);
+    const waitlistId = parseInt(rowEl.dataset.waitlistId || '', 10);
+    const action = actionEl.dataset.notifAction;
+    if (Number.isNaN(notifId)) return;
+    const currentNotif = notificationItems.find(n => n.id === notifId);
+
+    try {
+      if (action === 'delete') {
+        await eliminarNotificacion(notifId);
+        notificationItems = notificationItems.filter(n => n.id !== notifId);
+        renderNotifications();
+        return;
+      }
+
+      if (action === 'read') {
+        await marcarNotificacionLeida(notifId);
+        notificationItems = notificationItems.map(n => n.id === notifId ? { ...n, leida: 1 } : n);
+        renderNotifications();
+        return;
+      }
+
+      if (action === 'prefill-waitlist') {
+        const refCitaParam = !Number.isNaN(citaId) && citaId > 0 ? `&refCitaId=${citaId}` : '';
+        if (!Number.isNaN(waitlistId) && waitlistId > 0) {
+          window.location.href = `/citas?waitlistId=${waitlistId}${refCitaParam}`;
+          return;
+        }
+      }
+
+      if (action === 'convert-waitlist') {
+        if (waitlistConversionInFlight) return;
+        if (Number.isNaN(waitlistId) || waitlistId <= 0) {
+          return;
+        }
+
+        const confirmed = await showConfirmModal(
+          'Se creara una cita directamente desde esta sugerencia de lista de espera. ¿Deseas continuar?',
+          'Convertir sugerencia'
+        );
+        if (!confirmed) return;
+
+        waitlistConversionInFlight = true;
+        convertingNotificationId = notifId;
+        renderNotifications();
+        const created = await convertirListaEsperaEnCita({
+          itemId: waitlistId,
+          citaReferenciaId: !Number.isNaN(citaId) && citaId > 0 ? citaId : undefined
+        });
+
+        if (currentNotif && currentNotif.leida === 0) {
+          await marcarNotificacionLeida(notifId);
+          notificationItems = notificationItems.map(n => n.id === notifId ? { ...n, leida: 1 } : n);
+        }
+
+        await loadData();
+        window.location.href = `/citas?citaId=${created.id}`;
+        return;
+      }
+
+      if (currentNotif && currentNotif.leida === 0) {
+        await marcarNotificacionLeida(notifId);
+        notificationItems = notificationItems.map(n => n.id === notifId ? { ...n, leida: 1 } : n);
+        renderNotifications();
+      }
+      if (!Number.isNaN(citaId) && citaId > 0) {
+        window.location.href = `/citas?citaId=${citaId}`;
+      }
+    } catch (error) {
+      console.error('Notification action error:', error);
+    } finally {
+      waitlistConversionInFlight = false;
+      convertingNotificationId = null;
+      renderNotifications();
+    }
+  });
+
+  notifSearchInput?.addEventListener('input', () => {
+    notificationSearchTerm = notifSearchInput.value;
+    renderNotifications();
+  });
+
+  notifDateInput?.addEventListener('change', () => {
+    notificationDateFilter = notifDateInput.value;
+    renderNotifications();
+  });
+
+  notifClearFilters?.addEventListener('click', () => {
+    notificationSearchTerm = '';
+    notificationDateFilter = '';
+    notifSearchInput.value = '';
+    notifDateInput.value = '';
+    renderNotifications();
+  });
+
+  setNotificationFilterUI();
+  startNotificationsPolling();
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stopNotificationsPolling();
+    else {
+      loadNotifications();
+      startNotificationsPolling();
+    }
+  });
+  */
+
+  function normalizePhone(value: string | null | undefined): string {
+    return (value || '').replace(/\D/g, '');
+  }
+
+  function toDateKey(date: Date): string {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  function getTodayKey(): string {
+    return toDateKey(new Date());
+  }
+
+  function pickBestCita(citas: CitaConDetalles[]): CitaConDetalles | null {
+    return citas[0] || null;
+  }
+
+  function getCitasForCliente(_nombreCliente: string, _telefonoCliente?: string): CitaConDetalles[] {
+    return [];
+  }
+
+  // En Avance 1 la búsqueda redirige a Clientes / Mascotas (no a /citas).
+  // TODO: En Avance 2 restaurar redirección a /citas?citaId=...
+  function buildClientCitaTarget(_nombreCliente: string, _telefonoCliente?: string): string {
+    return '/clientes';
+  }
+
+  function buildMascotaCitaTarget(_mascotaId: number, _fallbackText: string): string {
+    return '/mascotas';
+  }
+
+  loadData();
+
+  // ==========================================
+  // OMNISEARCH — Functional search
+  // ==========================================
+  const omnisearchInput = document.getElementById('omnisearchInput') as HTMLInputElement | null;
+  const searchDropdown = document.getElementById('searchDropdown') as HTMLDivElement;
+  let searchTimeout: ReturnType<typeof setTimeout>;
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); omnisearchInput?.focus(); }
+    if (e.key === 'Escape') { omnisearchInput?.blur(); searchDropdown.classList.add('hidden'); }
+  });
+
+  function positionDropdown() {
+    if (!omnisearchInput) return;
+    const rect = omnisearchInput.getBoundingClientRect();
+    searchDropdown.style.top = `${rect.bottom + 6}px`;
+    searchDropdown.style.left = `${rect.left}px`;
+    searchDropdown.style.width = `${rect.width}px`;
+  }
+
+  function performSearch(query: string) {
+    if (!query || query.length < 2) { searchDropdown.classList.add('hidden'); return; }
+
+    const q = query.toLowerCase();
+    const qPhone = normalizePhone(query);
+    const results: Array<{
+      type: 'cita' | 'cliente' | 'mascota';
+      petName: string;
+      ownerName: string;
+      phone: string;
+      reason: string;
+      dateLabel: string;
+      timeLabel: string;
+      status: string;
+      statusLabel: string;
+      emoji: string;
+      bg: string;
+      targetUrl: string;
+    }> = [];
+
+    // Search citas (by client name, pet name, phone)
+    for (const c of allCitas) {
+      const phoneMatch = qPhone.length >= 3 && normalizePhone(c.telefono_cliente).includes(qPhone);
+      if (c.nombre_cliente.toLowerCase().includes(q) || c.nombre_mascota.toLowerCase().includes(q) || phoneMatch) {
+        const hora = new Date(c.fecha_hora).toLocaleTimeString('es-MX', { hour:'2-digit', minute:'2-digit' });
+        const fecha = new Date(c.fecha_hora).toLocaleDateString('es-MX', { day:'2-digit', month:'short' });
+        results.push({
+          type: 'cita',
+          petName: c.nombre_mascota,
+          ownerName: c.nombre_cliente,
+          phone: c.telefono_cliente || 'N/A',
+          reason: c.tipo_atencion,
+          dateLabel: fecha,
+          timeLabel: hora,
+          status: c.estado,
+          statusLabel: c.estado,
+          emoji: speciesEmoji[c.especie_mascota] || '🐾',
+          bg: speciesAvatarBg[c.especie_mascota] || 'background:#f1f5f9;',
+          targetUrl: `/citas?citaId=${c.id}`
+        });
+      }
+      if (results.length >= 10) break;
+    }
+
+    // Search clients not in citas
+    if (results.length < 10) {
+      for (const cl of allClientes) {
+        const phoneMatch = qPhone.length >= 3 && normalizePhone(cl.telefono).includes(qPhone);
+        if (cl.nombre.toLowerCase().includes(q) || phoneMatch) {
+          if (!results.find(r => r.type === 'cliente' && r.ownerName === cl.nombre)) {
+            const citasCliente = getCitasForCliente(cl.nombre, cl.telefono).sort((a, b) =>
+              new Date(a.fecha_hora).getTime() - new Date(b.fecha_hora).getTime()
+            );
+            const best = pickBestCita(citasCliente);
+            const bestDate = best ? new Date(best.fecha_hora) : null;
+            results.push({
+              type: 'cliente',
+              petName: best?.nombre_mascota || 'Cliente',
+              ownerName: cl.nombre,
+              phone: cl.telefono || 'N/A',
+              reason: best?.tipo_atencion || `${cl.total_mascotas} mascota(s) registradas`,
+              dateLabel: bestDate ? bestDate.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' }) : '--',
+              timeLabel: bestDate ? bestDate.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }) : 'Cliente',
+              status: best?.estado || 'completado',
+              statusLabel: best?.estado || 'cliente',
+              emoji: '👤',
+              bg: 'background:#eff6ff;',
+              targetUrl: buildClientCitaTarget(cl.nombre, cl.telefono)
+            });
+          }
+        }
+        if (results.length >= 10) break;
+      }
+    }
+
+    // Search pets not in citas
+    if (results.length < 10) {
+      for (const m of allMascotas) {
+        const ownerPhoneMatch = qPhone.length >= 3 && normalizePhone(m.telefono_dueno).includes(qPhone);
+        if (m.nombre.toLowerCase().includes(q) || (m.nombre_dueno && m.nombre_dueno.toLowerCase().includes(q)) || ownerPhoneMatch) {
+          if (!results.find(r => r.type === 'mascota' && r.petName === m.nombre && r.ownerName === m.nombre_dueno)) {
+            const citasMascota = allCitas
+              .filter(c => c.mascota_id === m.id)
+              .sort((a, b) => new Date(a.fecha_hora).getTime() - new Date(b.fecha_hora).getTime());
+            const best = pickBestCita(citasMascota);
+            const bestDate = best ? new Date(best.fecha_hora) : null;
+            results.push({
+              type: 'mascota',
+              petName: m.nombre,
+              ownerName: m.nombre_dueno,
+              phone: m.telefono_dueno || 'N/A',
+              reason: best?.tipo_atencion || `${m.especie}${m.raza ? ' · ' + m.raza : ''}`,
+              dateLabel: bestDate ? bestDate.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' }) : '--',
+              timeLabel: bestDate ? bestDate.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }) : 'Mascota',
+              status: best?.estado || 'completado',
+              statusLabel: best?.estado || 'mascota',
+              emoji: speciesEmoji[m.especie] || '🐾',
+              bg: speciesAvatarBg[m.especie] || 'background:#f1f5f9;',
+              targetUrl: buildMascotaCitaTarget(m.id, `${m.nombre} ${m.nombre_dueno}`)
+            });
+          }
+        }
+        if (results.length >= 10) break;
+      }
+    }
+
+    if (results.length === 0) {
+      searchDropdown.innerHTML = '<div class="search-no-results">No se encontraron resultados</div>';
+    } else {
+      searchDropdown.innerHTML = results.map(r => `
+        <div class="search-result-item" onclick="window.location.href='${r.targetUrl}'">
+          <div class="search-result-left">
+            <div class="search-avatar" style="${r.bg}">
+              <span>${r.emoji}</span>
+            </div>
+            <div class="search-result-info">
+              <div class="search-title-row">
+                <p class="search-pet-name">${r.petName}</p>
+                <span class="search-title-separator">|</span>
+                <p class="search-owner-name">${r.ownerName}</p>
+              </div>
+              <div class="search-meta-row">
+                <span class="search-meta-chip">
+                  <span class="search-meta-icon">📞</span>
+                  <span>${r.phone}</span>
+                </span>
+                <span class="search-meta-chip" title="${r.reason}">
+                  <span class="search-meta-icon">🩺</span>
+                  <span>${r.reason}</span>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="search-result-right">
+            <div class="search-right-meta">
+              <p class="search-date-label">${r.dateLabel}</p>
+              <p class="search-time-label">${r.timeLabel}</p>
+              <span class="search-status-badge ${r.status}">${r.statusLabel}</span>
+            </div>
+            <button
+              type="button"
+              class="search-detail-btn"
+              onclick="event.stopPropagation(); window.location.href='${r.targetUrl}'"
+              aria-label="Ver detalles de ${r.petName}"
+            >
+              <span class="search-detail-eye">👁</span>
+              <span>Ver detalles</span>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    positionDropdown();
+    searchDropdown.classList.remove('hidden');
+  }
+
+  omnisearchInput?.addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => performSearch(omnisearchInput.value.trim()), 300);
+  });
+
+  omnisearchInput?.addEventListener('focus', () => {
+    if (omnisearchInput.value.trim().length >= 2) performSearch(omnisearchInput.value.trim());
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!searchDropdown.contains(e.target as Node) && e.target !== omnisearchInput) searchDropdown.classList.add('hidden');
+  });
+
+  // ==========================================
+  // CALENDAR POPUP
+  // ==========================================
+  let calendarCurrentMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  let calendarSelectedDateKey: string | null = null;
+
+  function getMonthLabel(date: Date): string {
+    return date.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' });
+  }
+
+  function getDayCitas(dateKey: string): CitaConDetalles[] {
+    return allCitas
+      .filter(c => toDateKey(new Date(c.fecha_hora)) === dateKey)
+      .sort((a, b) => new Date(a.fecha_hora).getTime() - new Date(b.fecha_hora).getTime());
+  }
+
+  function renderCalendarDayList() {
+    if (!calendarSelectedDateKey) {
+      calendarDayTitle.textContent = 'Selecciona un dia';
+      calendarDayCount.textContent = '0 citas';
+      calendarDayList.innerHTML = '<div class="px-4 py-6 text-center text-xs" style="color:#94a3b8;">Haz clic en un dia del calendario para ver las citas</div>';
+      return;
+    }
+
+    const selectedDate = new Date(`${calendarSelectedDateKey}T12:00:00`);
+    calendarDayTitle.textContent = selectedDate.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
+
+    const term = calendarDaySearchInput.value.trim().toLowerCase();
+    const termPhone = normalizePhone(calendarDaySearchInput.value);
+    let citasDia = getDayCitas(calendarSelectedDateKey);
+
+    if (term) {
+      citasDia = citasDia.filter(c => {
+        const byName = c.nombre_cliente.toLowerCase().includes(term) || c.nombre_mascota.toLowerCase().includes(term);
+        const byPhone = termPhone.length >= 3 && normalizePhone(c.telefono_cliente).includes(termPhone);
+        return byName || byPhone;
+      });
+    }
+
+    calendarDayCount.textContent = `${citasDia.length} cita(s)`;
+
+    if (!citasDia.length) {
+      calendarDayList.innerHTML = '<div class="px-4 py-6 text-center text-xs" style="color:#94a3b8;">No hay citas para ese filtro</div>';
+      return;
+    }
+
+    calendarDayList.innerHTML = citasDia.map(c => {
+      const hora = new Date(c.fecha_hora).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+      const statusClass = c.estado.replace(/\s+/g, '_');
+      return `
+        <div class="calendar-day-item" onclick="window.location.href='/citas?citaId=${c.id}'">
+          <div class="calendar-day-item-row">
+            <p class="calendar-day-time">${hora}</p>
+            <div class="calendar-day-main">
+              <p class="calendar-day-pet-owner">
+                <span class="calendar-day-pet">${c.nombre_mascota}</span>
+                <span class="calendar-day-owner"> · ${c.nombre_cliente}</span>
+              </p>
+              <p class="calendar-day-service">${c.tipo_atencion}</p>
+            </div>
+            <span class="calendar-day-status ${statusClass}">${c.estado}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderCalendarGrid() {
+    const monthStart = new Date(calendarCurrentMonth.getFullYear(), calendarCurrentMonth.getMonth(), 1);
+    const monthEnd = new Date(calendarCurrentMonth.getFullYear(), calendarCurrentMonth.getMonth() + 1, 0);
+    const firstWeekday = (monthStart.getDay() + 6) % 7;
+    const daysInMonth = monthEnd.getDate();
+
+    const citasByDay = new Map<string, number>();
+    allCitas.forEach(c => {
+      const d = new Date(c.fecha_hora);
+      if (d.getMonth() === calendarCurrentMonth.getMonth() && d.getFullYear() === calendarCurrentMonth.getFullYear()) {
+        const key = toDateKey(d);
+        citasByDay.set(key, (citasByDay.get(key) || 0) + 1);
+      }
+    });
+
+    calendarMonthLabel.textContent = getMonthLabel(calendarCurrentMonth);
+    const totalMes = Array.from(citasByDay.values()).reduce((acc, n) => acc + n, 0);
+    calendarSummaryText.textContent = `${totalMes} cita(s) en ${getMonthLabel(calendarCurrentMonth)}`;
+
+    const cells: string[] = [];
+    for (let i = 0; i < firstWeekday; i++) {
+      cells.push('<div class="calendar-day-empty" aria-hidden="true"></div>');
+    }
+
+    const todayKey = getTodayKey();
+    for (let day = 1; day <= daysInMonth; day++) {
+      const key = toDateKey(new Date(calendarCurrentMonth.getFullYear(), calendarCurrentMonth.getMonth(), day));
+      const count = citasByDay.get(key) || 0;
+      const isSelected = calendarSelectedDateKey === key;
+      const isToday = key === todayKey;
+      cells.push(`
+        <button class="calendar-day-btn ${count ? 'has-citas' : ''} ${isSelected ? 'selected' : ''}" data-date-key="${key}" title="${count ? `${count} cita(s)` : 'Sin citas'}">
+          <span class="calendar-day-number-wrap">
+            <span class="calendar-day-number ${isSelected ? 'selected' : ''}">${day}</span>
+            ${isToday ? '<span class="calendar-today-dot"></span>' : ''}
+          </span>
+          ${count ? `<span class="calendar-day-count-badge">${count}</span>` : ''}
+        </button>
+      `);
+    }
+
+    calendarGrid.innerHTML = cells.join('');
+
+    calendarGrid.querySelectorAll<HTMLButtonElement>('.calendar-day-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        calendarSelectedDateKey = btn.dataset.dateKey || null;
+        renderCalendarGrid();
+        renderCalendarDayList();
+      });
+    });
+  }
+
+  function openCalendarPopup() {
+    renderCalendarGrid();
+    renderCalendarDayList();
+    if (calendarOverlay) calendarOverlay.dataset.open = 'true';
+  }
+
+  function closeCalendarFn() {
+    if (calendarOverlay) calendarOverlay.dataset.open = 'false';
+  }
+
+  calendarPopupBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (calendarOverlay && calendarOverlay.dataset.open === 'true') {
+      closeCalendarFn();
+      return;
+    }
+    openCalendarPopup();
+  });
+
+  closeCalendarPopup?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    closeCalendarFn();
+  });
+
+  calendarOverlay?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    closeCalendarFn();
+  });
+
+  calendarPopupPanel?.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+
+  calendarPrevMonth?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    calendarCurrentMonth = new Date(calendarCurrentMonth.getFullYear(), calendarCurrentMonth.getMonth() - 1, 1);
+    renderCalendarGrid();
+    renderCalendarDayList();
+  });
+
+  calendarNextMonth?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    calendarCurrentMonth = new Date(calendarCurrentMonth.getFullYear(), calendarCurrentMonth.getMonth() + 1, 1);
+    renderCalendarGrid();
+    renderCalendarDayList();
+  });
+
+  calendarDaySearchInput?.addEventListener('input', renderCalendarDayList);
+
+  // Calendar close is handled by overlay and close button.
+
+  // ==========================================
+  // TO-DO LIST
+  // ==========================================
+  interface TodoItem { id: number; text: string; status: 'pending' | 'completed' | 'cancelled'; createdAt: string; }
+
+  const TODO_KEY = 'vetpets_todo_list';
+  const todoListEl = document.getElementById('todoList') as HTMLDivElement;
+  const todoNewInput = document.getElementById('todoNewInput') as HTMLInputElement;
+  const todoAddBtn = document.getElementById('todoAddBtn') as HTMLButtonElement;
+  const todoCountBadge = document.getElementById('todoCountBadge') as HTMLSpanElement;
+  const todoPopupCount = document.getElementById('todoPopupCount') as HTMLSpanElement;
+  const todoSearchInput = document.getElementById('todoSearchInput') as HTMLInputElement;
+  const tasksPopupBtn = document.getElementById('tasksPopupBtn') as HTMLButtonElement;
+  const tasksPopupPanel = document.getElementById('tasksPopupPanel') as HTMLDivElement;
+  const closeTasksPopup = document.getElementById('closeTasksPopup') as HTMLButtonElement;
+  let currentTodoFilter = 'all';
+
+  // Filter tabs
+  document.querySelectorAll('.todo-filter-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.todo-filter-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentTodoFilter = (tab as HTMLElement).dataset.filter || 'all';
+      renderTodos(todoSearchInput?.value || '');
+    });
+  });
+
+  // Tasks popup toggle
+  tasksPopupBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    tasksPopupPanel.classList.toggle('hidden');
+    if (!tasksPopupPanel.classList.contains('hidden')) {
+      todoNewInput?.focus();
+    }
+  });
+  closeTasksPopup?.addEventListener('click', () => {
+    tasksPopupPanel.classList.add('hidden');
+  });
+  document.addEventListener('click', (e) => {
+    if (_blockPopupClose) return;
+    if (tasksPopupPanel && !tasksPopupPanel.contains(e.target as Node) && e.target !== tasksPopupBtn && !tasksPopupBtn.contains(e.target as Node)) {
+      tasksPopupPanel.classList.add('hidden');
+    }
+  });
+
+  // Flag to prevent popup from closing during modal/actions
+  let _blockPopupClose = false;
+
+  function formatTodoDate(dateStr: string): string {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' }) + ' ' + d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function loadTodos(): TodoItem[] {
+    try {
+      const raw = localStorage.getItem(TODO_KEY);
+      if (raw) {
+        const items = JSON.parse(raw) as any[];
+        let needsSave = false;
+        for (const item of items) {
+          if (!item.createdAt) {
+            item.createdAt = new Date().toISOString();
+            needsSave = true;
+          }
+          // Migrate old boolean completed to status string
+          if (item.status === undefined) {
+            item.status = item.completed ? 'completed' : 'pending';
+            delete item.completed;
+            needsSave = true;
+          }
+        }
+        if (needsSave) saveTodos(items);
+        return items;
+      }
+    } catch {}
+    const now = new Date().toISOString();
+    const defaults: TodoItem[] = [
+      { id: 1, text: 'Llamar al proveedor de croquetas', status: 'completed', createdAt: now },
+      { id: 2, text: 'Revisar inventario de vacunas', status: 'completed', createdAt: now },
+      { id: 3, text: 'Confirmar citas del lunes', status: 'completed', createdAt: now },
+      { id: 4, text: 'Limpiar área de gatos', status: 'pending', createdAt: now },
+      { id: 5, text: 'Actualizar precios en sistema', status: 'pending', createdAt: now },
+    ];
+    saveTodos(defaults);
+    return defaults;
+  }
+
+  function saveTodos(todos: TodoItem[]) { localStorage.setItem(TODO_KEY, JSON.stringify(todos)); }
+
+  const statusLabels: Record<string, string> = { pending: 'Pendiente', completed: 'Completada', cancelled: 'Cancelada' };
+
+  function renderTodos(filter = '') {
+    const todos = loadTodos();
+    const pendingCount = todos.filter(t => t.status === 'pending').length;
+    todoCountBadge.textContent = pendingCount.toString();
+    if (todoPopupCount) todoPopupCount.textContent = pendingCount.toString();
+
+    let filtered = filter ? todos.filter(t => t.text.toLowerCase().includes(filter.toLowerCase())) : [...todos];
+
+    // Apply tab filter
+    if (currentTodoFilter !== 'all') {
+      filtered = filtered.filter(t => t.status === currentTodoFilter);
+    }
+
+    if (filtered.length === 0) {
+      const emptyMessages: Record<string, string> = {
+        all: 'No hay tareas',
+        pending: 'No hay tareas pendientes',
+        completed: 'No hay tareas completadas',
+        cancelled: 'No hay tareas canceladas',
+      };
+      todoListEl.innerHTML = `
+        <div class="px-5 py-8 text-center">
+          <div style="width:48px;height:48px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;background:#f1f5f9;">
+            <svg style="width:24px;height:24px;color:#cbd5e1;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+          </div>
+          <p style="font-size:12px;font-weight:500;color:#94a3b8;">${filter ? 'No se encontraron tareas' : emptyMessages[currentTodoFilter] || emptyMessages.all}</p>
+          <p style="font-size:10px;margin-top:2px;color:#cbd5e1;">${filter ? 'Intenta con otro término' : (currentTodoFilter === 'all' || currentTodoFilter === 'pending' ? 'Agrega una nueva tarea abajo' : '')}</p>
+        </div>`;
+      return;
+    }
+
+    // Sort: pending first, then completed, then cancelled
+    const statusOrder: Record<string, number> = { pending: 0, completed: 1, cancelled: 2 };
+    const sorted = [...filtered].sort((a, b) => {
+      const oa = statusOrder[a.status] ?? 1;
+      const ob = statusOrder[b.status] ?? 1;
+      if (oa !== ob) return oa - ob;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+
+    todoListEl.innerHTML = sorted.map(t => {
+      const isCompleted = t.status === 'completed';
+      const isCancelled = t.status === 'cancelled';
+      const isPending = t.status === 'pending';
+      const textClass = isCompleted ? 'completed' : isCancelled ? 'cancelled' : '';
+
+      let actions = '';
+      if (isPending) {
+        actions = `
+          <button class="todo-action-btn edit-btn" onclick="editTodo(${t.id})" title="Editar tarea">
+            <svg style="width:14px;height:14px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+          </button>
+          <button class="todo-action-btn cancel-btn" onclick="cancelTodo(${t.id})" title="Cancelar tarea">
+            <svg style="width:14px;height:14px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+          </button>
+          <button class="todo-action-btn delete-btn" onclick="deleteTodo(${t.id})" title="Eliminar tarea">
+            <svg style="width:14px;height:14px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+          </button>`;
+      } else {
+        actions = `
+          <button class="todo-action-btn restore-btn" onclick="restoreTodo(${t.id})" title="Restaurar a pendiente">
+            <svg style="width:14px;height:14px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          </button>
+          <button class="todo-action-btn delete-btn" onclick="deleteTodo(${t.id})" title="Eliminar tarea">
+            <svg style="width:14px;height:14px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+          </button>`;
+      }
+
+      return `
+      <div class="todo-item" data-todo-id="${t.id}">
+        <input type="checkbox" class="todo-cb ${isCancelled ? 'cancelled' : ''}" ${isCompleted ? 'checked' : ''} ${isCancelled ? 'disabled' : ''} onchange="toggleTodo(${t.id})" title="${isPending ? 'Marcar como completada' : isCompleted ? 'Desmarcar' : 'Cancelada'}" />
+        <div class="todo-content">
+          <div class="todo-text ${textClass}${t.text.length > 100 ? ' truncated' : ''}" data-full-text>${t.text}</div>
+          ${t.text.length > 100 ? '<button class="todo-expand-btn" onclick="toggleExpandTodo(this)">Ver más ▾</button>' : ''}
+          <div class="todo-meta">
+            <span class="todo-status-badge ${t.status}">${statusLabels[t.status]}</span>
+            <span class="todo-date">
+              <svg style="width:10px;height:10px;flex-shrink:0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              ${t.createdAt ? formatTodoDate(t.createdAt) : ''}
+            </span>
+          </div>
+        </div>
+        <div class="todo-actions">
+          ${actions}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  (window as any).toggleTodo = (id: number) => {
+    const todos = loadTodos();
+    const t = todos.find(t => t.id === id);
+    if (t) {
+      t.status = t.status === 'completed' ? 'pending' : 'completed';
+      saveTodos(todos);
+      renderTodos(todoSearchInput?.value || '');
+    }
+  };
+
+  (window as any).cancelTodo = (id: number) => {
+    const todos = loadTodos();
+    const t = todos.find(t => t.id === id);
+    if (t) {
+      t.status = 'cancelled';
+      saveTodos(todos);
+      renderTodos(todoSearchInput?.value || '');
+    }
+  };
+
+  (window as any).restoreTodo = (id: number) => {
+    const todos = loadTodos();
+    const t = todos.find(t => t.id === id);
+    if (t) {
+      t.status = 'pending';
+      saveTodos(todos);
+      renderTodos(todoSearchInput?.value || '');
+    }
+  };
+
+  // Custom confirm modal
+  function showConfirmModal(message: string, title = 'Eliminar tarea'): Promise<boolean> {
+    return new Promise(resolve => {
+      _blockPopupClose = true;
+      const overlay = document.getElementById('confirmModal') as HTMLDivElement;
+      const msgEl = document.getElementById('confirmModalMsg') as HTMLParagraphElement;
+      const titleEl = overlay.querySelector('.confirm-modal-title') as HTMLElement;
+      const cancelBtn = document.getElementById('confirmModalCancel') as HTMLButtonElement;
+      const okBtn = document.getElementById('confirmModalOk') as HTMLButtonElement;
+
+      titleEl.textContent = title;
+      msgEl.textContent = message;
+      overlay.classList.remove('hidden');
+
+      const cleanup = (result: boolean) => {
+        overlay.classList.add('hidden');
+        cancelBtn.removeEventListener('click', onCancel);
+        okBtn.removeEventListener('click', onOk);
+        overlay.removeEventListener('click', onOverlayClick);
+        setTimeout(() => { _blockPopupClose = false; }, 50);
+        resolve(result);
+      };
+
+      const onCancel = () => cleanup(false);
+      const onOk = () => cleanup(true);
+      const onOverlayClick = (e: Event) => { if (e.target === overlay) cleanup(false); };
+
+      cancelBtn.addEventListener('click', onCancel);
+      okBtn.addEventListener('click', onOk);
+      overlay.addEventListener('click', onOverlayClick);
+    });
+  }
+
+  (window as any).deleteTodo = async (id: number) => {
+    const confirmed = await showConfirmModal('¿Estás seguro de que deseas eliminar esta tarea? Esta acción no se puede deshacer.', 'Eliminar tarea');
+    if (!confirmed) return;
+    saveTodos(loadTodos().filter(t => t.id !== id));
+    renderTodos(todoSearchInput?.value || '');
+  };
+
+  (window as any).editTodo = (id: number) => {
+    const todos = loadTodos();
+    const t = todos.find(t => t.id === id);
+    if (!t || t.status !== 'pending') return;
+    const item = document.querySelector(`[data-todo-id="${id}"]`) as HTMLDivElement;
+    if (!item) return;
+    const contentEl = item.querySelector('.todo-content') as HTMLDivElement;
+    const actionsEl = item.querySelector('.todo-actions') as HTMLDivElement;
+    if (!contentEl) return;
+
+    const originalText = t.text;
+    contentEl.innerHTML = `<input type="text" class="todo-edit-input" value="${originalText.replace(/"/g, '&quot;')}" />`;
+    if (actionsEl) actionsEl.style.display = 'none';
+    const input = contentEl.querySelector('.todo-edit-input') as HTMLInputElement;
+    input.focus();
+    input.select();
+
+    const saveEdit = () => {
+      const newText = input.value.trim();
+      if (newText && newText !== originalText) {
+        t.text = newText;
+        saveTodos(todos);
+      }
+      renderTodos(todoSearchInput?.value || '');
+    };
+
+    input.addEventListener('blur', saveEdit);
+    input.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+      if (e.key === 'Escape') { input.value = originalText; input.blur(); }
+    });
+  };
+
+  (window as any).toggleExpandTodo = (btn: HTMLButtonElement) => {
+    const textEl = btn.previousElementSibling as HTMLElement;
+    if (!textEl) return;
+    const isExpanded = textEl.classList.contains('expanded');
+    textEl.classList.toggle('truncated', isExpanded);
+    textEl.classList.toggle('expanded', !isExpanded);
+    btn.textContent = isExpanded ? 'Ver más ▾' : 'Ver menos ▴';
+  };
+
+  function addTodo() {
+    const text = todoNewInput.value.trim();
+    if (!text) return;
+    const todos = loadTodos();
+    todos.push({ id: todos.reduce((max, t) => Math.max(max, t.id), 0) + 1, text, status: 'pending', createdAt: new Date().toISOString() });
+    saveTodos(todos);
+    todoNewInput.value = '';
+    // Switch to "all" or "pending" tab so user sees the new task
+    if (currentTodoFilter !== 'all' && currentTodoFilter !== 'pending') {
+      currentTodoFilter = 'all';
+      document.querySelectorAll('.todo-filter-tab').forEach(t => {
+        t.classList.toggle('active', (t as HTMLElement).dataset.filter === 'all');
+      });
+    }
+    renderTodos(todoSearchInput?.value || '');
+  }
+
+  todoAddBtn?.addEventListener('click', addTodo);
+  todoNewInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') addTodo(); });
+  todoSearchInput?.addEventListener('input', () => renderTodos(todoSearchInput.value));
+
+  renderTodos();
+</script>

@@ -1,0 +1,216 @@
+<!-- Mobile hamburger overlay backdrop -->
+<div id="sidebarOverlay" class="fixed inset-0 bg-black/40 z-40 hidden lg:hidden"></div>
+
+<!-- Sidebar -->
+<aside id="sidebar" class="fixed inset-y-0 left-0 w-64 z-50 transform -translate-x-full lg:translate-x-0 flex flex-col" style="background: linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #263548 100%);">
+  <!-- Logo area -->
+  <div class="sidebar-header px-5 py-5 border-b border-white/10">
+    <div class="flex items-center space-x-3">
+      <div class="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+        </svg>
+      </div>
+      <div class="min-w-0 sidebar-label">
+        <p class="text-sm font-bold text-white truncate" id="vetName">VetPets</p>
+        <p class="text-xs text-white/50" id="roleBadge">Gestión Veterinaria</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nav links -->
+  <nav class="px-3 py-4 space-y-1 flex-1 overflow-y-auto">
+    <p class="px-3 text-[10px] font-semibold uppercase tracking-widest text-white/30 mb-2 sidebar-label">Menú Principal</p>
+    <a href="/home" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/70 hover:text-white hover:bg-white/8 transition-colors text-sm">
+      <svg class="w-5 h-5 flex-shrink-0" style="color: #60a5fa;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+      </svg>
+      <span class="sidebar-label">Inicio</span>
+    </a>
+    <a href="/clientes" class="nav-secretaria flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/70 hover:text-white hover:bg-white/8 transition-colors text-sm">
+      <svg class="w-5 h-5 flex-shrink-0" style="color: #60a5fa;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path>
+      </svg>
+      <span class="sidebar-label">Clientes</span>
+    </a>
+    <a href="/mascotas" class="nav-secretaria flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/70 hover:text-white hover:bg-white/8 transition-colors text-sm">
+      <svg class="w-5 h-5 flex-shrink-0" style="color: #60a5fa;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+      </svg>
+      <span class="sidebar-label">Mascotas</span>
+    </a>
+    <!-- TODO: Activar en Avance 2 / Avance 3 (Citas, Estadísticas, Reportes; /confirmar-cita es pública y no tiene enlace en el menú)
+    <a href="/citas" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/70 hover:text-white hover:bg-white/8 transition-colors text-sm">
+      <svg class="w-5 h-5 flex-shrink-0" style="color: #60a5fa;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+      </svg>
+      <span class="sidebar-label">Citas</span>
+    </a>
+    <a href="/estadisticas" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/70 hover:text-white hover:bg-white/8 transition-colors text-sm">
+      <svg class="w-5 h-5 flex-shrink-0" style="color: #60a5fa;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+      </svg>
+      <span class="sidebar-label">Estadísticas</span>
+    </a>
+    <a href="/reportes" class="nav-secretaria flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/70 hover:text-white hover:bg-white/8 transition-colors text-sm">
+      <svg class="w-5 h-5 flex-shrink-0" style="color: #60a5fa;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+      </svg>
+      <span class="sidebar-label">Reportes</span>
+    </a>
+    -->
+    <a href="/usuarios" class="nav-secretaria flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/70 hover:text-white hover:bg-white/8 transition-colors text-sm">
+      <svg class="w-5 h-5 flex-shrink-0" style="color: #60a5fa;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+      </svg>
+      <span class="sidebar-label">Usuarios</span>
+    </a>
+  </nav>
+
+  <!-- Collapse toggle (desktop only) -->
+  <button id="sidebarCollapseBtn" class="hidden lg:flex items-center justify-center mx-3 mb-2 py-1.5 rounded-lg text-white/40 hover:text-white/70 hover:bg-white/5 transition-colors" title="Colapsar menú">
+    <svg id="collapseIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
+    </svg>
+  </button>
+
+  <!-- User profile / Logout -->
+  <div class="px-3 pb-4 pt-3 border-t border-white/10">
+    <button id="logoutBtn" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-red-300 hover:bg-white/8 transition-colors text-sm w-full">
+      <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0" style="background: linear-gradient(135deg, #3b82f6, #2563eb);" id="userAvatar">V</div>
+      <div class="flex-1 text-left min-w-0 sidebar-label">
+        <p class="text-white text-xs font-medium truncate" id="sidebarUserName">Usuario</p>
+        <p class="text-white/40 text-[10px]" id="sidebarRoleLabel">Cerrar Sesión</p>
+      </div>
+      <svg class="w-4 h-4 flex-shrink-0 sidebar-label" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+      </svg>
+    </button>
+  </div>
+</aside>
+
+<style>
+  #sidebar {
+    transition: width 200ms ease, transform 200ms ease;
+  }
+  @media (min-width: 1024px) {
+    #sidebar.collapsed {
+      width: 4.5rem;
+    }
+    #sidebar.collapsed .sidebar-label {
+      display: none;
+    }
+    #sidebar.collapsed .sidebar-header {
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+    }
+    #sidebar.collapsed .sidebar-header .flex {
+      justify-content: center;
+    }
+    #sidebar.collapsed .sidebar-header .w-11 {
+      margin: 0 auto;
+    }
+    #sidebar.collapsed nav a {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    #sidebar.collapsed nav a svg {
+      margin: 0;
+    }
+    #sidebar.collapsed #logoutBtn {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    #sidebar.collapsed #userAvatar {
+      margin: 0;
+    }
+    #sidebar.collapsed #collapseIcon {
+      transform: rotate(180deg);
+    }
+  }
+</style>
+
+<script>
+  // ==================== Role-based menu visibility ====================
+  const usuarioRaw = localStorage.getItem('usuario');
+  const veterinariaRaw = localStorage.getItem('veterinaria');
+
+  const usuario = usuarioRaw ? JSON.parse(usuarioRaw) : null;
+  const veterinaria = veterinariaRaw ? JSON.parse(veterinariaRaw) : null;
+  const rol = usuario?.rol ?? 'secretaria';
+
+  // Show vet name
+  const vetNameEl = document.getElementById('vetName');
+  if (vetNameEl && veterinaria?.nombre) vetNameEl.textContent = veterinaria.nombre;
+
+  // Show user name and role
+  const sidebarUserName = document.getElementById('sidebarUserName');
+  const sidebarRoleLabel = document.getElementById('sidebarRoleLabel');
+  const userAvatarEl = document.getElementById('userAvatar');
+  const roleBadgeEl = document.getElementById('roleBadge');
+
+  if (sidebarUserName && usuario?.nombre) {
+    sidebarUserName.textContent = usuario.nombre;
+  }
+  if (sidebarRoleLabel) {
+    const roleText = rol === 'veterinario' ? 'Veterinario · Cerrar sesión' : 'Secretaria · Cerrar sesión';
+    sidebarRoleLabel.textContent = roleText;
+  }
+  if (roleBadgeEl) {
+    roleBadgeEl.textContent = rol === 'veterinario' ? 'Veterinario' : 'Secretaria';
+  }
+  if (userAvatarEl && usuario?.nombre) {
+    userAvatarEl.textContent = usuario.nombre.charAt(0).toUpperCase();
+  }
+
+  // Hide secretaria-only menu items for veterinarios
+  if (rol === 'veterinario') {
+    document.querySelectorAll('.nav-secretaria').forEach(el => {
+      (el as HTMLElement).style.display = 'none';
+    });
+  }
+
+  // ==================== Sidebar collapse toggle ====================
+  const SIDEBAR_KEY = 'vetpets_sidebar_collapsed';
+  const sidebarEl = document.getElementById('sidebar');
+  const collapseBtn = document.getElementById('sidebarCollapseBtn');
+  const mainContent = document.querySelector('[data-main-content]') as HTMLElement | null;
+
+  function applySidebarState(collapsed: boolean) {
+    if (!sidebarEl) return;
+    if (collapsed) {
+      sidebarEl.classList.add('collapsed');
+      if (mainContent) mainContent.style.marginLeft = '4.5rem';
+    } else {
+      sidebarEl.classList.remove('collapsed');
+      if (mainContent) mainContent.style.marginLeft = '';
+    }
+  }
+
+  if (window.innerWidth >= 1024) {
+    applySidebarState(localStorage.getItem(SIDEBAR_KEY) === 'true');
+  }
+
+  collapseBtn?.addEventListener('click', () => {
+    const nowCollapsed = !sidebarEl?.classList.contains('collapsed');
+    localStorage.setItem(SIDEBAR_KEY, String(nowCollapsed));
+    applySidebarState(nowCollapsed);
+  });
+
+  // ==================== Logout ====================
+  document.getElementById('logoutBtn')?.addEventListener('click', () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('veterinaria');
+    localStorage.removeItem('usuario');
+    window.location.href = '/';
+  });
+
+  // ==================== Mobile overlay ====================
+  const overlay = document.getElementById('sidebarOverlay');
+  overlay?.addEventListener('click', () => {
+    sidebarEl?.classList.add('-translate-x-full');
+    overlay.classList.add('hidden');
+  });
+</script>

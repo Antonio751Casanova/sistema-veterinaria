@@ -1,0 +1,272 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Registro - Sistema Veterinarias">
+  <main class="min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-lg animate-slide-up">
+      <!-- Card Container -->
+      <div class="bg-white rounded-2xl shadow-lg p-8" style="border: 1px solid #e2e8f0;">
+        <!-- Header -->
+        <div class="text-center mb-8">
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 mb-4">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            </svg>
+          </div>
+          <h1 class="text-3xl font-bold mb-2" style="color: #1e293b;">Registrar Veterinaria</h1>
+          <p style="color: #94a3b8;">Crea tu cuenta para gestionar tus clientes</p>
+        </div>
+
+        <!-- Register Form -->
+        <form id="registerForm" class="space-y-5">
+          <!-- Nombre -->
+          <div>
+            <label for="nombre" class="block text-sm font-medium mb-2" style="color: #475569;">
+              Nombre de la Veterinaria
+            </label>
+            <input
+              type="text"
+              id="nombre"
+              name="nombre"
+              required
+              maxlength="100"
+              class="w-full px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              style="background: #ffffff; border: 1px solid #e2e8f0; color: #1e293b;"
+              placeholder="Veterinaria El Amigo Fiel"
+            />
+          </div>
+
+          <!-- Teléfono -->
+          <div>
+            <label for="telefono" class="block text-sm font-medium mb-2" style="color: #475569;">
+              Teléfono
+            </label>
+            <input
+              type="tel"
+              id="telefono"
+              name="telefono"
+              required
+              pattern="[0-9+\s\-]{10,20}"
+              minlength="10"
+              maxlength="20"
+              title="Solo números, espacios, + y - (mínimo 10 caracteres)"
+              class="w-full px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 phone-input"
+              style="background: #ffffff; border: 1px solid #e2e8f0; color: #1e293b;"
+              placeholder="+52 555 123 4567"
+            />
+          </div>
+
+          <!-- Dirección -->
+          <div>
+            <label for="direccion" class="block text-sm font-medium mb-2" style="color: #475569;">
+              Dirección
+            </label>
+            <input
+              type="text"
+              id="direccion"
+              name="direccion"
+              required
+              maxlength="200"
+              class="w-full px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              style="background: #ffffff; border: 1px solid #e2e8f0; color: #1e293b;"
+              placeholder="Av. Principal #123, Col. Centro"
+            />
+          </div>
+
+          <!-- Email -->
+          <div>
+            <label for="email" class="block text-sm font-medium mb-2" style="color: #475569;">
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              required
+              maxlength="100"
+              class="w-full px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              style="background: #ffffff; border: 1px solid #e2e8f0; color: #1e293b;"
+              placeholder="contacto@veterinaria.com"
+            />
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label for="password" class="block text-sm font-medium mb-2" style="color: #475569;">
+              Contraseña
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              required
+              minlength="6"
+              maxlength="50"
+              class="w-full px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              style="background: #ffffff; border: 1px solid #e2e8f0; color: #1e293b;"
+              placeholder="Mínimo 6 caracteres"
+            />
+          </div>
+
+          <!-- Error/Success Message -->
+          <div id="messageBox" class="hidden p-4 rounded-xl">
+            <p class="text-sm text-center" id="messageText"></p>
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            id="submitBtn"
+            class="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+          >
+            <span id="btnText">Crear Cuenta</span>
+            <span id="btnLoader" class="hidden">
+              <svg class="animate-spin h-5 w-5 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </span>
+          </button>
+        </form>
+
+        <!-- Login Link -->
+        <div class="mt-6 pt-6 text-center" style="border-top: 1px solid #e2e8f0;">
+          <p class="text-sm mb-3" style="color: #94a3b8;">¿Ya tienes cuenta?</p>
+          <a
+            href="/"
+            class="inline-block w-full py-2 px-4 font-medium rounded-xl hover:bg-black/5 focus:outline-none transition-all duration-200 text-center"
+            style="background: #f8fafc; border: 1px solid #e2e8f0; color: #475569;"
+          >
+            Iniciar Sesión
+          </a>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <p class="text-center text-sm mt-6" style="color: #94a3b8;">
+        Sistema de Veterinarias © 2026
+      </p>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out;
+  }
+</style>
+
+<script>
+  import { registrarVeterinaria } from '../services/authService';
+
+  const form = document.getElementById('registerForm') as HTMLFormElement;
+  const submitBtn = document.getElementById('submitBtn') as HTMLButtonElement;
+  const btnText = document.getElementById('btnText') as HTMLSpanElement;
+  const btnLoader = document.getElementById('btnLoader') as HTMLSpanElement;
+  const messageBox = document.getElementById('messageBox') as HTMLDivElement;
+  const messageText = document.getElementById('messageText') as HTMLParagraphElement;
+  const phoneInput = document.getElementById('telefono') as HTMLInputElement;
+
+  // Phone validation - only allow numbers, +, -, spaces and validate 10 digits
+  phoneInput.addEventListener('input', (e) => {
+    const input = e.target as HTMLInputElement;
+    input.value = input.value.replace(/[^0-9+\s\-]/g, '');
+  });
+
+  // Email to lowercase
+  const emailInput = document.getElementById('email') as HTMLInputElement;
+  emailInput.addEventListener('input', (e) => {
+    const input = e.target as HTMLInputElement;
+    input.value = input.value.toLowerCase();
+  });
+
+  // Validate phone has exactly 10 digits
+  function validatePhone(phone: string): boolean {
+    const digitsOnly = phone.replace(/[^0-9]/g, '');
+    return digitsOnly.length === 10;
+  }
+
+  // Validate email domain (must end in valid TLD)
+  function validateEmail(email: string): boolean {
+    const validDomains = ['.com', '.mx', '.org', '.net', '.edu', '.gov', '.io', '.co.mx', '.gob.mx', '.com.mx', '.edu.mx'];
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return false;
+    return validDomains.some(domain => email.toLowerCase().endsWith(domain));
+  }
+
+  function setLoading(loading: boolean) {
+    submitBtn.disabled = loading;
+    btnText.classList.toggle('hidden', loading);
+    btnLoader.classList.toggle('hidden', !loading);
+  }
+
+  function showMessage(message: string, isError: boolean) {
+    messageText.textContent = message;
+    messageBox.classList.remove('hidden', 'bg-red-50', 'bg-green-50');
+    messageBox.classList.add(
+      isError ? 'bg-red-50' : 'bg-green-50'
+    );
+    messageBox.style.border = isError ? '1px solid #fecaca' : '1px solid #bbf7d0';
+    messageText.classList.remove('text-red-600', 'text-green-600');
+    messageText.classList.add(isError ? 'text-red-600' : 'text-green-600');
+  }
+
+  function hideMessage() {
+    messageBox.classList.add('hidden');
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideMessage();
+
+    const formData = new FormData(form);
+    const telefono = formData.get('telefono') as string;
+
+    // Validate phone has 10 digits
+    if (!validatePhone(telefono)) {
+      showMessage('El teléfono debe tener exactamente 10 dígitos numéricos', true);
+      return;
+    }
+
+    // Validate email domain
+    const email = (formData.get('email') as string).toLowerCase();
+    if (!validateEmail(email)) {
+      showMessage('El correo debe tener un dominio válido (ej: .com, .mx, .org)', true);
+      return;
+    }
+
+    setLoading(true);
+
+    const data = {
+      nombre: formData.get('nombre') as string,
+      telefono: telefono,
+      direccion: formData.get('direccion') as string,
+      email: email,
+      password: formData.get('password') as string,
+    };
+
+    try {
+      await registrarVeterinaria(data);
+      showMessage('¡Cuenta creada exitosamente! Redirigiendo...', false);
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 2000);
+    } catch (error) {
+      showMessage(error instanceof Error ? error.message : 'Error al registrar', true);
+    } finally {
+      setLoading(false);
+    }
+  });
+</script>

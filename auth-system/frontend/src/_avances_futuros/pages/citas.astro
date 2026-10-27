@@ -1,0 +1,2285 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Sidebar from '../components/Sidebar.astro';
+---
+
+<Layout title="Citas - Sistema Veterinarias">
+  <Sidebar />
+  <div class="lg:ml-64 min-h-screen transition-[margin] duration-200" style="background: #f1f5f9;" data-main-content>
+    <!-- Sticky Header -->
+    <header class="sticky top-0 z-30 backdrop-blur-md" style="background: rgba(255,255,255,0.8); border-bottom: 1px solid #e2e8f0;">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <button id="hamburgerBtn" class="lg:hidden p-2 rounded-lg hover:bg-black/5" style="color: #0f172a;">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+          <div>
+            <h1 class="text-xl md:text-2xl font-bold" style="color: #1e293b;">Gestión de Citas</h1>
+            <p class="text-sm" style="color: #94a3b8;">Agenda y administra las citas de la veterinaria</p>
+          </div>
+        </div>
+        <button
+          id="addCitaBtn"
+          class="px-4 md:px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 flex items-center space-x-2"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          <span>Nueva Cita</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+
+      <!-- Stats Summary -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white rounded-xl p-4" style="border: 1px solid #e2e8f0;">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs" style="color: #9a8b7c;">Total Citas</p>
+              <p id="totalCitas" class="text-2xl font-bold mt-1" style="color: #0f172a;">0</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
+              <span class="text-xl">📅</span>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl p-4" style="border: 1px solid #e2e8f0;">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs" style="color: #9a8b7c;">Pendientes</p>
+              <p id="citasPendientes" class="text-2xl font-bold text-yellow-600 mt-1">0</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
+              <span class="text-xl">⏳</span>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl p-4" style="border: 1px solid #e2e8f0;">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs" style="color: #9a8b7c;">Confirmadas</p>
+              <p id="citasConfirmadas" class="text-2xl font-bold text-blue-600 mt-1">0</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
+              <span class="text-xl">✅</span>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl p-4" style="border: 1px solid #e2e8f0;">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs" style="color: #9a8b7c;">Hoy</p>
+              <p id="citasHoy" class="text-2xl font-bold text-sky-600 mt-1">0</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-sky-500/20 flex items-center justify-center">
+              <span class="text-xl">📍</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="bg-white rounded-2xl p-4 mb-6" style="border: 1px solid #e2e8f0;">
+        <div class="flex flex-col sm:flex-row gap-3">
+          <div class="relative flex-1">
+            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5" style="color: #9a8b7c;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Buscar por mascota o cliente..."
+              class="w-full pl-10 pr-4 py-2.5 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;"
+            />
+          </div>
+          <select id="estadoFilter" class="px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;">
+            <option value="" class="bg-white">Todos los estados</option>
+            <option value="pendiente" class="bg-white">Pendiente</option>
+            <option value="confirmado" class="bg-white">Confirmado</option>
+            <option value="en_espera" class="bg-white">En Espera</option>
+            <option value="completado" class="bg-white">Completado</option>
+            <option value="rechazado" class="bg-white">Rechazado</option>
+          </select>
+          <input type="date" id="fechaFilter" class="px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;" />
+          <!-- Vet filter — secretaria only, shown dynamically -->
+          <select id="vetFilter" class="hidden px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;">
+            <option value="">Todos los veterinarios</option>
+          </select>
+          <!-- Report button — only visible when a vet is selected -->
+          <button id="reporteVetBtn" class="hidden items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white transition-all" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            Enviar Reporte
+          </button>
+        </div>
+      </div>
+
+      <!-- Waitlist Panel (secretaria) -->
+      <div id="waitlistPanel" class="bg-white rounded-2xl overflow-hidden mb-6 hidden" style="border: 1px solid #e2e8f0;">
+        <div class="px-4 py-3 flex items-center justify-between" style="border-bottom: 1px solid #e2e8f0; background:#fafbfc;">
+          <div>
+            <h3 class="text-sm font-semibold" style="color:#0f172a;">Lista de Espera</h3>
+            <p class="text-xs" style="color:#94a3b8;">Pacientes candidatos para cubrir huecos por cancelaciones</p>
+          </div>
+          <button id="addWaitlistBtn" class="px-3 py-2 rounded-lg text-xs font-semibold text-white" style="background:linear-gradient(135deg,#2563eb,#1d4ed8);">
+            Nuevo en espera
+          </button>
+        </div>
+
+        <div id="waitlistLoading" class="p-4 text-xs" style="color:#94a3b8;">Cargando lista de espera...</div>
+        <div id="waitlistEmpty" class="p-4 text-xs hidden" style="color:#94a3b8;">No hay pacientes en lista de espera.</div>
+        <div id="waitlistTableWrap" class="hidden overflow-x-auto">
+          <table class="w-full">
+            <thead style="background:#f8fafc;border-bottom:1px solid #e2e8f0;">
+              <tr>
+                <th class="px-3 py-2 text-left text-[11px] uppercase" style="color:#9a8b7c;">Mascota / Cliente</th>
+                <th class="px-3 py-2 text-left text-[11px] uppercase" style="color:#9a8b7c;">Atencion</th>
+                <th class="px-3 py-2 text-left text-[11px] uppercase" style="color:#9a8b7c;">Prioridad</th>
+                <th class="px-3 py-2 text-left text-[11px] uppercase" style="color:#9a8b7c;">Preferencia</th>
+                <th class="px-3 py-2 text-left text-[11px] uppercase" style="color:#9a8b7c;">Estado</th>
+                <th class="px-3 py-2 text-center text-[11px] uppercase" style="color:#9a8b7c;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="waitlistTableBody" class="divide-y divide-[#e2e8f0]"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Citas Table -->
+      <div class="bg-white rounded-2xl overflow-hidden" style="border: 1px solid #e2e8f0;">
+        <!-- Loading State -->
+        <div id="loadingState" class="p-12 text-center">
+          <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mx-auto"></div>
+          <p class="mt-4" style="color: #9a8b7c;">Cargando citas...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="p-12 text-center hidden">
+          <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style="background: #f1f5f9;">
+            <span class="text-3xl">📅</span>
+          </div>
+          <h3 class="text-lg font-medium" style="color: #0f172a;">No hay citas programadas</h3>
+          <p class="mt-2" style="color: #9a8b7c;">Haz clic en "Nueva Cita" para agendar una</p>
+        </div>
+
+        <!-- Table -->
+        <div id="tableContainer" class="hidden overflow-x-auto">
+          <table class="w-full">
+            <thead style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: #9a8b7c;">Fecha/Hora</th>
+                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: #9a8b7c;">Mascota</th>
+                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: #9a8b7c;">Cliente</th>
+                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: #9a8b7c;">Tipo Atención</th>
+                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: #9a8b7c;">Costo</th>
+                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: #9a8b7c;">Estado</th>
+                <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider" style="color: #9a8b7c;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="citasTableBody" class="divide-y divide-[#e2e8f0]"></tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div id="paginationContainer" class="hidden px-4 py-3" style="border-top: 1px solid #e2e8f0;">
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="text-sm" style="color: #9a8b7c;">
+            Mostrando <span class="showingFromSync">1</span> a <span class="showingToSync">10</span> de <span class="totalItemsSync">0</span> citas
+          </div>
+          <div class="flex items-center space-x-2">
+            <button class="prevPageSync px-3 py-1.5 rounded-lg hover:bg-black/5 disabled:opacity-50 disabled:cursor-not-allowed" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #475569;">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            </button>
+            <span class="text-sm px-3" style="color: #0f172a;"><span class="currentPageSync">1</span> / <span class="totalPagesSync">1</span></span>
+            <button class="nextPageSync px-3 py-1.5 rounded-lg hover:bg-black/5 disabled:opacity-50 disabled:cursor-not-allowed" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #475569;">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </button>
+          </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Create/Edit Modal -->
+    <div id="modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+      <div class="bg-white rounded-2xl w-full max-w-2xl mx-4 shadow-2xl max-h-[90vh] flex flex-col" style="border: 1px solid #e2e8f0;">
+        <div class="p-4 flex justify-between items-center flex-shrink-0" style="border-bottom: 1px solid #e2e8f0;">
+          <h3 id="modalTitle" class="text-lg font-semibold" style="color: #0f172a;">Nueva Cita</h3>
+          <button id="closeModal" class="p-1 hover:bg-black/5 rounded-lg transition-colors" style="color: #9a8b7c;">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+        <form id="citaForm" class="p-5 space-y-4 flex-1 overflow-y-auto">
+          <input type="hidden" id="citaId" value="" />
+
+          <!-- Step 1: Cliente Selection -->
+          <div>
+            <label class="block text-sm font-medium mb-2" style="color: #475569;">1. Seleccionar Cliente *</label>
+            <div class="flex gap-2 mb-2">
+              <select id="clienteSearchType" class="px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;">
+                <option value="nombre" class="bg-white">Por Nombre</option>
+                <option value="telefono" class="bg-white">Por Telefono</option>
+                <option value="id" class="bg-white">Por ID</option>
+              </select>
+              <div class="relative flex-1">
+                <input
+                  type="text"
+                  id="clienteSearch"
+                  placeholder="Escribe para buscar..."
+                  class="w-full px-4 py-2 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;"
+                  autocomplete="off"
+                />
+                <input type="hidden" id="clienteIdCita" name="cliente_id" />
+                <div id="clienteDropdown" class="absolute z-50 top-full left-0 right-0 mt-1 bg-white rounded-lg max-h-48 overflow-y-auto hidden shadow-xl" style="border: 1px solid #e2e8f0;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Selected Cliente Info -->
+          <div id="selectedClienteInfo" class="hidden rounded-lg p-4" style="background: rgba(13, 148, 136, 0.08); border: 1px solid rgba(13, 148, 136, 0.2);">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
+                  <svg class="w-5 h-5" style="color: #3b82f6;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <p id="clienteNombreSelected" class="font-medium" style="color: #0f172a;"></p>
+                  <p id="clienteContacto" class="text-sm" style="color: #9a8b7c;"></p>
+                </div>
+              </div>
+              <button type="button" id="clearCliente" class="p-1" style="color: #9a8b7c;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2: Mascota Selection -->
+          <div id="mascotaSection" class="hidden">
+            <label class="block text-sm font-medium mb-2" style="color: #475569;">2. Seleccionar Mascota del Cliente *</label>
+            <div class="flex gap-2 mb-2">
+              <select id="mascotaSearchType" class="px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;">
+                <option value="nombre" class="bg-white">Por Nombre</option>
+                <option value="especie" class="bg-white">Por Especie</option>
+                <option value="id" class="bg-white">Por ID</option>
+              </select>
+              <div class="relative flex-1">
+                <input
+                  type="text"
+                  id="mascotaSearchInput"
+                  placeholder="Filtrar mascotas..."
+                  class="w-full px-4 py-2 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;"
+                  autocomplete="off"
+                />
+              </div>
+            </div>
+            <select id="mascotaSelect" class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;">
+              <option value="" class="bg-white">-- Selecciona una mascota --</option>
+            </select>
+            <input type="hidden" id="mascotaId" name="mascota_id" required />
+          </div>
+
+          <!-- Selected Mascota Info -->
+          <div id="selectedMascotaInfo" class="hidden rounded-lg p-4" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <div id="mascotaAvatar" class="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center">
+                  <span class="text-2xl">🐕</span>
+                </div>
+                <div>
+                  <p id="mascotaNombre" class="font-medium" style="color: #0f172a;"></p>
+                  <p id="mascotaDetalles" class="text-sm" style="color: #9a8b7c;"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fecha + Duración -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium mb-2" style="color: #475569;">Fecha *</label>
+              <input
+                type="date"
+                id="fechaCita"
+                name="fecha"
+                required
+                class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2" style="color: #475569;">Duración</label>
+              <div class="flex items-center gap-2">
+                <div class="flex-1">
+                  <input
+                    type="number"
+                    id="duracionHoras"
+                    value="1"
+                    min="0"
+                    max="8"
+                    step="1"
+                    list="listaHoras"
+                    placeholder="0"
+                    class="w-full px-3 py-2.5 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;"
+                  />
+                  <datalist id="listaHoras">
+                    <option value="0"></option>
+                    <option value="1"></option>
+                    <option value="2"></option>
+                    <option value="3"></option>
+                    <option value="4"></option>
+                    <option value="5"></option>
+                    <option value="6"></option>
+                    <option value="7"></option>
+                    <option value="8"></option>
+                  </datalist>
+                  <p class="text-xs mt-1 text-center" style="color: #94a3b8;">horas</p>
+                </div>
+                <span class="font-bold text-lg mb-4" style="color: #9a8b7c;">:</span>
+                <div class="flex-1">
+                  <input
+                    type="number"
+                    id="duracionMinutos"
+                    value="0"
+                    min="0"
+                    max="45"
+                    step="15"
+                    list="listaMinutos"
+                    placeholder="0"
+                    class="w-full px-3 py-2.5 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;"
+                  />
+                  <datalist id="listaMinutos">
+                    <option value="0"></option>
+                    <option value="15"></option>
+                    <option value="30"></option>
+                    <option value="45"></option>
+                  </datalist>
+                  <p class="text-xs mt-1 text-center" style="color: #94a3b8;">minutos</p>
+                </div>
+              </div>
+              <p id="duracionTotal" class="text-xs mt-2 text-center font-medium" style="color: #3b82f6;">= 1 hora</p>
+            </div>
+          </div>
+
+          <!-- Hora (hidden) + Time Grid -->
+          <div>
+            <input type="hidden" id="horaCita" name="hora" />
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <label class="block text-sm font-medium" style="color: #475569;">
+                  Hora *
+                  <span id="selectedTimeDisplay" class="ml-2 font-semibold hidden" style="color: #3b82f6;"></span>
+                </label>
+                <button
+                  type="button"
+                  id="toggleTimeGrid"
+                  title="Mostrar u ocultar horarios disponibles"
+                  class="p-1 rounded-md hover:bg-black/5 transition-colors" style="color: #9a8b7c;"
+                >
+                  <svg id="toggleTimeGridIcon" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </button>
+              </div>
+              <div class="flex items-center gap-3 text-xs" style="color: #94a3b8;">
+                <span class="flex items-center gap-1">
+                  <span class="w-3 h-3 rounded inline-block" style="background: #f8fafc; border: 1px solid #e2e8f0;"></span> Libre
+                </span>
+                <span class="flex items-center gap-1">
+                  <span class="w-3 h-3 rounded bg-red-500/30 border border-red-500/40 inline-block"></span> Ocupado
+                </span>
+                <span class="flex items-center gap-1">
+                  <span class="w-3 h-3 rounded bg-amber-500/20 border border-amber-500/30 inline-block"></span> Conflicto
+                </span>
+                <span class="flex items-center gap-1">
+                  <span class="w-3 h-3 rounded bg-blue-500 inline-block"></span> Inicio
+                </span>
+                <span class="flex items-center gap-1">
+                  <span class="w-3 h-3 rounded bg-blue-500/25 border border-blue-500/40 inline-block"></span> Rango
+                </span>
+                <span class="flex items-center gap-1">
+                  <span class="w-3 h-3 rounded bg-blue-500/10 border border-dashed border-blue-500/50 inline-block"></span> Fin
+                </span>
+              </div>
+            </div>
+            <div id="timeGridContainer" class="rounded-xl p-3 min-h-[60px]" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+              <p class="text-xs text-center py-2" style="color: #94a3b8;">Selecciona una fecha para ver los horarios</p>
+            </div>
+          </div>
+
+          <!-- Tipo de atención -->
+          <div>
+            <label class="block text-sm font-medium mb-2" style="color: #475569;">Tipo de Atención *</label>
+            <div class="relative">
+              <input
+                type="text"
+                id="tipoAtencion"
+                name="tipo_atencion"
+                required
+                list="tiposAtencionList"
+                placeholder="Selecciona o escribe un tipo..."
+                class="w-full px-4 py-2.5 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;"
+              />
+              <datalist id="tiposAtencionList">
+                <!-- Consultas -->
+                <option value="Consulta General">
+                <option value="Consulta de Emergencia">
+                <option value="Consulta de Seguimiento">
+                <option value="Primera Consulta">
+                <option value="Segunda Opinion">
+                <!-- Vacunacion -->
+                <option value="Vacunacion">
+                <option value="Vacunacion Cachorro">
+                <option value="Vacunacion Adulto">
+                <option value="Vacunacion Antirabica">
+                <option value="Refuerzo de Vacunas">
+                <!-- Desparasitacion -->
+                <option value="Desparasitacion Interna">
+                <option value="Desparasitacion Externa">
+                <option value="Control de Pulgas y Garrapatas">
+                <!-- Cirugias -->
+                <option value="Cirugia General">
+                <option value="Cirugia de Emergencia">
+                <option value="Esterilizacion">
+                <option value="Castracion">
+                <option value="Cirugia Ortopedica">
+                <option value="Extraccion Dental">
+                <option value="Cirugia de Tumor">
+                <!-- Cuidado Dental -->
+                <option value="Limpieza Dental">
+                <option value="Revision Dental">
+                <option value="Extraccion de Diente">
+                <!-- Diagnostico -->
+                <option value="Radiografia">
+                <option value="Ecografia">
+                <option value="Electrocardiograma">
+                <option value="Analisis de Sangre">
+                <option value="Analisis de Orina">
+                <option value="Analisis de Heces">
+                <option value="Citologia">
+                <option value="Biopsia">
+                <!-- Estetica y Cuidado -->
+                <option value="Grooming">
+                <option value="Bano y Corte">
+                <option value="Corte de Unas">
+                <option value="Limpieza de Oidos">
+                <option value="Limpieza de Glandulas Anales">
+                <!-- Control y Prevencion -->
+                <option value="Control de Peso">
+                <option value="Revision Geriatrica">
+                <option value="Chequeo Preventivo">
+                <option value="Control Prenatal">
+                <option value="Control Postparto">
+                <!-- Post-operatorio -->
+                <option value="Revision Post-operatoria">
+                <option value="Retiro de Puntos">
+                <option value="Curacion de Heridas">
+                <!-- Tratamientos -->
+                <option value="Hospitalizacion">
+                <option value="Quimioterapia">
+                <option value="Fisioterapia">
+                <option value="Aplicacion de Medicamentos">
+                <option value="Nebulizacion">
+                <!-- Otros -->
+                <option value="Microchip">
+                <option value="Certificado de Salud">
+                <option value="Eutanasia">
+                <option value="Cremacion">
+              </datalist>
+            </div>
+          </div>
+
+          <!-- Estado -->
+          <div>
+            <label class="block text-sm font-medium mb-2" style="color: #475569;">Estado</label>
+            <select
+              id="estadoCita"
+              name="estado"
+              class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;"
+            >
+              <option value="pendiente" class="bg-white">Pendiente (por confirmar)</option>
+              <option value="confirmado" class="bg-white">Confirmado</option>
+              <option value="rechazado" class="bg-white">Rechazado</option>
+            </select>
+            <p id="estadoHint" class="text-xs mt-1" style="color: #94a3b8;">Al crear una nueva cita, el estado queda como Pendiente hasta que el cliente confirme.</p>
+          </div>
+
+          <!-- Veterinario asignado (visible solo para secretaria) -->
+          <div id="vetSelectorField">
+            <label class="block text-sm font-medium mb-2" style="color: #475569;">Veterinario Asignado <span class="text-red-500">*</span></label>
+            <select
+              id="veterinarioAsignado"
+              name="veterinario_asignado_id"
+              class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;"
+            >
+              <option value="">-- Seleccionar veterinario --</option>
+            </select>
+          </div>
+
+          <!-- Detalles médicos -->
+          <div>
+            <label class="block text-sm font-medium mb-2" style="color: #475569;">Detalles / Notas</label>
+            <textarea
+              id="detallesCita"
+              name="detalles"
+              rows="3"
+              placeholder="Notas adicionales, síntomas, indicaciones..."
+              class="w-full px-4 py-2.5 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;"
+            ></textarea>
+          </div>
+
+          <!-- Error -->
+          <div id="formError" class="hidden bg-red-50 rounded-lg p-3" style="border: 1px solid #fecaca;">
+            <p id="formErrorText" class="text-red-600 text-sm"></p>
+          </div>
+
+          <!-- Buttons -->
+          <div class="flex gap-3 pt-4">
+            <button type="button" id="cancelBtn" class="flex-1 px-4 py-2.5 rounded-lg hover:bg-black/5 transition-colors" style="border: 1px solid #e2e8f0; color: #475569;">
+              Cancelar
+            </button>
+            <button type="submit" class="flex-1 px-4 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-colors">
+              Guardar Cita
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Waitlist Modal -->
+    <div id="waitlistModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+      <div class="bg-white rounded-2xl w-full max-w-xl mx-4 shadow-2xl max-h-[90vh] flex flex-col" style="border:1px solid #e2e8f0;">
+        <div class="p-4 flex justify-between items-center" style="border-bottom:1px solid #e2e8f0;">
+          <h3 id="waitlistModalTitle" class="text-lg font-semibold" style="color:#0f172a;">Nuevo en Lista de Espera</h3>
+          <button id="closeWaitlistModal" class="p-1 rounded-lg hover:bg-black/5" style="color:#94a3b8;">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+        <form id="waitlistForm" class="p-5 space-y-4 overflow-y-auto">
+          <input type="hidden" id="waitlistId" value="" />
+          <div>
+            <label class="block text-sm font-medium mb-2" style="color:#475569;">Mascota *</label>
+            <select id="waitlistMascota" class="w-full px-4 py-2.5 rounded-lg" style="background:#f8fafc;border:1px solid #e2e8f0;color:#0f172a;">
+              <option value="">-- Seleccionar mascota --</option>
+            </select>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm font-medium mb-2" style="color:#475569;">Tipo de atencion *</label>
+              <input id="waitlistTipo" type="text" class="w-full px-4 py-2.5 rounded-lg" style="background:#f8fafc;border:1px solid #e2e8f0;color:#0f172a;" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2" style="color:#475569;">Duracion (min)</label>
+              <input id="waitlistDuracion" type="number" min="15" max="480" step="15" value="60" class="w-full px-4 py-2.5 rounded-lg" style="background:#f8fafc;border:1px solid #e2e8f0;color:#0f172a;" />
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="block text-sm font-medium mb-2" style="color:#475569;">Prioridad</label>
+              <input id="waitlistPrioridad" type="number" min="0" max="5" value="0" class="w-full px-4 py-2.5 rounded-lg" style="background:#f8fafc;border:1px solid #e2e8f0;color:#0f172a;" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2" style="color:#475569;">Hora inicio</label>
+              <input id="waitlistHoraInicio" type="number" min="0" max="23" placeholder="8" class="w-full px-4 py-2.5 rounded-lg" style="background:#f8fafc;border:1px solid #e2e8f0;color:#0f172a;" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2" style="color:#475569;">Hora fin</label>
+              <input id="waitlistHoraFin" type="number" min="0" max="23" placeholder="16" class="w-full px-4 py-2.5 rounded-lg" style="background:#f8fafc;border:1px solid #e2e8f0;color:#0f172a;" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-2" style="color:#475569;">Veterinario preferido</label>
+            <select id="waitlistVeterinario" class="w-full px-4 py-2.5 rounded-lg" style="background:#f8fafc;border:1px solid #e2e8f0;color:#0f172a;">
+              <option value="">-- Sin preferencia --</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-2" style="color:#475569;">Notas</label>
+            <textarea id="waitlistNotas" rows="3" class="w-full px-4 py-2.5 rounded-lg resize-none" style="background:#f8fafc;border:1px solid #e2e8f0;color:#0f172a;"></textarea>
+          </div>
+          <div id="waitlistError" class="hidden rounded-lg px-3 py-2 text-sm" style="background:#fef2f2;border:1px solid #fecaca;color:#dc2626;"></div>
+          <div class="flex gap-3 pt-2">
+            <button type="button" id="cancelWaitlistBtn" class="flex-1 px-4 py-2.5 rounded-lg" style="border:1px solid #e2e8f0;color:#475569;">Cancelar</button>
+            <button type="submit" class="flex-1 px-4 py-2.5 rounded-lg text-white" style="background:linear-gradient(135deg,#2563eb,#1d4ed8);">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div id="deleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+      <div class="bg-white rounded-2xl w-full max-w-md mx-4 shadow-2xl p-6" style="border: 1px solid #e2e8f0;">
+        <div class="text-center">
+          <div class="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2" style="color: #0f172a;">¿Eliminar Cita?</h3>
+          <p class="mb-6" style="color: #9a8b7c;">Esta acción no se puede deshacer.</p>
+          <div class="flex gap-3">
+            <button id="cancelDelete" class="flex-1 px-4 py-2.5 rounded-lg hover:bg-black/5 transition-colors" style="border: 1px solid #e2e8f0; color: #475569;">
+              Cancelar
+            </button>
+            <button id="confirmDelete" class="flex-1 px-4 py-2.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
+              Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WhatsApp Message Modal -->
+    <div id="whatsappModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+      <div class="bg-white rounded-2xl w-full max-w-lg mx-4 shadow-2xl" style="border: 1px solid #e2e8f0;">
+        <div class="p-4 flex justify-between items-center" style="border-bottom: 1px solid #e2e8f0;">
+          <h3 class="text-lg font-semibold flex items-center gap-2" style="color: #0f172a;">
+            <svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Enviar Recordatorio
+          </h3>
+          <button id="closeWhatsapp" class="p-1 hover:bg-black/5 rounded-lg transition-colors" style="color: #9a8b7c;">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+        <div class="p-5">
+          <p class="text-sm mb-3" style="color: #9a8b7c;">Mensaje a enviar:</p>
+          <textarea
+            id="whatsappMessage"
+            rows="5"
+            class="w-full px-4 py-3 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+            style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;"
+          ></textarea>
+          <div class="flex gap-3 mt-4">
+            <button id="cancelWhatsapp" class="flex-1 px-4 py-2.5 rounded-lg hover:bg-black/5 transition-colors" style="border: 1px solid #e2e8f0; color: #475569;">
+              Cancelar
+            </button>
+            <button id="sendWhatsapp" class="flex-1 px-4 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-2">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              Abrir WhatsApp
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Email Message Modal -->
+    <div id="emailModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+      <div class="bg-white rounded-2xl w-full max-w-lg mx-4 shadow-2xl" style="border: 1px solid #e2e8f0;">
+        <div class="p-4 flex justify-between items-center" style="border-bottom: 1px solid #e2e8f0;">
+          <h3 class="text-lg font-semibold flex items-center gap-2" style="color: #0f172a;">
+            <svg class="w-5 h-5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
+            Enviar Email
+          </h3>
+          <button id="closeEmail" class="p-1 hover:bg-black/5 rounded-lg transition-colors" style="color: #9a8b7c;">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+        <div class="p-5 space-y-4">
+          <div>
+            <label class="block text-sm mb-1" style="color: #9a8b7c;">Asunto:</label>
+            <input
+              type="text"
+              id="emailSubject"
+              class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+              style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;"
+            />
+          </div>
+          <div>
+            <label class="block text-sm mb-1" style="color: #9a8b7c;">Mensaje:</label>
+            <textarea
+              id="emailBody"
+              rows="6"
+              class="w-full px-4 py-3 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 resize-none"
+              style="background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;"
+            ></textarea>
+          </div>
+          <div class="flex gap-3">
+            <button id="cancelEmail" class="flex-1 px-4 py-2.5 rounded-lg hover:bg-black/5 transition-colors" style="border: 1px solid #e2e8f0; color: #475569;">
+              Cancelar
+            </button>
+            <button id="sendEmail" class="flex-1 px-4 py-2.5 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors flex items-center justify-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+              </svg>
+              Abrir Email
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div id="toastNotification" class="fixed bottom-6 right-6 z-50 hidden items-center gap-2 bg-blue-600 text-white px-4 py-3 rounded-xl shadow-xl">
+    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+    </svg>
+    <span id="toastText" class="text-sm font-medium">Datos actualizados</span>
+  </div>
+</Layout>
+
+<style>
+  :global(body) {
+    background: #f1f5f9 !important;
+  }
+
+  :global(.cita-row-focus) {
+    animation: citaRowPulse 1.8s ease;
+    background: rgba(59, 130, 246, 0.12) !important;
+  }
+
+  @keyframes citaRowPulse {
+    0% { box-shadow: inset 0 0 0 9999px rgba(59, 130, 246, 0.22); }
+    100% { box-shadow: inset 0 0 0 9999px rgba(59, 130, 246, 0); }
+  }
+</style>
+
+<script>
+  import { getVetName, getUsuario, isAuthenticated, logout } from '../services/authService';
+  import { listarCitas, crearCita, actualizarCita, eliminarCita, generarMensajeWhatsApp, generarMensajeEmail, abrirWhatsApp, abrirEmail, type CitaConDetalles, type CitaCreate, type CitaUpdate } from '../services/citaService';
+  import { listarMascotas, type Mascota } from '../services/mascotaService';
+  import { listarClientes, type Cliente } from '../services/clienteService';
+  import { listarVeterinarios, type UsuarioData } from '../services/usuarioService';
+  import { listarListaEspera, obtenerItemListaEspera, crearItemListaEspera, actualizarItemListaEspera, eliminarItemListaEspera, type ListaEsperaItem, type ListaEsperaCreate } from '../services/listaEsperaService';
+
+  // Check auth
+  if (!isAuthenticated()) {
+    window.location.href = '/';
+  }
+
+  const usuarios = getUsuario();
+  const userRol = usuarios?.rol ?? 'secretaria';
+  const queryParams = new URLSearchParams(window.location.search);
+  const initialSearchQuery = (queryParams.get('buscar') || '').trim();
+  const prefillWaitlistId = parseInt(queryParams.get('waitlistId') || '', 10);
+  const prefillReferenceCitaId = parseInt(queryParams.get('refCitaId') || queryParams.get('citaId') || '', 10);
+  let pendingFocusCitaId: number | null = null;
+  const queryCitaId = parseInt(queryParams.get('citaId') || '', 10);
+  if (!Number.isNaN(queryCitaId) && queryCitaId > 0) {
+    pendingFocusCitaId = queryCitaId;
+  }
+
+  // State
+  let citas: CitaConDetalles[] = [];
+  let filteredCitas: CitaConDetalles[] = [];
+  let mascotas: (Mascota & { cliente_nombre?: string; cliente_telefono?: string })[] = [];
+  let clientes: Cliente[] = [];
+  let veterinarios: UsuarioData[] = [];
+  let mascotasDelCliente: Mascota[] = [];
+  let selectedClienteId: number | null = null;
+  let currentPage = 1;
+  const pageSize = 10;
+  let deleteCitaId: number | null = null;
+  let whatsappCita: CitaConDetalles | null = null;
+  let emailCita: CitaConDetalles | null = null;
+  let currentSelectionHasConflict = false;
+  let waitlistItems: ListaEsperaItem[] = [];
+  let pendingWaitlistPrefillHandled = false;
+
+  // Duration cache de respaldo para citas antiguas sin duracion_minutos persistida
+  const DURACIONES_KEY = 'vet_cita_duraciones';
+  function loadDuracionesMap(): Record<string, number> {
+    try { return JSON.parse(localStorage.getItem(DURACIONES_KEY) || '{}'); }
+    catch { return {}; }
+  }
+  function saveCitaDuracion(citaId: number, duracion: number): void {
+    const map = loadDuracionesMap();
+    map[citaId] = duracion;
+    localStorage.setItem(DURACIONES_KEY, JSON.stringify(map));
+  }
+  function getCitaDuracion(citaId: number): number {
+    return loadDuracionesMap()[citaId] ?? 60;
+  }
+
+  // Elements
+  const vetNameEl = document.getElementById('vetName') as HTMLSpanElement;
+  const logoutBtn = document.getElementById('logoutBtn') as HTMLButtonElement;
+  const addCitaBtn = document.getElementById('addCitaBtn') as HTMLButtonElement;
+  const loadingState = document.getElementById('loadingState') as HTMLDivElement;
+  const emptyState = document.getElementById('emptyState') as HTMLDivElement;
+  const tableContainer = document.getElementById('tableContainer') as HTMLDivElement;
+  const citasTableBody = document.getElementById('citasTableBody') as HTMLTableSectionElement;
+  const paginationContainer = document.getElementById('paginationContainer') as HTMLDivElement;
+
+  // Stats
+  const totalCitasEl = document.getElementById('totalCitas') as HTMLParagraphElement;
+  const citasPendientesEl = document.getElementById('citasPendientes') as HTMLParagraphElement;
+  const citasConfirmadasEl = document.getElementById('citasConfirmadas') as HTMLParagraphElement;
+  const citasHoyEl = document.getElementById('citasHoy') as HTMLParagraphElement;
+
+  // Filters
+  const searchInput = document.getElementById('searchInput') as HTMLInputElement;
+  const estadoFilter = document.getElementById('estadoFilter') as HTMLSelectElement;
+  const fechaFilter = document.getElementById('fechaFilter') as HTMLInputElement;
+  const vetFilter = document.getElementById('vetFilter') as HTMLSelectElement;
+  const reporteVetBtn = document.getElementById('reporteVetBtn') as HTMLButtonElement;
+
+  // Waitlist elements
+  const waitlistPanel = document.getElementById('waitlistPanel') as HTMLDivElement;
+  const addWaitlistBtn = document.getElementById('addWaitlistBtn') as HTMLButtonElement;
+  const waitlistLoading = document.getElementById('waitlistLoading') as HTMLDivElement;
+  const waitlistEmpty = document.getElementById('waitlistEmpty') as HTMLDivElement;
+  const waitlistTableWrap = document.getElementById('waitlistTableWrap') as HTMLDivElement;
+  const waitlistTableBody = document.getElementById('waitlistTableBody') as HTMLTableSectionElement;
+  const waitlistModal = document.getElementById('waitlistModal') as HTMLDivElement;
+  const waitlistModalTitle = document.getElementById('waitlistModalTitle') as HTMLHeadingElement;
+  const closeWaitlistModal = document.getElementById('closeWaitlistModal') as HTMLButtonElement;
+  const cancelWaitlistBtn = document.getElementById('cancelWaitlistBtn') as HTMLButtonElement;
+  const waitlistForm = document.getElementById('waitlistForm') as HTMLFormElement;
+  const waitlistIdInput = document.getElementById('waitlistId') as HTMLInputElement;
+  const waitlistMascota = document.getElementById('waitlistMascota') as HTMLSelectElement;
+  const waitlistTipo = document.getElementById('waitlistTipo') as HTMLInputElement;
+  const waitlistDuracion = document.getElementById('waitlistDuracion') as HTMLInputElement;
+  const waitlistPrioridad = document.getElementById('waitlistPrioridad') as HTMLInputElement;
+  const waitlistHoraInicio = document.getElementById('waitlistHoraInicio') as HTMLInputElement;
+  const waitlistHoraFin = document.getElementById('waitlistHoraFin') as HTMLInputElement;
+  const waitlistVeterinario = document.getElementById('waitlistVeterinario') as HTMLSelectElement;
+  const waitlistNotas = document.getElementById('waitlistNotas') as HTMLTextAreaElement;
+  const waitlistError = document.getElementById('waitlistError') as HTMLDivElement;
+
+  // Modal elements
+  const modal = document.getElementById('modal') as HTMLDivElement;
+  const modalTitle = document.getElementById('modalTitle') as HTMLHeadingElement;
+  const closeModal = document.getElementById('closeModal') as HTMLButtonElement;
+  const cancelBtn = document.getElementById('cancelBtn') as HTMLButtonElement;
+  const citaForm = document.getElementById('citaForm') as HTMLFormElement;
+  const citaIdInput = document.getElementById('citaId') as HTMLInputElement;
+  const formError = document.getElementById('formError') as HTMLDivElement;
+  const formErrorText = document.getElementById('formErrorText') as HTMLParagraphElement;
+
+  // Cliente search
+  const clienteSearchType = document.getElementById('clienteSearchType') as HTMLSelectElement;
+  const clienteSearch = document.getElementById('clienteSearch') as HTMLInputElement;
+  const clienteIdCita = document.getElementById('clienteIdCita') as HTMLInputElement;
+  const clienteDropdown = document.getElementById('clienteDropdown') as HTMLDivElement;
+  const selectedClienteInfo = document.getElementById('selectedClienteInfo') as HTMLDivElement;
+  const clienteNombreSelected = document.getElementById('clienteNombreSelected') as HTMLParagraphElement;
+  const clienteContacto = document.getElementById('clienteContacto') as HTMLParagraphElement;
+  const clearCliente = document.getElementById('clearCliente') as HTMLButtonElement;
+
+  // Mascota selection
+  const mascotaSection = document.getElementById('mascotaSection') as HTMLDivElement;
+  const mascotaSearchType = document.getElementById('mascotaSearchType') as HTMLSelectElement;
+  const mascotaSearchInput = document.getElementById('mascotaSearchInput') as HTMLInputElement;
+  const mascotaSelect = document.getElementById('mascotaSelect') as HTMLSelectElement;
+  const mascotaIdInput = document.getElementById('mascotaId') as HTMLInputElement;
+  const selectedMascotaInfo = document.getElementById('selectedMascotaInfo') as HTMLDivElement;
+  const mascotaAvatar = document.getElementById('mascotaAvatar') as HTMLDivElement;
+  const mascotaNombre = document.getElementById('mascotaNombre') as HTMLParagraphElement;
+  const mascotaDetalles = document.getElementById('mascotaDetalles') as HTMLParagraphElement;
+
+  // Form fields
+  const fechaCita = document.getElementById('fechaCita') as HTMLInputElement;
+  const horaCita = document.getElementById('horaCita') as HTMLInputElement;
+  const duracionHoras   = document.getElementById('duracionHoras')   as HTMLInputElement;
+  const duracionMinutos = document.getElementById('duracionMinutos') as HTMLInputElement;
+
+  function getDuracion(): number {
+    const h = parseInt(duracionHoras.value)   || 0;
+    const m = parseInt(duracionMinutos.value) || 0;
+    return Math.max(15, h * 60 + m);
+  }
+
+  function setDuracion(totalMin: number): void {
+    duracionHoras.value   = Math.floor(totalMin / 60).toString();
+    duracionMinutos.value = (totalMin % 60).toString();
+  }
+  const tipoAtencion = document.getElementById('tipoAtencion') as HTMLInputElement;
+  const estadoCita = document.getElementById('estadoCita') as HTMLSelectElement;
+  const detallesCita = document.getElementById('detallesCita') as HTMLTextAreaElement;
+  const veterinarioAsignado = document.getElementById('veterinarioAsignado') as HTMLSelectElement;
+  const vetSelectorField = document.getElementById('vetSelectorField') as HTMLDivElement;
+
+  // Hide vet selector for veterinario role (they are auto-assigned)
+  if (userRol === 'veterinario' && vetSelectorField) {
+    vetSelectorField.style.display = 'none';
+  }
+
+  // Show vet filter in the filter bar only for secretaria
+  if (userRol === 'secretaria') {
+    vetFilter.classList.remove('hidden');
+    waitlistPanel.classList.remove('hidden');
+  }
+
+  // Conflict panel elements
+  const timeGridContainer    = document.getElementById('timeGridContainer')    as HTMLDivElement;
+  const selectedTimeDisplay  = document.getElementById('selectedTimeDisplay')  as HTMLSpanElement;
+  const duracionTotalEl      = document.getElementById('duracionTotal')         as HTMLParagraphElement;
+  const toggleTimeGridBtn    = document.getElementById('toggleTimeGrid')        as HTMLButtonElement;
+  const toggleTimeGridIcon   = document.getElementById('toggleTimeGridIcon')    as HTMLElement;
+  let   timeGridVisible      = true;
+
+  // Delete modal
+  const deleteModal = document.getElementById('deleteModal') as HTMLDivElement;
+  const cancelDelete = document.getElementById('cancelDelete') as HTMLButtonElement;
+  const confirmDelete = document.getElementById('confirmDelete') as HTMLButtonElement;
+
+  // WhatsApp modal
+  const whatsappModal = document.getElementById('whatsappModal') as HTMLDivElement;
+  const closeWhatsapp = document.getElementById('closeWhatsapp') as HTMLButtonElement;
+  const cancelWhatsapp = document.getElementById('cancelWhatsapp') as HTMLButtonElement;
+  const sendWhatsapp = document.getElementById('sendWhatsapp') as HTMLButtonElement;
+  const whatsappMessage = document.getElementById('whatsappMessage') as HTMLTextAreaElement;
+
+  // Email modal
+  const emailModal = document.getElementById('emailModal') as HTMLDivElement;
+  const closeEmail = document.getElementById('closeEmail') as HTMLButtonElement;
+  const cancelEmail = document.getElementById('cancelEmail') as HTMLButtonElement;
+  const sendEmail = document.getElementById('sendEmail') as HTMLButtonElement;
+  const emailSubject = document.getElementById('emailSubject') as HTMLInputElement;
+  const emailBody = document.getElementById('emailBody') as HTMLTextAreaElement;
+
+  // Pagination
+  const prevPageBtns = document.querySelectorAll('.prevPageSync') as NodeListOf<HTMLButtonElement>;
+  const nextPageBtns = document.querySelectorAll('.nextPageSync') as NodeListOf<HTMLButtonElement>;
+  const currentPageDisplays = document.querySelectorAll('.currentPageSync') as NodeListOf<HTMLSpanElement>;
+  const totalPagesDisplays = document.querySelectorAll('.totalPagesSync') as NodeListOf<HTMLSpanElement>;
+  const showingFromEls = document.querySelectorAll('.showingFromSync') as NodeListOf<HTMLSpanElement>;
+  const showingToEls = document.querySelectorAll('.showingToSync') as NodeListOf<HTMLSpanElement>;
+  const totalItemsEls = document.querySelectorAll('.totalItemsSync') as NodeListOf<HTMLSpanElement>;
+
+  // Species emojis
+  const speciesEmojis: Record<string, string> = { 'Perro': '🐕', 'Gato': '🐱', 'Ave': '🦜', 'Roedor': '🐹', 'Reptil': '🦎', 'Otro': '🐾' };
+
+  // Estado badges
+  const estadoBadges: Record<string, string> = {
+    'pendiente': 'bg-yellow-500/20 text-yellow-700',
+    'confirmado': 'bg-blue-500/20 text-blue-700',
+    'en_espera': 'bg-sky-500/20 text-sky-700',
+    'completado': 'bg-gray-500/20 text-gray-600',
+    'rechazado': 'bg-red-500/20 text-red-700'
+  };
+
+  const estadoLabels: Record<string, string> = {
+    'pendiente': 'Pendiente',
+    'confirmado': 'Confirmado',
+    'en_espera': 'En Espera',
+    'completado': 'Completado',
+    'rechazado': 'Rechazado'
+  };
+
+  // Init
+  vetNameEl.textContent = getVetName() || 'Veterinaria';
+
+  // Sidebar
+  const sidebar = document.getElementById('sidebar') as HTMLElement;
+  const sidebarOverlay = document.getElementById('sidebarOverlay') as HTMLDivElement;
+  const hamburgerBtn = document.getElementById('hamburgerBtn') as HTMLButtonElement;
+  hamburgerBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('-translate-x-full');
+    sidebarOverlay.classList.toggle('hidden');
+  });
+  sidebarOverlay.addEventListener('click', () => {
+    sidebar.classList.add('-translate-x-full');
+    sidebarOverlay.classList.add('hidden');
+  });
+
+  // Logout
+  logoutBtn.addEventListener('click', () => {
+    logout();
+    window.location.href = '/';
+  });
+
+  // Load data
+  async function loadCitas() {
+    try {
+      citas = await listarCitas();
+      applyFilters();
+      updateStats();
+    } catch (error) {
+      console.error('Error loading citas:', error);
+    } finally {
+      loadingState.classList.add('hidden');
+    }
+  }
+
+  async function loadMascotas() {
+    try {
+      mascotas = await listarMascotas();
+      if (waitlistMascota) {
+        waitlistMascota.innerHTML = '<option value="">-- Seleccionar mascota --</option>';
+        mascotas
+          .sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''))
+          .forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = String(m.id);
+            opt.textContent = `${m.nombre} (${m.especie}) - ${m.cliente_nombre || 'Cliente'}`;
+            waitlistMascota.appendChild(opt);
+          });
+      }
+    } catch (error) {
+      console.error('Error loading mascotas:', error);
+    }
+  }
+
+  async function loadClientes() {
+    try {
+      clientes = await listarClientes();
+    } catch (error) {
+      console.error('Error loading clientes:', error);
+    }
+  }
+
+  async function loadVeterinarios() {
+    if (userRol !== 'secretaria') return;
+    try {
+      veterinarios = await listarVeterinarios();
+      // Populate the form selector
+      veterinarioAsignado.innerHTML = '<option value="">-- Seleccionar veterinario --</option>';
+      // Populate the filter selector
+      vetFilter.innerHTML = '<option value="">Todos los veterinarios</option>';
+      waitlistVeterinario.innerHTML = '<option value="">-- Sin preferencia --</option>';
+      veterinarios.forEach(vet => {
+        const opt = document.createElement('option');
+        opt.value = vet.id.toString();
+        opt.textContent = vet.nombre;
+        veterinarioAsignado.appendChild(opt.cloneNode(true) as HTMLOptionElement);
+        vetFilter.appendChild(opt);
+        waitlistVeterinario.appendChild(opt.cloneNode(true) as HTMLOptionElement);
+      });
+    } catch (error) {
+      console.error('Error loading veterinarios:', error);
+    }
+  }
+
+  // Update stats
+  function updateStats() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    totalCitasEl.textContent = citas.length.toString();
+    citasPendientesEl.textContent = citas.filter(c => c.estado === 'pendiente').length.toString();
+    citasConfirmadasEl.textContent = citas.filter(c => c.estado === 'confirmado').length.toString();
+    citasHoyEl.textContent = citas.filter(c => {
+      const fecha = new Date(c.fecha_hora);
+      return fecha >= today && fecha < tomorrow;
+    }).length.toString();
+  }
+
+  function estadoWaitlistLabel(estado: string): string {
+    if (estado === 'activa') return 'Activa';
+    if (estado === 'contactado') return 'Contactado';
+    if (estado === 'convertida') return 'Convertida';
+    if (estado === 'descartada') return 'Descartada';
+    return estado;
+  }
+
+  function renderWaitlistTable() {
+    if (userRol !== 'secretaria') return;
+
+    waitlistLoading.classList.add('hidden');
+    if (!waitlistItems.length) {
+      waitlistEmpty.classList.remove('hidden');
+      waitlistTableWrap.classList.add('hidden');
+      return;
+    }
+
+    waitlistEmpty.classList.add('hidden');
+    waitlistTableWrap.classList.remove('hidden');
+
+    waitlistTableBody.innerHTML = waitlistItems.map(item => {
+      const prefVet = item.preferencia_veterinario_nombre || 'Sin preferencia';
+      const prefHora = item.hora_inicio_preferida != null && item.hora_fin_preferida != null
+        ? `${item.hora_inicio_preferida}:00-${item.hora_fin_preferida}:00`
+        : 'Sin franja';
+
+      return `
+        <tr>
+          <td class="px-3 py-2 text-sm" style="color:#0f172a;">
+            <div class="font-medium">${item.nombre_mascota}</div>
+            <div class="text-xs" style="color:#94a3b8;">${item.nombre_cliente}</div>
+          </td>
+          <td class="px-3 py-2 text-sm" style="color:#0f172a;">
+            <div>${item.tipo_atencion}</div>
+            <div class="text-xs" style="color:#94a3b8;">${item.duracion_minutos || 60} min</div>
+          </td>
+          <td class="px-3 py-2 text-sm" style="color:#0f172a;">${item.prioridad || 0}</td>
+          <td class="px-3 py-2 text-sm" style="color:#0f172a;">
+            <div class="text-xs">${prefVet}</div>
+            <div class="text-xs" style="color:#94a3b8;">${prefHora}</div>
+          </td>
+          <td class="px-3 py-2 text-sm"><span class="px-2 py-1 rounded-full text-xs" style="background:#e2e8f0;color:#475569;">${estadoWaitlistLabel(item.estado)}</span></td>
+          <td class="px-3 py-2">
+            <div class="flex items-center justify-center gap-1">
+              <button onclick="window.editWaitlistItem(${item.id})" class="p-1.5 rounded-lg hover:bg-black/5" style="color:#64748b;" title="Editar">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+              </button>
+              <button onclick="window.prefillFromWaitlist(${item.id})" class="p-1.5 rounded-lg hover:bg-blue-50" style="color:#2563eb;" title="Prefill cita">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+              </button>
+              <button onclick="window.deleteWaitlistItem(${item.id})" class="p-1.5 rounded-lg hover:bg-red-50" style="color:#dc2626;" title="Eliminar">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  async function loadWaitlist() {
+    if (userRol !== 'secretaria') return;
+    try {
+      waitlistItems = await listarListaEspera();
+      renderWaitlistTable();
+    } catch (error) {
+      console.error('Error loading waitlist:', error);
+      waitlistLoading.textContent = 'No se pudo cargar la lista de espera';
+    }
+  }
+
+  function openWaitlistModal(isEdit = false) {
+    waitlistModal.classList.remove('hidden');
+    waitlistModal.classList.add('flex');
+    waitlistModalTitle.textContent = isEdit ? 'Editar Lista de Espera' : 'Nuevo en Lista de Espera';
+    waitlistError.classList.add('hidden');
+    if (!isEdit) {
+      waitlistForm.reset();
+      waitlistIdInput.value = '';
+      waitlistDuracion.value = '60';
+      waitlistPrioridad.value = '0';
+    }
+  }
+
+  function closeWaitlistModalFn() {
+    waitlistModal.classList.add('hidden');
+    waitlistModal.classList.remove('flex');
+  }
+
+  function applyWaitlistPrefill(item: ListaEsperaItem) {
+    const mascota = mascotas.find(m => m.id === item.mascota_id);
+    if (!mascota) return;
+    const cliente = clientes.find(c => c.id === mascota.cliente_id);
+    if (!cliente) return;
+
+    openModal(false);
+    selectCliente(cliente);
+    mascotaIdInput.value = String(item.mascota_id);
+    mascotaSelect.value = String(item.mascota_id);
+    mascotaSelect.dispatchEvent(new Event('change'));
+
+    tipoAtencion.value = item.tipo_atencion;
+    setDuracion(item.duracion_minutos || 60);
+    if (item.preferencia_veterinario_id) {
+      veterinarioAsignado.value = String(item.preferencia_veterinario_id);
+    }
+
+    if (!Number.isNaN(prefillReferenceCitaId) && prefillReferenceCitaId > 0) {
+      const citaRef = citas.find(c => c.id === prefillReferenceCitaId);
+      if (citaRef) {
+        const f = new Date(citaRef.fecha_hora);
+        fechaCita.value = f.toISOString().split('T')[0];
+        horaCita.value = f.toTimeString().slice(0, 5);
+      }
+    }
+
+    renderTimeGrid();
+  }
+
+  (window as any).prefillFromWaitlist = async (itemId: number) => {
+    try {
+      const item = await obtenerItemListaEspera(itemId);
+      applyWaitlistPrefill(item);
+    } catch (error: any) {
+      formErrorText.textContent = error.message || 'No se pudo precargar la sugerencia';
+      formError.classList.remove('hidden');
+    }
+  };
+
+  (window as any).editWaitlistItem = (itemId: number) => {
+    const item = waitlistItems.find(w => w.id === itemId);
+    if (!item) return;
+    openWaitlistModal(true);
+    waitlistIdInput.value = String(item.id);
+    waitlistMascota.value = String(item.mascota_id);
+    waitlistTipo.value = item.tipo_atencion;
+    waitlistDuracion.value = String(item.duracion_minutos || 60);
+    waitlistPrioridad.value = String(item.prioridad || 0);
+    waitlistHoraInicio.value = item.hora_inicio_preferida == null ? '' : String(item.hora_inicio_preferida);
+    waitlistHoraFin.value = item.hora_fin_preferida == null ? '' : String(item.hora_fin_preferida);
+    waitlistVeterinario.value = item.preferencia_veterinario_id ? String(item.preferencia_veterinario_id) : '';
+    waitlistNotas.value = item.notas || '';
+  };
+
+  (window as any).deleteWaitlistItem = async (itemId: number) => {
+    const confirmDeleteItem = window.confirm('Eliminar este elemento de la lista de espera?');
+    if (!confirmDeleteItem) return;
+    try {
+      await eliminarItemListaEspera(itemId);
+      await loadWaitlist();
+    } catch (error) {
+      console.error('Error deleting waitlist item:', error);
+    }
+  };
+
+  // Time grid renderer
+  function getVetIdForScheduling(): number | null {
+    if (userRol !== 'secretaria') return usuarios?.id ?? null;
+    const vetId = parseInt(veterinarioAsignado.value || '', 10);
+    return Number.isNaN(vetId) ? null : vetId;
+  }
+
+  function renderTimeGrid() {
+    const fecha = fechaCita.value;
+    const duracion = getDuracion();
+    const selectedTime = horaCita.value;
+    const selectedVetId = getVetIdForScheduling();
+
+    // Update the total duration label (always, regardless of date/time selection)
+    {
+      const h = Math.floor(duracion / 60);
+      const m = duracion % 60;
+      let label: string;
+      if (h > 0 && m > 0)      label = `${h}h ${m}min`;
+      else if (h > 0)           label = `${h} hora${h > 1 ? 's' : ''}`;
+      else                      label = `${m} min`;
+      duracionTotalEl.textContent = `= ${label}`;
+    }
+
+    // Update the "Inicio → Fin" label whenever date, duration, or selection changes
+    if (selectedTime && fecha) {
+      const sel = new Date(`${fecha}T${selectedTime}:00`);
+      if (!isNaN(sel.getTime())) {
+        const end  = new Date(sel.getTime() + duracion * 60_000);
+        const endH = end.getHours().toString().padStart(2, '0');
+        const endM = end.getMinutes().toString().padStart(2, '0');
+        selectedTimeDisplay.textContent = `${selectedTime} → ${endH}:${endM}`;
+        selectedTimeDisplay.classList.remove('hidden');
+      }
+    } else if (!selectedTime) {
+      selectedTimeDisplay.classList.add('hidden');
+    }
+
+    if (!fecha) {
+      timeGridContainer.innerHTML = '<p class="text-xs text-center py-2" style="color: #94a3b8;">Selecciona una fecha para ver los horarios</p>';
+      return;
+    }
+
+    if (userRol === 'secretaria' && !selectedVetId) {
+      currentSelectionHasConflict = true;
+      timeGridContainer.innerHTML = `
+        <div class="rounded-lg px-3 py-3 text-xs" style="background:#fffbeb;border:1px solid #fde68a;color:#92400e;">
+          Selecciona un veterinario para calcular horarios disponibles.
+        </div>
+      `;
+      return;
+    }
+
+    const editingId = citaIdInput.value ? parseInt(citaIdInput.value) : null;
+    const dayStart = new Date(`${fecha}T00:00:00`);
+    const dayEnd = new Date(`${fecha}T23:59:59`);
+
+    // Citas activas del día (excluye la que se edita y las completadas/rechazadas)
+    const dayCitas = citas.filter(c => {
+      if (editingId && c.id === editingId) return false;
+      if (c.estado === 'rechazado' || c.estado === 'completado') return false;
+      if (selectedVetId && c.veterinario_asignado_id !== selectedVetId) return false;
+      const cf = new Date(c.fecha_hora);
+      return cf >= dayStart && cf <= dayEnd;
+    });
+
+    // Generate all 15-min slots 07:00 → 19:45
+    const allSlots: string[] = [];
+    for (let h = 7; h < 20; h++) {
+      for (let m = 0; m < 60; m += 15) {
+        allSlots.push(`${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`);
+      }
+    }
+
+    // Classify each slot
+    type SlotInfo = { slot: string; state: 'free' | 'occupied' | 'partial'; tooltip: string };
+    const classified: SlotInfo[] = allSlots.map(slot => {
+      const slotStart = new Date(`${fecha}T${slot}:00`);
+      const slot15End  = new Date(slotStart.getTime() + 15 * 60_000);
+
+      // Is this 15-min window itself occupied?
+      const occupier = dayCitas.find(c => {
+        const cs = new Date(c.fecha_hora);
+        const ce = new Date(cs.getTime() + (c.duracion_minutos ?? getCitaDuracion(c.id)) * 60_000);
+        return slotStart < ce && slot15End > cs;
+      });
+      if (occupier) {
+        const oh = new Date(occupier.fecha_hora).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+        return { slot, state: 'occupied', tooltip: `${oh} · ${occupier.nombre_mascota || ''} (${occupier.nombre_cliente || ''}) · ${occupier.tipo_atencion}` };
+      }
+
+      // Is the full [slot, slot+duracion) block free?
+      const slotFullEnd = new Date(slotStart.getTime() + duracion * 60_000);
+      const blockFree = !dayCitas.some(c => {
+        const cs = new Date(c.fecha_hora);
+        const ce = new Date(cs.getTime() + (c.duracion_minutos ?? getCitaDuracion(c.id)) * 60_000);
+        return slotStart < ce && slotFullEnd > cs;
+      });
+
+      if (!blockFree) {
+        return { slot, state: 'partial', tooltip: `Hora libre, pero la duración de ${duracion} min se empalmaría con otra cita` };
+      }
+      return { slot, state: 'free', tooltip: '' };
+    });
+
+    const freeCount  = classified.filter(s => s.state === 'free').length;
+    const busyCount  = classified.filter(s => s.state === 'occupied').length;
+
+    // Detectar si la selección actual se empalma con alguna cita existente
+    let hasSelectionConflict = false;
+    if (selectedTime) {
+      const selStart = new Date(`${fecha}T${selectedTime}:00`);
+      const selEnd   = new Date(selStart.getTime() + duracion * 60_000);
+      hasSelectionConflict = dayCitas.some(c => {
+        const cs = new Date(c.fecha_hora);
+        const ce = new Date(cs.getTime() + (c.duracion_minutos ?? getCitaDuracion(c.id)) * 60_000);
+        return selStart < ce && selEnd > cs;
+      });
+    }
+    currentSelectionHasConflict = hasSelectionConflict;
+
+    function slotBtn({ slot, state, tooltip }: SlotInfo): string {
+      const isSelected = slot === selectedTime;
+
+      // Is this slot within the duration block of the selected start time?
+      const isInSelectedRange = !isSelected && !!selectedTime && (() => {
+        const selStart = new Date(`${fecha}T${selectedTime}:00`);
+        const selEnd   = new Date(selStart.getTime() + duracion * 60_000);
+        const s        = new Date(`${fecha}T${slot}:00`);
+        return s > selStart && s < selEnd;
+      })();
+
+      // Is this slot exactly the END boundary of the selected appointment?
+      const isEndBoundary = !isSelected && !isInSelectedRange && !!selectedTime && (() => {
+        const selStart = new Date(`${fecha}T${selectedTime}:00`);
+        const selEnd   = new Date(selStart.getTime() + duracion * 60_000);
+        const s        = new Date(`${fecha}T${slot}:00`);
+        return s.getTime() === selEnd.getTime();
+      })();
+
+      if (isSelected) {
+        if (hasSelectionConflict) {
+          return `<button type="button" onclick="window.selectTimeSlot('${slot}')" title="¡Conflicto de horario! La duración se empalma con otra cita"
+            class="px-2.5 py-1.5 text-xs rounded-lg font-bold bg-red-500 border-2 border-red-300 text-white ring-2 ring-red-400/50 ring-offset-1 ring-offset-white">
+            ${slot}
+          </button>`;
+        }
+        return `<button type="button" onclick="window.selectTimeSlot('${slot}')" title="Inicio de la cita"
+          class="px-2.5 py-1.5 text-xs rounded-lg font-bold bg-blue-500 border-2 border-blue-300 text-white ring-2 ring-blue-400/50 ring-offset-1 ring-offset-white">
+          ${slot}
+        </button>`;
+      }
+      if (isInSelectedRange) {
+        if (state === 'occupied') {
+          return `<button type="button" disabled title="¡Conflicto! ${tooltip}"
+            class="px-2.5 py-1.5 text-xs rounded-lg bg-red-500/30 border-2 border-red-500/50 text-red-600 cursor-not-allowed font-bold">
+            ${slot}
+          </button>`;
+        }
+        return `<button type="button" disabled title="Ocupado por esta cita (${duracion} min)"
+          class="px-2.5 py-1.5 text-xs rounded-lg bg-blue-500/25 border border-blue-500/40 text-blue-600/70 cursor-not-allowed">
+          ${slot}
+        </button>`;
+      }
+      if (isEndBoundary) {
+        return `<button type="button" onclick="window.selectTimeSlot('${slot}')" title="Fin de la cita — disponible para siguiente"
+          class="px-2.5 py-1.5 text-xs rounded-lg bg-blue-500/10 border border-dashed border-blue-500/50 text-blue-600/60 hover:bg-blue-500/25 transition-colors">
+          ${slot} ←
+        </button>`;
+      }
+      if (state === 'occupied') {
+        return `<button type="button" disabled title="${tooltip}"
+          class="px-2.5 py-1.5 text-xs rounded-lg bg-red-500/20 border border-red-500/40 text-red-400 cursor-not-allowed opacity-75">
+          ${slot}
+        </button>`;
+      }
+      if (state === 'partial') {
+        return `<button type="button" disabled title="${tooltip}"
+          class="px-2.5 py-1.5 text-xs rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-500/70 cursor-not-allowed opacity-60">
+          ${slot}
+        </button>`;
+      }
+      // free
+      return `<button type="button" onclick="window.selectTimeSlot('${slot}')" title="Disponible"
+        class="px-2.5 py-1.5 text-xs rounded-lg hover:bg-blue-500/20 border hover:border-blue-500/50 transition-colors" style="background: #f8fafc; border-color: #e2e8f0; color: #9a8b7c;">
+        ${slot}
+      </button>`;
+    }
+
+    const morning   = classified.filter(s => parseInt(s.slot) < 12);
+    const afternoon = classified.filter(s => parseInt(s.slot) >= 12);
+
+    timeGridContainer.innerHTML = `
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-xs" style="color: #9a8b7c;">${freeCount} horarios libres · ${busyCount} ocupados</span>
+        ${selectedTime
+          ? `<span class="text-xs font-medium ${hasSelectionConflict ? 'text-red-500' : 'text-blue-600'}">Seleccionado: <strong>${selectedTime}</strong>${hasSelectionConflict ? ' — ¡Conflicto!' : ''}</span>`
+          : '<span class="text-xs italic" style="color: #94a3b8;">Haz clic en un bloque verde para elegir la hora</span>'}
+      </div>
+      ${hasSelectionConflict ? `
+        <div class="mb-3 flex items-start gap-2 bg-red-50 border border-red-200 rounded-lg px-3 py-2.5">
+          <svg class="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+          </svg>
+          <p class="text-red-600 text-xs font-medium">La hora seleccionada se empalma con otra cita. Los bloques rojos dentro del rango indican el conflicto. Elige una hora diferente.</p>
+        </div>
+      ` : ''}
+      <div class="mb-3">
+        <p class="text-xs uppercase tracking-wider font-medium mb-2" style="color: #9a8b7c;">Mañana</p>
+        <div class="flex flex-wrap gap-1.5">${morning.map(slotBtn).join('')}</div>
+      </div>
+      <div>
+        <p class="text-xs uppercase tracking-wider font-medium mb-2" style="color: #9a8b7c;">Tarde</p>
+        <div class="flex flex-wrap gap-1.5">${afternoon.map(slotBtn).join('')}</div>
+      </div>
+    `;
+  }
+
+  (window as any).selectTimeSlot = (slot: string) => {
+    horaCita.value = slot;
+    renderTimeGrid();
+  };
+
+  // Apply filters
+  function applyFilters() {
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    const searchDigits = searchTerm.replace(/\D/g, '');
+    const estadoValue = estadoFilter.value;
+    const fechaValue = fechaFilter.value;
+    const vetFilterValue = vetFilter.value;
+
+    filteredCitas = citas.filter(cita => {
+      // Search filter
+      let matchesSearch = true;
+      if (searchTerm) {
+        const phoneMatch = searchDigits.length >= 3 && (cita.telefono_cliente || '').replace(/\D/g, '').includes(searchDigits);
+        matchesSearch =
+          cita.nombre_mascota?.toLowerCase().includes(searchTerm) ||
+          cita.nombre_cliente?.toLowerCase().includes(searchTerm) ||
+          phoneMatch ||
+          cita.tipo_atencion.toLowerCase().includes(searchTerm) ||
+          false;
+      }
+
+      // Estado filter
+      let matchesEstado = true;
+      if (estadoValue) {
+        matchesEstado = cita.estado === estadoValue;
+      }
+
+      // Fecha filter
+      let matchesFecha = true;
+      if (fechaValue) {
+        // Extraer fecha directamente del string para evitar problemas de timezone
+        const citaFechaStr = cita.fecha_hora.split('T')[0];
+        matchesFecha = citaFechaStr === fechaValue;
+      }
+
+      // Vet filter (secretaria only)
+      let matchesVet = true;
+      if (vetFilterValue && userRol === 'secretaria') {
+        matchesVet = cita.veterinario_asignado_id?.toString() === vetFilterValue;
+      }
+
+      return matchesSearch && matchesEstado && matchesFecha && matchesVet;
+    });
+
+    // Sort by date descending
+    filteredCitas.sort((a, b) => new Date(b.fecha_hora).getTime() - new Date(a.fecha_hora).getTime());
+
+    currentPage = 1;
+    if (pendingFocusCitaId) {
+      const index = filteredCitas.findIndex(c => c.id === pendingFocusCitaId);
+      if (index >= 0) {
+        currentPage = Math.floor(index / pageSize) + 1;
+      }
+    }
+    renderTable();
+  }
+
+  // Render table
+  function renderTable() {
+    if (filteredCitas.length === 0) {
+      emptyState.classList.remove('hidden');
+      tableContainer.classList.add('hidden');
+      paginationContainer.classList.add('hidden');
+      return;
+    }
+
+    emptyState.classList.add('hidden');
+    tableContainer.classList.remove('hidden');
+    paginationContainer.classList.remove('hidden');
+
+    const totalPages = Math.ceil(filteredCitas.length / pageSize);
+    const start = (currentPage - 1) * pageSize;
+    const end = Math.min(start + pageSize, filteredCitas.length);
+    const pageItems = filteredCitas.slice(start, end);
+
+    citasTableBody.innerHTML = pageItems.map(cita => {
+      const fecha = new Date(cita.fecha_hora);
+      const fechaStr = fecha.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+      const horaStr = fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+      const emoji = speciesEmojis[cita.especie_mascota || ''] || '🐾';
+      const badgeClass = estadoBadges[cita.estado] || 'bg-gray-500/20 text-gray-600';
+      const estadoLabel = estadoLabels[cita.estado] || cita.estado;
+      const isTarget = pendingFocusCitaId === cita.id;
+
+      return `
+        <tr id="cita-row-${cita.id}" class="hover:bg-black/[0.02] transition-colors ${isTarget ? 'cita-row-focus' : ''}">
+          <td class="px-4 py-3">
+            <div class="text-sm font-medium" style="color: #0f172a;">${fechaStr}</div>
+            <div class="text-xs" style="color: #9a8b7c;">${horaStr}</div>
+          </td>
+          <td class="px-4 py-3">
+            <div class="flex items-center space-x-2">
+              <span class="text-lg">${emoji}</span>
+              <div>
+                <a href="/mascotas?id=${cita.mascota_id}" class="text-sm font-medium hover:text-blue-600" style="color: #0f172a;">${cita.nombre_mascota || 'Sin nombre'}</a>
+                <div class="text-xs" style="color: #9a8b7c;">${cita.especie_mascota || ''}</div>
+              </div>
+            </div>
+          </td>
+          <td class="px-4 py-3">
+            <div class="text-sm" style="color: #0f172a;">${cita.nombre_cliente || 'Sin cliente'}</div>
+            ${cita.telefono_cliente ? `
+              <a href="https://wa.me/${cita.telefono_cliente.replace(/\D/g, '')}" target="_blank" class="text-blue-600 hover:text-blue-700 text-xs flex items-center gap-1">
+                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                ${cita.telefono_cliente}
+              </a>
+            ` : ''}
+          </td>
+          <td class="px-4 py-3 text-sm" style="color: #0f172a;">${cita.tipo_atencion}</td>
+          <td class="px-4 py-3 text-sm" style="color: #0f172a;">${cita.costo ? `$${parseFloat(cita.costo).toFixed(2)}` : '-'}</td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-1 rounded-full text-xs font-medium ${badgeClass}">${estadoLabel}</span>
+          </td>
+          <td class="px-4 py-3">
+            <div class="flex items-center justify-center space-x-1">
+              <button onclick="window.editCita(${cita.id})" class="p-1.5 hover:bg-black/5 rounded-lg transition-colors" style="color: #9a8b7c;" title="Editar">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+              </button>
+              <button onclick="window.openWhatsappModal(${cita.id})" class="p-1.5 text-blue-500 hover:text-blue-600 hover:bg-black/5 rounded-lg transition-colors" title="WhatsApp">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              </button>
+              <button onclick="window.openEmailModal(${cita.id})" class="p-1.5 text-sky-500 hover:text-sky-600 hover:bg-black/5 rounded-lg transition-colors ${cita.email_cliente ? '' : 'opacity-50 cursor-not-allowed'}" title="Email" ${!cita.email_cliente ? 'disabled' : ''}>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+              </button>
+              <button onclick="window.deleteCita(${cita.id})" class="p-1.5 text-red-400 hover:text-red-500 hover:bg-black/5 rounded-lg transition-colors" title="Eliminar">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    // Update pagination
+    currentPageDisplays.forEach(el => el.textContent = currentPage.toString());
+    totalPagesDisplays.forEach(el => el.textContent = totalPages.toString());
+    showingFromEls.forEach(el => el.textContent = (start + 1).toString());
+    showingToEls.forEach(el => el.textContent = end.toString());
+    totalItemsEls.forEach(el => el.textContent = filteredCitas.length.toString());
+
+    prevPageBtns.forEach(btn => btn.disabled = currentPage === 1);
+    nextPageBtns.forEach(btn => btn.disabled = currentPage === totalPages);
+
+    if (pendingFocusCitaId) {
+      const targetRow = document.getElementById(`cita-row-${pendingFocusCitaId}`);
+      if (targetRow) {
+        requestAnimationFrame(() => {
+          targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+        pendingFocusCitaId = null;
+      }
+    }
+  }
+
+  // Pagination events
+  prevPageBtns.forEach(btn => btn.addEventListener('click', () => {
+    if (currentPage > 1) {
+      currentPage--;
+      renderTable();
+    }
+  }));
+
+  nextPageBtns.forEach(btn => btn.addEventListener('click', () => {
+    const totalPages = Math.ceil(filteredCitas.length / pageSize);
+    if (currentPage < totalPages) {
+      currentPage++;
+      renderTable();
+    }
+  }));
+
+  // Filter events
+  searchInput.addEventListener('input', applyFilters);
+  estadoFilter.addEventListener('change', applyFilters);
+  fechaFilter.addEventListener('change', applyFilters);
+  vetFilter.addEventListener('change', () => {
+    applyFilters();
+    // Show report button only when a vet is selected
+    if (vetFilter.value) {
+      reporteVetBtn.classList.remove('hidden');
+      reporteVetBtn.style.display = 'flex';
+    } else {
+      reporteVetBtn.classList.add('hidden');
+    }
+  });
+
+  // Report button — generates email with that vet's filtered citas
+  reporteVetBtn.addEventListener('click', () => {
+    const vetId = parseInt(vetFilter.value);
+    const vet = veterinarios.find(v => v.id === vetId);
+    if (!vet) return;
+
+    const now = new Date();
+    const fechaHoy = now.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    const estadoActivo = estadoFilter.value;
+    const fechaActiva = fechaFilter.value;
+
+    const vetCitas = filteredCitas.filter(c => c.veterinario_asignado_id === vetId);
+
+    const estadoLabels: Record<string, string> = {
+      pendiente: 'Pendiente', confirmado: 'Confirmado', en_espera: 'En Espera',
+      completado: 'Completado', rechazado: 'Rechazado'
+    };
+
+    let periodoInfo = '';
+    if (fechaActiva) {
+      periodoInfo = `Fecha: ${new Date(fechaActiva + 'T12:00:00').toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })}\n`;
+    }
+    if (estadoActivo) {
+      periodoInfo += `Estado: ${estadoLabels[estadoActivo] || estadoActivo}\n`;
+    }
+
+    let body = `Reporte de citas — Dr./Dra. ${vet.nombre}\n`;
+    body += `Generado el: ${fechaHoy}\n`;
+    if (periodoInfo) body += periodoInfo;
+    body += `Total: ${vetCitas.length} cita(s)\n`;
+    body += '─'.repeat(40) + '\n\n';
+
+    if (vetCitas.length === 0) {
+      body += 'No hay citas en el período seleccionado.\n';
+    } else {
+      vetCitas.forEach((c, i) => {
+        const fechaStr = new Date(c.fecha_hora).toLocaleDateString('es-MX', {
+          weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
+        });
+        const horaStr = new Date(c.fecha_hora).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+        body += `${i + 1}. ${c.nombre_mascota} (${c.especie_mascota}) — ${c.nombre_cliente}\n`;
+        body += `   📅 ${fechaStr} a las ${horaStr}\n`;
+        body += `   🩺 ${c.tipo_atencion}  |  Estado: ${estadoLabels[c.estado] || c.estado}\n`;
+        if (c.descripcion) body += `   Notas: ${c.descripcion}\n`;
+        body += '\n';
+      });
+    }
+
+    const subject = encodeURIComponent(`Reporte de citas — ${vet.nombre} — ${fechaHoy}`);
+    const mailtoUrl = `mailto:${vet.email || ''}?subject=${subject}&body=${encodeURIComponent(body)}`;
+    window.open(mailtoUrl, '_blank');
+  });
+
+  // Time grid triggers
+  fechaCita.addEventListener('change', renderTimeGrid);
+  veterinarioAsignado.addEventListener('change', () => {
+    formError.classList.add('hidden');
+    renderTimeGrid();
+  });
+  duracionHoras.addEventListener('input', renderTimeGrid);
+  duracionMinutos.addEventListener('input', renderTimeGrid);
+
+  // Prevent accidental scroll-wheel changes on duration number inputs
+  duracionHoras.addEventListener('wheel', (e) => e.preventDefault(), { passive: false });
+  duracionMinutos.addEventListener('wheel', (e) => e.preventDefault(), { passive: false });
+
+  // Snap manually typed minutes to nearest multiple of 15 (with carry-over to hours)
+  duracionMinutos.addEventListener('blur', () => {
+    let m = parseInt(duracionMinutos.value) || 0;
+    m = Math.round(m / 15) * 15;
+    if (m >= 60) {
+      const h = (parseInt(duracionHoras.value) || 0) + Math.floor(m / 60);
+      duracionHoras.value = Math.min(h, 8).toString();
+      m = m % 60;
+    }
+    m = Math.max(0, Math.min(m, 45));
+    duracionMinutos.value = m.toString();
+    renderTimeGrid();
+  });
+
+  // Toggle visibility of the time grid
+  toggleTimeGridBtn.addEventListener('click', () => {
+    timeGridVisible = !timeGridVisible;
+    timeGridContainer.style.display = timeGridVisible ? '' : 'none';
+    toggleTimeGridIcon.style.transform = timeGridVisible ? 'rotate(0deg)' : 'rotate(-90deg)';
+  });
+
+  // Modal functions
+  function openModal(isEdit = false) {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    modalTitle.textContent = isEdit ? 'Editar Cita' : 'Nueva Cita';
+    formError.classList.add('hidden');
+    // Always show the time grid when opening the modal
+    timeGridVisible = true;
+    timeGridContainer.style.display = '';
+    toggleTimeGridIcon.style.transform = 'rotate(0deg)';
+    if (!isEdit) {
+      citaForm.reset();
+      citaIdInput.value = '';
+      // Reset cliente - IMPORTANTE: mostrar el input de búsqueda
+      selectedClienteInfo.classList.add('hidden');
+      clienteIdCita.value = '';
+      clienteSearch.value = '';
+      clienteSearch.classList.remove('hidden');
+      selectedClienteId = null;
+      // Reset mascota
+      mascotaSection.classList.add('hidden');
+      selectedMascotaInfo.classList.add('hidden');
+      mascotaIdInput.value = '';
+      mascotaSelect.selectedIndex = 0;
+      mascotasDelCliente = [];
+      // Set default date to today
+      fechaCita.value = new Date().toISOString().split('T')[0];
+      // Reset duracion, hora y time grid
+      setDuracion(60);
+      horaCita.value = '';
+      selectedTimeDisplay.classList.add('hidden');
+      renderTimeGrid();
+    }
+  }
+
+  function closeModalFn() {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+
+  addCitaBtn.addEventListener('click', () => openModal(false));
+  closeModal.addEventListener('click', closeModalFn);
+  cancelBtn.addEventListener('click', closeModalFn);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeModalFn(); });
+
+  if (userRol === 'secretaria') {
+    addWaitlistBtn?.addEventListener('click', () => openWaitlistModal(false));
+    closeWaitlistModal?.addEventListener('click', closeWaitlistModalFn);
+    cancelWaitlistBtn?.addEventListener('click', closeWaitlistModalFn);
+    waitlistModal?.addEventListener('click', (e) => {
+      if (e.target === waitlistModal) closeWaitlistModalFn();
+    });
+
+    waitlistForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      waitlistError.classList.add('hidden');
+
+      const mascotaId = parseInt(waitlistMascota.value || '', 10);
+      if (Number.isNaN(mascotaId) || mascotaId <= 0) {
+        waitlistError.textContent = 'Selecciona una mascota';
+        waitlistError.classList.remove('hidden');
+        return;
+      }
+
+      if (!waitlistTipo.value.trim()) {
+        waitlistError.textContent = 'Especifica el tipo de atencion';
+        waitlistError.classList.remove('hidden');
+        return;
+      }
+
+      const duracion = parseInt(waitlistDuracion.value || '60', 10);
+      const prioridad = parseInt(waitlistPrioridad.value || '0', 10);
+      const horaInicioRaw = waitlistHoraInicio.value.trim();
+      const horaFinRaw = waitlistHoraFin.value.trim();
+      const horaInicio = horaInicioRaw === '' ? undefined : parseInt(horaInicioRaw, 10);
+      const horaFin = horaFinRaw === '' ? undefined : parseInt(horaFinRaw, 10);
+      const prefVet = waitlistVeterinario.value ? parseInt(waitlistVeterinario.value, 10) : undefined;
+
+      if ((horaInicio != null && Number.isNaN(horaInicio)) || (horaFin != null && Number.isNaN(horaFin))) {
+        waitlistError.textContent = 'Las horas preferidas no son validas';
+        waitlistError.classList.remove('hidden');
+        return;
+      }
+
+      if (horaInicio != null && horaFin != null && horaInicio > horaFin) {
+        waitlistError.textContent = 'La hora de inicio no puede ser mayor que la hora de fin';
+        waitlistError.classList.remove('hidden');
+        return;
+      }
+
+      const payload: ListaEsperaCreate = {
+        mascota_id: mascotaId,
+        tipo_atencion: waitlistTipo.value.trim(),
+        duracion_minutos: duracion,
+        prioridad,
+        hora_inicio_preferida: horaInicio,
+        hora_fin_preferida: horaFin,
+        notas: waitlistNotas.value.trim() || undefined,
+        preferencia_veterinario_id: prefVet
+      };
+
+      try {
+        const itemId = parseInt(waitlistIdInput.value || '', 10);
+        if (!Number.isNaN(itemId) && itemId > 0) {
+          await actualizarItemListaEspera(itemId, payload);
+        } else {
+          await crearItemListaEspera(payload);
+        }
+        closeWaitlistModalFn();
+        await loadWaitlist();
+      } catch (error: any) {
+        waitlistError.textContent = error.message || 'No se pudo guardar el elemento';
+        waitlistError.classList.remove('hidden');
+      }
+    });
+  }
+
+  // Cliente search with type filter
+  clienteSearch.addEventListener('input', () => {
+    const term = clienteSearch.value.trim();
+    const searchType = clienteSearchType.value;
+    
+    if (term.length < 1) {
+      clienteDropdown.classList.add('hidden');
+      return;
+    }
+
+    let matches: Cliente[] = [];
+    
+    if (searchType === 'id') {
+      // Búsqueda exacta por ID
+      matches = clientes.filter(c => c.id.toString() === term);
+    } else if (searchType === 'telefono') {
+      // Búsqueda por teléfono (solo números)
+      const cleanTerm = term.replace(/\D/g, '');
+      matches = clientes.filter(c => c.telefono.replace(/\D/g, '').includes(cleanTerm));
+    } else {
+      // Búsqueda por nombre
+      matches = clientes.filter(c => c.nombre.toLowerCase().includes(term.toLowerCase()));
+    }
+    
+    matches = matches.slice(0, 10);
+
+    if (matches.length === 0) {
+      clienteDropdown.innerHTML = '<div class="px-3 py-2 text-sm" style="color: #9a8b7c;">No se encontraron resultados</div>';
+      clienteDropdown.classList.remove('hidden');
+      return;
+    }
+
+    clienteDropdown.innerHTML = matches.map(c => `
+      <div class="px-3 py-2 hover:bg-black/5 cursor-pointer flex items-center space-x-2" data-id="${c.id}">
+        <div class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
+          <svg class="w-4 h-4" style="color: #3b82f6;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm" style="color: #0f172a;"><span class="text-xs" style="color: #9a8b7c;">#${c.id}</span> ${c.nombre}</p>
+          <p class="text-xs" style="color: #9a8b7c;">${c.telefono} ${c.email ? '- ' + c.email : ''}</p>
+        </div>
+      </div>
+    `).join('');
+    clienteDropdown.classList.remove('hidden');
+  });
+
+  // Update placeholder when search type changes
+  clienteSearchType.addEventListener('change', () => {
+    const type = clienteSearchType.value;
+    if (type === 'id') {
+      clienteSearch.placeholder = 'Ingresa el ID del cliente...';
+    } else if (type === 'telefono') {
+      clienteSearch.placeholder = 'Ingresa el telefono...';
+    } else {
+      clienteSearch.placeholder = 'Escribe el nombre...';
+    }
+    clienteSearch.value = '';
+    clienteDropdown.classList.add('hidden');
+  });
+
+  clienteDropdown.addEventListener('click', (e) => {
+    const target = (e.target as HTMLElement).closest('[data-id]');
+    if (!target) return;
+
+    const id = parseInt(target.getAttribute('data-id') || '0');
+    const cliente = clientes.find(c => c.id === id);
+    if (!cliente) return;
+
+    selectCliente(cliente);
+    clienteDropdown.classList.add('hidden');
+  });
+
+  function selectCliente(cliente: Cliente) {
+    selectedClienteId = cliente.id;
+    clienteIdCita.value = cliente.id.toString();
+    clienteSearch.value = cliente.nombre;
+    clienteSearch.classList.add('hidden');
+    selectedClienteInfo.classList.remove('hidden');
+    clienteNombreSelected.textContent = cliente.nombre;
+    clienteContacto.textContent = `${cliente.telefono}${cliente.email ? ' - ' + cliente.email : ''}`;
+
+    // Load mascotas for this cliente
+    mascotasDelCliente = mascotas.filter(m => m.cliente_id === cliente.id);
+    
+    // Show mascota section
+    mascotaSection.classList.remove('hidden');
+    updateMascotaSelect();
+  }
+
+  clearCliente.addEventListener('click', () => {
+    selectedClienteId = null;
+    clienteIdCita.value = '';
+    clienteSearch.value = '';
+    clienteSearch.classList.remove('hidden');
+    selectedClienteInfo.classList.add('hidden');
+    mascotaSection.classList.add('hidden');
+    selectedMascotaInfo.classList.add('hidden');
+    mascotaIdInput.value = '';
+    mascotasDelCliente = [];
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!clienteSearch.contains(e.target as Node) && !clienteDropdown.contains(e.target as Node)) {
+      clienteDropdown.classList.add('hidden');
+    }
+  });
+
+  // Mascota selection with filter
+  function updateMascotaSelect() {
+    const searchType = mascotaSearchType.value;
+    const term = mascotaSearchInput.value.trim();
+    
+    let filtered = mascotasDelCliente;
+    
+    if (term.length > 0) {
+      if (searchType === 'id') {
+        filtered = mascotasDelCliente.filter(m => m.id.toString() === term);
+      } else if (searchType === 'especie') {
+        filtered = mascotasDelCliente.filter(m => m.especie.toLowerCase().includes(term.toLowerCase()));
+      } else {
+        filtered = mascotasDelCliente.filter(m => m.nombre.toLowerCase().includes(term.toLowerCase()));
+      }
+    }
+
+    mascotaSelect.innerHTML = '<option value="" class="bg-white">-- Selecciona una mascota (' + filtered.length + ' disponibles) --</option>' +
+      filtered.map(m => `
+        <option value="${m.id}" class="bg-white">${speciesEmojis[m.especie] || ''} #${m.id} ${m.nombre} (${m.especie} - ${m.raza})</option>
+      `).join('');
+
+    if (mascotaIdInput.value) {
+      mascotaSelect.value = mascotaIdInput.value;
+    }
+  }
+
+  // Mascota search filter
+  mascotaSearchInput.addEventListener('input', updateMascotaSelect);
+  mascotaSearchType.addEventListener('change', () => {
+    const type = mascotaSearchType.value;
+    if (type === 'id') {
+      mascotaSearchInput.placeholder = 'Filtrar por ID...';
+    } else if (type === 'especie') {
+      mascotaSearchInput.placeholder = 'Filtrar por especie...';
+    } else {
+      mascotaSearchInput.placeholder = 'Filtrar por nombre...';
+    }
+    mascotaSearchInput.value = '';
+    updateMascotaSelect();
+  });
+
+  mascotaSelect.addEventListener('change', () => {
+    const id = parseInt(mascotaSelect.value);
+    if (!id) {
+      mascotaIdInput.value = '';
+      selectedMascotaInfo.classList.add('hidden');
+      return;
+    }
+
+    const mascota = mascotasDelCliente.find(m => m.id === id);
+    if (!mascota) return;
+
+    mascotaIdInput.value = mascota.id.toString();
+    selectedMascotaInfo.classList.remove('hidden');
+    const emoji = speciesEmojis[mascota.especie] || '';
+    mascotaAvatar.innerHTML = `<span class="text-2xl">${emoji}</span>`;
+    mascotaNombre.textContent = mascota.nombre;
+    mascotaDetalles.textContent = `${mascota.especie} - ${mascota.raza} - ${mascota.edad || 0} años`;
+  });
+
+  // Form submit
+  citaForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    formError.classList.add('hidden');
+
+    if (!selectedClienteId) {
+      formErrorText.textContent = 'Por favor selecciona un cliente';
+      formError.classList.remove('hidden');
+      return;
+    }
+
+    const mascotaId = parseInt(mascotaIdInput.value);
+    if (!mascotaId) {
+      formErrorText.textContent = 'Por favor selecciona una mascota';
+      formError.classList.remove('hidden');
+      return;
+    }
+
+    const fecha = fechaCita.value;
+    const hora = horaCita.value;
+    if (!fecha || !hora) {
+      formErrorText.textContent = 'Por favor completa la fecha y hora';
+      formError.classList.remove('hidden');
+      return;
+    }
+
+    if (!tipoAtencion.value.trim()) {
+      formErrorText.textContent = 'Por favor selecciona o escribe el tipo de atencion';
+      formError.classList.remove('hidden');
+      return;
+    }
+
+    if (userRol === 'secretaria' && !veterinarioAsignado.value) {
+      formErrorText.textContent = 'Por favor selecciona un veterinario para la cita';
+      formError.classList.remove('hidden');
+      return;
+    }
+
+    const fechaHora = `${fecha}T${hora}:00`;
+
+    if (currentSelectionHasConflict) {
+      formErrorText.textContent = 'La hora seleccionada se empalma con otra cita. Por favor elige una hora diferente.';
+      formError.classList.remove('hidden');
+      return;
+    }
+
+    const citaData: CitaCreate = {
+      mascota_id: mascotaId,
+      fecha_hora: fechaHora,
+      duracion_minutos: getDuracion(),
+      tipo_atencion: tipoAtencion.value,
+      estado: estadoCita.value,
+      costo: undefined,
+      descripcion: detallesCita.value || undefined,
+      veterinario_asignado_id: veterinarioAsignado.value ? parseInt(veterinarioAsignado.value) : undefined
+    };
+
+    try {
+      const id = citaIdInput.value ? parseInt(citaIdInput.value) : null;
+      if (id) {
+        await actualizarCita(id, citaData as CitaUpdate);
+        saveCitaDuracion(id, citaData.duracion_minutos || 60);
+      } else {
+        const newCita = await crearCita(citaData);
+        saveCitaDuracion(newCita.id, citaData.duracion_minutos || 60);
+      }
+      closeModalFn();
+      await loadCitas();
+    } catch (error: any) {
+      formErrorText.textContent = error.message || 'Error al guardar la cita';
+      formError.classList.remove('hidden');
+    }
+  });
+
+  // Edit cita
+  (window as any).editCita = (id: number) => {
+    const cita = citas.find(c => c.id === id);
+    if (!cita) return;
+
+    openModal(true);
+    citaIdInput.value = cita.id.toString();
+
+    const fecha = new Date(cita.fecha_hora);
+    fechaCita.value = fecha.toISOString().split('T')[0];
+    const horaStr = fecha.toTimeString().slice(0, 5);
+    horaCita.value = horaStr;
+    tipoAtencion.value = cita.tipo_atencion;
+    estadoCita.value = cita.estado;
+    detallesCita.value = cita.descripcion || '';
+    if (cita.veterinario_asignado_id) {
+      veterinarioAsignado.value = cita.veterinario_asignado_id.toString();
+    } else {
+      veterinarioAsignado.value = '';
+    }
+
+    // Find cliente from mascota
+    const mascota = mascotas.find(m => m.id === cita.mascota_id);
+    if (mascota && mascota.cliente_id) {
+      const cliente = clientes.find(c => c.id === mascota.cliente_id);
+      if (cliente) {
+        selectedClienteId = cliente.id;
+        clienteIdCita.value = cliente.id.toString();
+        clienteSearch.value = cliente.nombre;
+        clienteSearch.classList.add('hidden');
+        selectedClienteInfo.classList.remove('hidden');
+        clienteNombreSelected.textContent = cliente.nombre;
+        clienteContacto.textContent = `${cliente.telefono}${cliente.email ? ' - ' + cliente.email : ''}`;
+        
+        // Load mascotas for this cliente
+        mascotasDelCliente = mascotas.filter(m => m.cliente_id === cliente.id);
+        mascotaSection.classList.remove('hidden');
+        updateMascotaSelect();
+      }
+    }
+
+    // Select mascota
+    mascotaIdInput.value = cita.mascota_id.toString();
+    mascotaSelect.value = cita.mascota_id.toString();
+    selectedMascotaInfo.classList.remove('hidden');
+    const emoji = speciesEmojis[cita.especie_mascota || ''] || '';
+    mascotaAvatar.innerHTML = `<span class="text-2xl">${emoji}</span>`;
+    mascotaNombre.textContent = cita.nombre_mascota || 'Sin nombre';
+    mascotaDetalles.textContent = cita.especie_mascota || '';
+
+    // Load stored duration for this cita and render the time grid
+    setDuracion(cita.duracion_minutos ?? getCitaDuracion(cita.id));
+    renderTimeGrid();
+  };
+
+  // Delete cita
+  (window as any).deleteCita = (id: number) => {
+    deleteCitaId = id;
+    deleteModal.classList.remove('hidden');
+    deleteModal.classList.add('flex');
+  };
+
+  cancelDelete.addEventListener('click', () => {
+    deleteModal.classList.add('hidden');
+    deleteModal.classList.remove('flex');
+    deleteCitaId = null;
+  });
+
+  confirmDelete.addEventListener('click', async () => {
+    if (!deleteCitaId) return;
+    try {
+      await eliminarCita(deleteCitaId);
+      deleteModal.classList.add('hidden');
+      deleteModal.classList.remove('flex');
+      deleteCitaId = null;
+      await loadCitas();
+    } catch (error) {
+      console.error('Error deleting cita:', error);
+    }
+  });
+
+  // WhatsApp modal
+  (window as any).openWhatsappModal = (id: number) => {
+    const cita = citas.find(c => c.id === id);
+    if (!cita) return;
+
+    whatsappCita = cita;
+    whatsappMessage.value = generarMensajeWhatsApp(cita);
+    whatsappModal.classList.remove('hidden');
+    whatsappModal.classList.add('flex');
+  };
+
+  closeWhatsapp.addEventListener('click', () => {
+    whatsappModal.classList.add('hidden');
+    whatsappModal.classList.remove('flex');
+    whatsappCita = null;
+  });
+
+  cancelWhatsapp.addEventListener('click', () => {
+    whatsappModal.classList.add('hidden');
+    whatsappModal.classList.remove('flex');
+    whatsappCita = null;
+  });
+
+  sendWhatsapp.addEventListener('click', () => {
+    if (!whatsappCita?.telefono_cliente) return;
+    abrirWhatsApp(whatsappCita.telefono_cliente, whatsappMessage.value);
+    whatsappModal.classList.add('hidden');
+    whatsappModal.classList.remove('flex');
+    whatsappCita = null;
+  });
+
+  whatsappModal.addEventListener('click', (e) => {
+    if (e.target === whatsappModal) {
+      whatsappModal.classList.add('hidden');
+      whatsappModal.classList.remove('flex');
+      whatsappCita = null;
+    }
+  });
+
+  // Email modal
+  (window as any).openEmailModal = (id: number) => {
+    const cita = citas.find(c => c.id === id);
+    if (!cita || !cita.email_cliente) return;
+
+    emailCita = cita;
+    const { subject, body } = generarMensajeEmail(cita);
+    emailSubject.value = subject;
+    emailBody.value = body;
+    emailModal.classList.remove('hidden');
+    emailModal.classList.add('flex');
+  };
+
+  closeEmail.addEventListener('click', () => {
+    emailModal.classList.add('hidden');
+    emailModal.classList.remove('flex');
+    emailCita = null;
+  });
+
+  cancelEmail.addEventListener('click', () => {
+    emailModal.classList.add('hidden');
+    emailModal.classList.remove('flex');
+    emailCita = null;
+  });
+
+  sendEmail.addEventListener('click', () => {
+    if (!emailCita?.email_cliente) return;
+    abrirEmail(emailCita.email_cliente, emailSubject.value, emailBody.value);
+    emailModal.classList.add('hidden');
+    emailModal.classList.remove('flex');
+    emailCita = null;
+  });
+
+  emailModal.addEventListener('click', (e) => {
+    if (e.target === emailModal) {
+      emailModal.classList.add('hidden');
+      emailModal.classList.remove('flex');
+      emailCita = null;
+    }
+  });
+
+  // Initial load
+  async function initPage() {
+    if (initialSearchQuery) {
+      searchInput.value = initialSearchQuery;
+    }
+
+    await Promise.all([
+      loadClientes(),
+      loadMascotas(),
+      loadVeterinarios(),
+      loadCitas()
+    ]);
+
+    await loadWaitlist();
+
+    if (!pendingWaitlistPrefillHandled && !Number.isNaN(prefillWaitlistId) && prefillWaitlistId > 0) {
+      pendingWaitlistPrefillHandled = true;
+      try {
+        const item = await obtenerItemListaEspera(prefillWaitlistId);
+        applyWaitlistPrefill(item);
+      } catch (error) {
+        console.error('Error applying waitlist prefill:', error);
+      }
+    }
+  }
+
+  initPage();
+
+  // Polling: detectar confirmaciones de clientes cada 30 segundos
+  setInterval(() => {
+    loadCitas();
+    loadWaitlist();
+  }, 30_000);
+</script>

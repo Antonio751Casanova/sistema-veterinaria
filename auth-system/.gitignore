@@ -1,0 +1,64 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+env/
+venv/
+.env
+.env.local
+pyvenv.cfg
+
+# SQLite
+*.db
+*.sqlite3
+
+# VSCode
+.vscode/
+
+# Node
+node_modules/
+dist/
+build/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Frontend
+/.parcel-cache
+/.cache
+/public/build/
+
+# Temporary Claude folders
+tmpclaude-*/
+
+# Misc
+coverage/
+coverage.*
+.htmlcov/
+
+# Ignore secrets and keys
+*.pem
+*.key
+
+# IDE files
+*.iml
+.idea/
+
+# Backup de avances futuros
+_backup_avances_futuros/
+
+# Entornos y compilados
+backend/venv/
+backend/__pycache__/
+frontend/node_modules/
+frontend/dist/
+frontend/.astro/
+
+# Base de datos y variables de entorno
+backend/auth.db
+.env
