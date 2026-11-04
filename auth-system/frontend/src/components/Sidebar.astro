@@ -39,13 +39,13 @@
       </svg>
       <span class="sidebar-label">Mascotas</span>
     </a>
-    <!-- TODO: Activar en Avance 2 / Avance 3 (Citas, Estadísticas, Reportes; /confirmar-cita es pública y no tiene enlace en el menú)
     <a href="/citas" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/70 hover:text-white hover:bg-white/8 transition-colors text-sm">
       <svg class="w-5 h-5 flex-shrink-0" style="color: #60a5fa;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
       </svg>
       <span class="sidebar-label">Citas</span>
     </a>
+    <!-- TODO: Activar en Avance 3 (Estadísticas y Reportes; /confirmar-cita es pública y no tiene enlace en el menú)
     <a href="/estadisticas" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-white/70 hover:text-white hover:bg-white/8 transition-colors text-sm">
       <svg class="w-5 h-5 flex-shrink-0" style="color: #60a5fa;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
@@ -133,12 +133,11 @@
 </style>
 
 <script>
-  // ==================== Role-based menu visibility ====================
-  const usuarioRaw = localStorage.getItem('usuario');
-  const veterinariaRaw = localStorage.getItem('veterinaria');
+  import { getVeterinaria, getUsuario, clearSession } from '../infrastructure/api/authService';
 
-  const usuario = usuarioRaw ? JSON.parse(usuarioRaw) : null;
-  const veterinaria = veterinariaRaw ? JSON.parse(veterinariaRaw) : null;
+  // ==================== Role-based menu visibility ====================
+  const usuario = getUsuario();
+  const veterinaria = getVeterinaria();
   const rol = usuario?.rol ?? 'secretaria';
 
   // Show vet name
@@ -201,9 +200,7 @@
 
   // ==================== Logout ====================
   document.getElementById('logoutBtn')?.addEventListener('click', () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('veterinaria');
-    localStorage.removeItem('usuario');
+    clearSession();
     window.location.href = '/';
   });
 

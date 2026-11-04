@@ -26,6 +26,7 @@ class CitaUpdate(BaseModel):
     """Schema para actualizar cita"""
     fecha_hora: Optional[datetime] = None
     tipo_atencion: Optional[str] = None
+    mascota_id: Optional[int] = None
     descripcion: Optional[str] = None
     tratamiento: Optional[str] = None
     medicamento: Optional[str] = None

@@ -169,96 +169,69 @@ import Layout from '../layouts/Layout.astro';
 </style>
 
 <script>
-  import { registrarVeterinaria } from '../services/authService';
+  import {
+    registrarVeterinariaUseCase,
+    sanitizePhoneInput,
+  } from '../application/use_cases/authUseCases';
 
-  const form = document.getElementById('registerForm') as HTMLFormElement;
-  const submitBtn = document.getElementById('submitBtn') as HTMLButtonElement;
-  const btnText = document.getElementById('btnText') as HTMLSpanElement;
-  const btnLoader = document.getElementById('btnLoader') as HTMLSpanElement;
-  const messageBox = document.getElementById('messageBox') as HTMLDivElement;
-  const messageText = document.getElementById('messageText') as HTMLParagraphElement;
-  const phoneInput = document.getElementById('telefono') as HTMLInputElement;
+  const form = document.getElementById('registerForm') as HTMLFormElement | null;
+  const submitBtn = document.getElementById('submitBtn') as HTMLButtonElement | null;
+  const btnText = document.getElementById('btnText') as HTMLSpanElement | null;
+  const btnLoader = document.getElementById('btnLoader') as HTMLSpanElement | null;
+  const messageBox = document.getElementById('messageBox') as HTMLDivElement | null;
+  const messageText = document.getElementById('messageText') as HTMLParagraphElement | null;
+  const phoneInput = document.getElementById('telefono') as HTMLInputElement | null;
+  const emailInput = document.getElementById('email') as HTMLInputElement | null;
 
-  // Phone validation - only allow numbers, +, -, spaces and validate 10 digits
-  phoneInput.addEventListener('input', (e) => {
+  phoneInput?.addEventListener('input', (e) => {
     const input = e.target as HTMLInputElement;
-    input.value = input.value.replace(/[^0-9+\s\-]/g, '');
+    input.value = sanitizePhoneInput(input.value);
   });
 
-  // Email to lowercase
-  const emailInput = document.getElementById('email') as HTMLInputElement;
-  emailInput.addEventListener('input', (e) => {
+  emailInput?.addEventListener('input', (e) => {
     const input = e.target as HTMLInputElement;
     input.value = input.value.toLowerCase();
   });
 
-  // Validate phone has exactly 10 digits
-  function validatePhone(phone: string): boolean {
-    const digitsOnly = phone.replace(/[^0-9]/g, '');
-    return digitsOnly.length === 10;
-  }
-
-  // Validate email domain (must end in valid TLD)
-  function validateEmail(email: string): boolean {
-    const validDomains = ['.com', '.mx', '.org', '.net', '.edu', '.gov', '.io', '.co.mx', '.gob.mx', '.com.mx', '.edu.mx'];
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) return false;
-    return validDomains.some(domain => email.toLowerCase().endsWith(domain));
-  }
-
   function setLoading(loading: boolean) {
-    submitBtn.disabled = loading;
-    btnText.classList.toggle('hidden', loading);
-    btnLoader.classList.toggle('hidden', !loading);
+    if (submitBtn) submitBtn.disabled = loading;
+    btnText?.classList.toggle('hidden', loading);
+    btnLoader?.classList.toggle('hidden', !loading);
   }
 
   function showMessage(message: string, isError: boolean) {
-    messageText.textContent = message;
-    messageBox.classList.remove('hidden', 'bg-red-50', 'bg-green-50');
-    messageBox.classList.add(
-      isError ? 'bg-red-50' : 'bg-green-50'
-    );
-    messageBox.style.border = isError ? '1px solid #fecaca' : '1px solid #bbf7d0';
-    messageText.classList.remove('text-red-600', 'text-green-600');
-    messageText.classList.add(isError ? 'text-red-600' : 'text-green-600');
+    if (messageText) {
+      messageText.textContent = message;
+      messageText.classList.remove('text-red-600', 'text-green-600');
+      messageText.classList.add(isError ? 'text-red-600' : 'text-green-600');
+    }
+    if (messageBox) {
+      messageBox.classList.remove('hidden', 'bg-red-50', 'bg-green-50');
+      messageBox.classList.add(isError ? 'bg-red-50' : 'bg-green-50');
+      messageBox.style.border = isError ? '1px solid #fecaca' : '1px solid #bbf7d0';
+    }
   }
 
   function hideMessage() {
-    messageBox.classList.add('hidden');
+    messageBox?.classList.add('hidden');
   }
 
-  form.addEventListener('submit', async (e) => {
+  form?.addEventListener('submit', async (e) => {
     e.preventDefault();
     hideMessage();
-
-    const formData = new FormData(form);
-    const telefono = formData.get('telefono') as string;
-
-    // Validate phone has 10 digits
-    if (!validatePhone(telefono)) {
-      showMessage('El teléfono debe tener exactamente 10 dígitos numéricos', true);
-      return;
-    }
-
-    // Validate email domain
-    const email = (formData.get('email') as string).toLowerCase();
-    if (!validateEmail(email)) {
-      showMessage('El correo debe tener un dominio válido (ej: .com, .mx, .org)', true);
-      return;
-    }
-
     setLoading(true);
 
+    const formData = new FormData(form);
     const data = {
-      nombre: formData.get('nombre') as string,
-      telefono: telefono,
-      direccion: formData.get('direccion') as string,
-      email: email,
-      password: formData.get('password') as string,
+      nombre: (formData.get('nombre') as string) || '',
+      telefono: (formData.get('telefono') as string) || '',
+      direccion: (formData.get('direccion') as string) || '',
+      email: (formData.get('email') as string) || '',
+      password: (formData.get('password') as string) || '',
     };
 
     try {
-      await registrarVeterinaria(data);
+      await registrarVeterinariaUseCase(data);
       showMessage('¡Cuenta creada exitosamente! Redirigiendo...', false);
       setTimeout(() => {
         window.location.href = '/';

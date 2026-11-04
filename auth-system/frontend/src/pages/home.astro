@@ -51,7 +51,7 @@ import Sidebar from '../components/Sidebar.astro';
           </div>
 
           <div class="flex items-center space-x-3 flex-shrink-0">
-            <!-- TODO: Activar en Avance 2 / Avance 3 (Calendario de citas) - Calendar Popup Button
+            <!-- Calendar Popup Button -->
             <div class="relative">
               <button id="calendarPopupBtn" class="relative p-2.5 rounded-xl transition-all duration-200 hover:bg-slate-100" style="color: #64748b;" title="Calendario de citas">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -59,7 +59,6 @@ import Sidebar from '../components/Sidebar.astro';
                 </svg>
               </button>
             </div>
-            -->
 
             <!-- Tasks Popup Button -->
             <div class="relative">
@@ -189,7 +188,7 @@ import Sidebar from '../components/Sidebar.astro';
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-sm font-bold tracking-tight" style="color: #0f172a;">Accesos Rápidos</h3>
           </div>
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <!-- Nuevo Cliente -->
             <a href="/clientes" data-only-secretaria class="shortcut-btn group flex flex-col items-center gap-2.5 p-4 rounded-xl bg-white transition-all duration-200 hover:shadow-md" style="border: 1px solid #e2e8f0;">
               <div class="w-11 h-11 rounded-xl flex items-center justify-center transition-transform duration-200 group-hover:scale-110" style="background: linear-gradient(135deg, #eff6ff, #dbeafe);">
@@ -204,14 +203,14 @@ import Sidebar from '../components/Sidebar.astro';
               </div>
               <span class="text-xs font-semibold" style="color: #334155;">Nueva Mascota</span>
             </a>
-            <!-- TODO: Activar en Avance 2 / Avance 3 (acceso rapido a Citas y Reportes; restaurar sm:grid-cols-4 en el grid) - Agendar Cita
+            <!-- Agendar Cita -->
             <a href="/citas" class="shortcut-btn group flex flex-col items-center gap-2.5 p-4 rounded-xl bg-white transition-all duration-200 hover:shadow-md" style="border: 1px solid #e2e8f0;">
               <div class="w-11 h-11 rounded-xl flex items-center justify-center transition-transform duration-200 group-hover:scale-110" style="background: linear-gradient(135deg, #eff6ff, #dbeafe);">
                 <svg class="w-5 h-5" style="color: #3b82f6;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
               </div>
               <span class="text-xs font-semibold" style="color: #334155;">Agendar Cita</span>
             </a>
-            Ver Reportes
+            <!-- TODO: Activar en Avance 3 (acceso rapido a Reportes; restaurar sm:grid-cols-4 en el grid)
             <a href="/reportes" data-only-secretaria class="shortcut-btn group flex flex-col items-center gap-2.5 p-4 rounded-xl bg-white transition-all duration-200 hover:shadow-md" style="border: 1px solid #e2e8f0;">
               <div class="w-11 h-11 rounded-xl flex items-center justify-center transition-transform duration-200 group-hover:scale-110" style="background: linear-gradient(135deg, #eff6ff, #dbeafe);">
                 <svg class="w-5 h-5" style="color: #3b82f6;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -260,9 +259,9 @@ import Sidebar from '../components/Sidebar.astro';
           </a>
         </div>
 
-        <!-- TODO: Activar en Avance 2 / Avance 3 (Citas pendientes y Citas de hoy) - Citas Grid: Side by Side
+        <!-- Citas Grid: Side by Side -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          Citas Pendientes por Confirmar
+          <!-- Citas Pendientes por Confirmar -->
           <div class="dash-card" style="animation-delay: 0.3s;">
             <div class="bg-white rounded-2xl overflow-hidden h-full flex flex-col" style="border: 1px solid #e2e8f0;">
               <div class="px-5 py-4 flex items-center justify-between flex-shrink-0" style="border-bottom: 1px solid #f1f5f9;">
@@ -280,12 +279,12 @@ import Sidebar from '../components/Sidebar.astro';
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </a>
               </div>
-              Loading
+              <!-- Loading -->
               <div id="pendientesLoading" class="p-8 text-center">
                 <div class="w-8 h-8 rounded-full border-2 border-amber-200 border-t-amber-500 animate-spin mx-auto"></div>
                 <p class="text-xs mt-3" style="color: #94a3b8;">Cargando citas pendientes...</p>
               </div>
-              Empty
+              <!-- Empty -->
               <div id="pendientesEmpty" class="px-5 py-8 text-center hidden">
                 <div class="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-3" style="background: #f1f5f9;">
                   <svg class="w-7 h-7" style="color: #cbd5e1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -295,12 +294,12 @@ import Sidebar from '../components/Sidebar.astro';
                 <p class="text-sm font-medium" style="color: #64748b;">Todas las citas están confirmadas</p>
                 <p class="text-xs mt-1" style="color: #94a3b8;">No hay citas pendientes de confirmar</p>
               </div>
-              List
+              <!-- List -->
               <div id="pendientesList" class="hidden flex-1 overflow-y-auto" style="max-height: 400px;"></div>
             </div>
           </div>
 
-          Citas de Hoy
+          <!-- Citas de Hoy -->
           <div class="dash-card" style="animation-delay: 0.35s;">
             <div class="bg-white rounded-2xl overflow-hidden h-full flex flex-col" style="border: 1px solid #e2e8f0;">
               <div class="px-5 py-4 flex items-center justify-between flex-shrink-0" style="border-bottom: 1px solid #f1f5f9;">
@@ -338,10 +337,6 @@ import Sidebar from '../components/Sidebar.astro';
             </div>
           </div>
         </div>
-
-
-
-      -->
       </main>
     </div>
 
@@ -404,7 +399,7 @@ import Sidebar from '../components/Sidebar.astro';
       </div>
     </div>
 
-    <!-- TODO: Activar en Avance 2 / Avance 3 (Calendario de citas) - Calendar Modal Overlay (outside dashboard flow)
+    <!-- Calendar Modal Overlay (outside dashboard flow) -->
     <div id="calendarOverlay" class="calendar-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" data-open="false" aria-hidden="true">
       <div id="calendarPopupPanel" class="calendar-popup-panel relative w-full max-w-5xl max-h-[90vh] bg-white rounded-xl shadow-2xl flex overflow-hidden" style="border: 1px solid #e2e8f0;">
         <div class="px-4 py-3.5 flex items-center justify-between" style="border-bottom: 1px solid #e2e8f0; background: linear-gradient(135deg, #f8fafc, #ffffff);">
@@ -468,8 +463,6 @@ import Sidebar from '../components/Sidebar.astro';
         </div>
       </div>
     </div>
-
-    -->
 
   </div>
 </Layout>
@@ -1356,17 +1349,21 @@ import Sidebar from '../components/Sidebar.astro';
 </style>
 
 <script>
-  import { getVeterinaria, getUsuario, clearSession, isAuthenticated } from '../services/authService';
-  // TODO: Activar en Avance 2 / Avance 3 (Citas, Notificaciones y Lista de espera)
-  // import { listarCitas, type CitaConDetalles } from '../services/citaService';
-  // import { listarNotificaciones, marcarNotificacionLeida, eliminarNotificacion, type Notificacion } from '../services/notificacionService';
-  // import { convertirListaEsperaEnCita } from '../services/listaEsperaService';
-  import { listarClientes, type Cliente } from '../services/clienteService';
-  import { listarMascotas, type MascotaConDueno } from '../services/mascotaService';
-  import { listarUsuarios } from '../services/usuarioService';
-
-  type CitaConDetalles = any;
-  type Notificacion = any;
+  import type { Cliente } from '../domain/models/cliente';
+  import type { MascotaConDueno } from '../domain/models/mascota';
+  import type { CitaConDetalles } from '../domain/models/cita';
+  import type { TodoItem } from '../domain/models/todo';
+  import { getVeterinaria, getUsuario, clearSession, isAuthenticated } from '../infrastructure/api/authService';
+  import { listarCitas } from '../infrastructure/api/citaService';
+  import { listarClientes } from '../infrastructure/api/clienteService';
+  import { listarMascotas } from '../infrastructure/api/mascotaService';
+  import { listarUsuarios } from '../infrastructure/api/usuarioService';
+  import {
+    formatTodoDate,
+    loadTodosUseCase as loadTodos,
+    saveTodosUseCase as saveTodos,
+    statusLabels,
+  } from '../application/use_cases/dashboardUseCases';
 
   if (!isAuthenticated()) { window.location.href = '/'; }
   const vet = getVeterinaria();
@@ -1384,18 +1381,6 @@ import Sidebar from '../components/Sidebar.astro';
   // Elements
   const welcomeMessage = document.getElementById('welcomeMessage') as HTMLHeadingElement;
   const logoutBtn = document.getElementById('logoutBtn') as HTMLButtonElement;
-  const notificationBtn = document.getElementById('notificationBtn') as HTMLButtonElement;
-  const notificationBadge = document.getElementById('notificationBadge') as HTMLSpanElement;
-  const notificationPanel = document.getElementById('notificationPanel') as HTMLDivElement;
-  const closeNotifications = document.getElementById('closeNotifications') as HTMLButtonElement;
-  const notificationList = document.getElementById('notificationList') as HTMLDivElement;
-  const notificationUnreadCount = document.getElementById('notificationUnreadCount') as HTMLSpanElement;
-  const markAllNotificationsRead = document.getElementById('markAllNotificationsRead') as HTMLButtonElement;
-  const notifFilterUnread = document.getElementById('notifFilterUnread') as HTMLButtonElement;
-  const notifFilterAll = document.getElementById('notifFilterAll') as HTMLButtonElement;
-  const notifSearchInput = document.getElementById('notifSearchInput') as HTMLInputElement;
-  const notifDateInput = document.getElementById('notifDateInput') as HTMLInputElement;
-  const notifClearFilters = document.getElementById('notifClearFilters') as HTMLButtonElement;
   const sidebar = document.getElementById('sidebar') as HTMLElement;
   const sidebarOverlay = document.getElementById('sidebarOverlay') as HTMLDivElement;
   const hamburgerBtn = document.getElementById('hamburgerBtn') as HTMLButtonElement;
@@ -1446,23 +1431,6 @@ import Sidebar from '../components/Sidebar.astro';
 
   // Logout
   logoutBtn.addEventListener('click', () => { clearSession(); window.location.href = '/'; });
-
-  // Notifications panel (TODO: Activar en Avance 2 / Avance 3)
-  notificationBtn?.addEventListener('click', () => {
-    notificationPanel?.classList.toggle('translate-x-full');
-    if (notificationPanel && !notificationPanel.classList.contains('translate-x-full')) {
-      loadNotifications();
-    }
-  });
-  closeNotifications?.addEventListener('click', () => { notificationPanel?.classList.add('translate-x-full'); });
-  let notificationItems: Notificacion[] = [];
-  let notificationFilter: 'unread' | 'all' = 'unread';
-  let notificationSearchTerm = '';
-  let notificationDateFilter = '';
-  let notificationsPollingId: ReturnType<typeof setInterval> | null = null;
-  let notificationsFetchInFlight = false;
-  let waitlistConversionInFlight = false;
-  let convertingNotificationId: number | null = null;
 
   // Species helpers
   const speciesEmoji: Record<string, string> = { 'Perro': '🐕', 'Gato': '🐱', 'Ave': '🦜', 'Roedor': '🐹', 'Reptil': '🦎', 'Pez': '🐠', 'Anfibio': '🐸', 'Exotico': '🦥' };
@@ -1585,11 +1553,15 @@ import Sidebar from '../components/Sidebar.astro';
   // ==========================================
   async function loadData() {
     try {
-      // TODO: Activar en Avance 2 / Avance 3 (carga de citas y notificaciones)
-      // const citas = await listarCitas();
-      // allCitas = citas;
-      // renderPendientes(citas);
-      // renderCitasHoy(citas);
+      try {
+        const citas = await listarCitas();
+        allCitas = citas;
+        renderPendientes(citas);
+        renderCitasHoy(citas);
+      } catch (e) {
+        console.error('Error loading citas in dashboard:', e);
+      }
+      // TODO: Activar en Avance 3 (notificaciones)
       // loadNotifications();
 
       const metricClientes = document.getElementById('metricClientes');
@@ -2290,9 +2262,6 @@ import Sidebar from '../components/Sidebar.astro';
   // ==========================================
   // TO-DO LIST
   // ==========================================
-  interface TodoItem { id: number; text: string; status: 'pending' | 'completed' | 'cancelled'; createdAt: string; }
-
-  const TODO_KEY = 'vetpets_todo_list';
   const todoListEl = document.getElementById('todoList') as HTMLDivElement;
   const todoNewInput = document.getElementById('todoNewInput') as HTMLInputElement;
   const todoAddBtn = document.getElementById('todoAddBtn') as HTMLButtonElement;
@@ -2334,49 +2303,6 @@ import Sidebar from '../components/Sidebar.astro';
 
   // Flag to prevent popup from closing during modal/actions
   let _blockPopupClose = false;
-
-  function formatTodoDate(dateStr: string): string {
-    const d = new Date(dateStr);
-    return d.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' }) + ' ' + d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
-  }
-
-  function loadTodos(): TodoItem[] {
-    try {
-      const raw = localStorage.getItem(TODO_KEY);
-      if (raw) {
-        const items = JSON.parse(raw) as any[];
-        let needsSave = false;
-        for (const item of items) {
-          if (!item.createdAt) {
-            item.createdAt = new Date().toISOString();
-            needsSave = true;
-          }
-          // Migrate old boolean completed to status string
-          if (item.status === undefined) {
-            item.status = item.completed ? 'completed' : 'pending';
-            delete item.completed;
-            needsSave = true;
-          }
-        }
-        if (needsSave) saveTodos(items);
-        return items;
-      }
-    } catch {}
-    const now = new Date().toISOString();
-    const defaults: TodoItem[] = [
-      { id: 1, text: 'Llamar al proveedor de croquetas', status: 'completed', createdAt: now },
-      { id: 2, text: 'Revisar inventario de vacunas', status: 'completed', createdAt: now },
-      { id: 3, text: 'Confirmar citas del lunes', status: 'completed', createdAt: now },
-      { id: 4, text: 'Limpiar área de gatos', status: 'pending', createdAt: now },
-      { id: 5, text: 'Actualizar precios en sistema', status: 'pending', createdAt: now },
-    ];
-    saveTodos(defaults);
-    return defaults;
-  }
-
-  function saveTodos(todos: TodoItem[]) { localStorage.setItem(TODO_KEY, JSON.stringify(todos)); }
-
-  const statusLabels: Record<string, string> = { pending: 'Pendiente', completed: 'Completada', cancelled: 'Cancelada' };
 
   function renderTodos(filter = '') {
     const todos = loadTodos();

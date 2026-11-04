@@ -56,7 +56,7 @@ import Sidebar from '../components/Sidebar.astro';
   </div>
 
   <!-- Create/Edit Modal -->
-  <div id="userModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4" style="background: rgba(0,0,0,0.5);">
+  <div id="userModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.5);">
     <div class="bg-white rounded-2xl w-full max-w-md" style="border: 1px solid #e2e8f0; box-shadow: 0 20px 60px rgba(0,0,0,0.15);">
       <div class="flex items-center justify-between px-6 py-4 border-b" style="border-color: #e2e8f0;">
         <h3 class="font-bold text-lg" style="color: #0f172a;" id="modalTitle">Nuevo Usuario</h3>
@@ -114,7 +114,7 @@ import Sidebar from '../components/Sidebar.astro';
   </div>
 
   <!-- Delete confirm modal -->
-  <div id="deleteModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4" style="background: rgba(0,0,0,0.5);">
+  <div id="deleteModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.5);">
     <div class="bg-white rounded-2xl w-full max-w-sm p-6" style="border: 1px solid #e2e8f0;">
       <h3 class="font-bold text-lg mb-2" style="color: #0f172a;">Desactivar usuario</h3>
       <p class="text-sm mb-5" style="color: #64748b;">¿Estás seguro de que deseas desactivar a <strong id="deleteUserName"></strong>? No podrá iniciar sesión.</p>
@@ -127,8 +127,14 @@ import Sidebar from '../components/Sidebar.astro';
 </Layout>
 
 <script>
-  import { isAuthenticated, getUsuario } from '../services/authService';
-  import { listarUsuarios, crearUsuario, actualizarUsuario, eliminarUsuario, type UsuarioData } from '../services/usuarioService';
+  import type { RolUsuario, UsuarioData } from '../domain/models/usuario';
+  import { isAuthenticated, getUsuario } from '../infrastructure/api/authService';
+  import { listarUsuarios, eliminarUsuario } from '../infrastructure/api/usuarioService';
+  import {
+    guardarUsuarioUseCase,
+    rolColors,
+    rolLabels,
+  } from '../application/use_cases/usuarioUseCases';
 
   // Auth + role guard
   if (!isAuthenticated()) { window.location.href = '/'; }
@@ -139,30 +145,22 @@ import Sidebar from '../components/Sidebar.astro';
   let deletingId: number | null = null;
 
   // DOM
-  const usersContainer = document.getElementById('usersContainer') as HTMLDivElement;
-  const userModal = document.getElementById('userModal') as HTMLDivElement;
-  const deleteModal = document.getElementById('deleteModal') as HTMLDivElement;
-  const userForm = document.getElementById('userForm') as HTMLFormElement;
-  const modalTitle = document.getElementById('modalTitle') as HTMLHeadingElement;
-  const passwordHint = document.getElementById('passwordHint') as HTMLSpanElement;
-  const formMsg = document.getElementById('formMsg') as HTMLDivElement;
+  const usersContainer = document.getElementById('usersContainer') as HTMLDivElement | null;
+  const userModal = document.getElementById('userModal') as HTMLDivElement | null;
+  const deleteModal = document.getElementById('deleteModal') as HTMLDivElement | null;
+  const userForm = document.getElementById('userForm') as HTMLFormElement | null;
+  const modalTitle = document.getElementById('modalTitle') as HTMLHeadingElement | null;
+  const passwordHint = document.getElementById('passwordHint') as HTMLSpanElement | null;
+  const formMsg = document.getElementById('formMsg') as HTMLDivElement | null;
 
-  const uId = document.getElementById('usuarioId') as HTMLInputElement;
-  const uNombre = document.getElementById('uNombre') as HTMLInputElement;
-  const uEmail = document.getElementById('uEmail') as HTMLInputElement;
-  const uPassword = document.getElementById('uPassword') as HTMLInputElement;
-  const uRol = document.getElementById('uRol') as HTMLSelectElement;
-
-  const rolLabels: Record<string, string> = {
-    'veterinario': 'Veterinario',
-    'secretaria': 'Secretaria'
-  };
-  const rolColors: Record<string, string> = {
-    'veterinario': 'background:#dbeafe;color:#1d4ed8;',
-    'secretaria': 'background:#dcfce7;color:#166534;'
-  };
+  const uId = document.getElementById('usuarioId') as HTMLInputElement | null;
+  const uNombre = document.getElementById('uNombre') as HTMLInputElement | null;
+  const uEmail = document.getElementById('uEmail') as HTMLInputElement | null;
+  const uPassword = document.getElementById('uPassword') as HTMLInputElement | null;
+  const uRol = document.getElementById('uRol') as HTMLSelectElement | null;
 
   function renderUsers() {
+    if (!usersContainer) return;
     if (usuarios.length === 0) {
       usersContainer.innerHTML = `
         <div class="text-center py-12">
@@ -228,39 +226,45 @@ import Sidebar from '../components/Sidebar.astro';
       usuarios = await listarUsuarios();
       renderUsers();
     } catch (e: any) {
-      usersContainer.innerHTML = `<p class="text-center py-8 text-sm text-red-500">${e.message || 'Error al cargar usuarios'}</p>`;
+      if (usersContainer) {
+        usersContainer.innerHTML = `<p class="text-center py-8 text-sm text-red-500">${e.message || 'Error al cargar usuarios'}</p>`;
+      }
     }
   }
 
   function openModal(editMode = false) {
-    modalTitle.textContent = editMode ? 'Editar Usuario' : 'Nuevo Usuario';
-    passwordHint.style.display = editMode ? 'inline' : 'none';
-    uPassword.required = !editMode;
-    formMsg.classList.add('hidden');
-    userModal.classList.remove('hidden');
+    if (modalTitle) modalTitle.textContent = editMode ? 'Editar Usuario' : 'Nuevo Usuario';
+    if (passwordHint) passwordHint.style.display = editMode ? 'inline' : 'none';
+    if (uPassword) uPassword.required = !editMode;
+    formMsg?.classList.add('hidden');
+    userModal?.classList.remove('hidden');
+    userModal?.classList.add('flex');
   }
 
   function closeModalFn() {
-    userModal.classList.add('hidden');
-    userForm.reset();
-    uId.value = '';
+    userModal?.classList.add('hidden');
+    userModal?.classList.remove('flex');
+    userForm?.reset();
+    if (uId) uId.value = '';
   }
 
   (window as any).editUser = (id: number) => {
     const u = usuarios.find(x => x.id === id);
     if (!u) return;
-    uId.value = u.id.toString();
-    uNombre.value = u.nombre;
-    uEmail.value = u.email;
-    uPassword.value = '';
-    uRol.value = u.rol;
+    if (uId) uId.value = u.id.toString();
+    if (uNombre) uNombre.value = u.nombre;
+    if (uEmail) uEmail.value = u.email;
+    if (uPassword) uPassword.value = '';
+    if (uRol) uRol.value = u.rol;
     openModal(true);
   };
 
   (window as any).confirmDelete = (id: number, name: string) => {
     deletingId = id;
-    (document.getElementById('deleteUserName') as HTMLElement).textContent = name;
-    deleteModal.classList.remove('hidden');
+    const deleteUserNameEl = document.getElementById('deleteUserName');
+    if (deleteUserNameEl) deleteUserNameEl.textContent = name;
+    deleteModal?.classList.remove('hidden');
+    deleteModal?.classList.add('flex');
   };
 
   document.getElementById('btnNuevoUsuario')?.addEventListener('click', () => openModal(false));
@@ -268,7 +272,8 @@ import Sidebar from '../components/Sidebar.astro';
   document.getElementById('btnCancelModal')?.addEventListener('click', closeModalFn);
 
   document.getElementById('cancelDeleteBtn')?.addEventListener('click', () => {
-    deleteModal.classList.add('hidden');
+    deleteModal?.classList.add('hidden');
+    deleteModal?.classList.remove('flex');
     deletingId = null;
   });
 
@@ -276,7 +281,8 @@ import Sidebar from '../components/Sidebar.astro';
     if (!deletingId) return;
     try {
       await eliminarUsuario(deletingId);
-      deleteModal.classList.add('hidden');
+      deleteModal?.classList.add('hidden');
+      deleteModal?.classList.remove('flex');
       deletingId = null;
       await loadUsers();
     } catch (e: any) {
@@ -284,34 +290,35 @@ import Sidebar from '../components/Sidebar.astro';
     }
   });
 
-  userForm.addEventListener('submit', async (e) => {
+  userForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const data = {
-      nombre: uNombre.value.trim(),
-      email: uEmail.value.trim().toLowerCase(),
-      password: uPassword.value,
-      rol: uRol.value as 'veterinario' | 'secretaria'
-    };
-    const btnGuardar = document.getElementById('btnGuardar') as HTMLButtonElement;
-    btnGuardar.disabled = true;
-    btnGuardar.textContent = 'Guardando...';
+    const btnGuardar = document.getElementById('btnGuardar') as HTMLButtonElement | null;
+    if (btnGuardar) {
+      btnGuardar.disabled = true;
+      btnGuardar.textContent = 'Guardando...';
+    }
 
     try {
-      const id = uId.value ? parseInt(uId.value) : null;
-      if (id) {
-        await actualizarUsuario(id, data);
-      } else {
-        await crearUsuario(data);
-      }
+      await guardarUsuarioUseCase({
+        id: uId?.value || null,
+        nombre: uNombre?.value || '',
+        email: uEmail?.value || '',
+        password: uPassword?.value || '',
+        rol: (uRol?.value as RolUsuario) || 'veterinario',
+      });
       closeModalFn();
       await loadUsers();
     } catch (err: any) {
-      formMsg.textContent = err.message || 'Error al guardar';
-      formMsg.className = 'rounded-lg p-3 text-sm text-center bg-red-50 text-red-600';
-      formMsg.classList.remove('hidden');
+      if (formMsg) {
+        formMsg.textContent = err.message || 'Error al guardar';
+        formMsg.className = 'rounded-lg p-3 text-sm text-center bg-red-50 text-red-600';
+        formMsg.classList.remove('hidden');
+      }
     } finally {
-      btnGuardar.disabled = false;
-      btnGuardar.textContent = 'Guardar';
+      if (btnGuardar) {
+        btnGuardar.disabled = false;
+        btnGuardar.textContent = 'Guardar';
+      }
     }
   });
 

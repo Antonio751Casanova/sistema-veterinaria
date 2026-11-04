@@ -25,6 +25,16 @@ def listar_usuarios(
     return use_case.execute(current.veterinaria_id)
 
 
+@router.get("/veterinarios", response_model=List[UsuarioResponse])
+def listar_veterinarios(
+    current: CurrentUser = Depends(require_role("secretaria")),
+    use_case: ListarUsuariosUseCase = Depends(listar_usuarios_uc),
+):
+    """Listar los veterinarios activos de la veterinaria (usado para asignar citas)"""
+    usuarios = use_case.execute(current.veterinaria_id)
+    return [u for u in usuarios if u.rol == "veterinario" and u.activo == 1]
+
+
 @router.post("", response_model=UsuarioResponse)
 def crear_usuario(
     data: UsuarioCreate,

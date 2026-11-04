@@ -64,10 +64,12 @@ import Sidebar from '../components/Sidebar.astro';
           <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
             <span class="text-xl">&#128062;</span>
           </div>
-          <!-- TODO: Activar en Avance 2 / Avance 3 --> <a href="/estadisticas" class="text-sm hover:opacity-70 flex items-center gap-1" style="color: #3b82f6;">
+          <!-- TODO: Activar en Avance 2 / Avance 3 (Estadísticas)
+          <a href="/estadisticas" class="text-sm hover:opacity-70 flex items-center gap-1" style="color: #3b82f6;">
             Ver estad&#237;sticas
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
           </a>
+          -->
         </div>
       </div>
 
@@ -426,10 +428,25 @@ import Sidebar from '../components/Sidebar.astro';
 </style>
 
 <script>
-  import { getVeterinaria, getUsuario, clearSession, isAuthenticated } from '../services/authService';
-  import { listarClientes, type Cliente } from '../services/clienteService';
-  import { listarMascotas, crearMascota, actualizarMascota, eliminarMascota, type MascotaConDueno, type MascotaCreate } from '../services/mascotaService';
-  import { listarBitacora, crearEntradaBitacora, eliminarEntradaBitacora, type Bitacora, type BitacoraCreate } from '../services/bitacoraService';
+  import type { Cliente } from '../domain/models/cliente';
+  import type { MascotaConDueno } from '../domain/models/mascota';
+  import type { Bitacora, BitacoraCreate } from '../domain/models/bitacora';
+  import { getVeterinaria, getUsuario, clearSession, isAuthenticated } from '../infrastructure/api/authService';
+  import { listarClientes } from '../infrastructure/api/clienteService';
+  import { listarMascotas, eliminarMascota } from '../infrastructure/api/mascotaService';
+  import { listarBitacora, crearEntradaBitacora, eliminarEntradaBitacora } from '../infrastructure/api/bitacoraService';
+  import {
+    filterClientesAutocomplete,
+    filterMascotas,
+    getBreedsForSpecies,
+    getCustomSpecies,
+    guardarMascotaUseCase,
+    parseMascotaEdad,
+    parseMascotaPeso,
+    speciesBadgeColors,
+    speciesColors,
+    speciesEmojis,
+  } from '../application/use_cases/mascotaUseCases';
 
   // Check auth
   if (!isAuthenticated()) {
@@ -443,33 +460,33 @@ import Sidebar from '../components/Sidebar.astro';
   const clienteIdFromUrl = urlParams.get('cliente');
 
   // Elements
-  const vetNameEl = document.getElementById('vetName') as HTMLSpanElement;
-  const pageSubtitle = document.getElementById('pageSubtitle') as HTMLParagraphElement;
-  const logoutBtn = document.getElementById('logoutBtn') as HTMLButtonElement;
-  const addPetBtn = document.getElementById('addPetBtn') as HTMLButtonElement;
-  const loadingState = document.getElementById('loadingState') as HTMLDivElement;
-  const emptyState = document.getElementById('emptyState') as HTMLDivElement;
-  const tableContainer = document.getElementById('tableContainer') as HTMLDivElement;
-  const petsTableBody = document.getElementById('petsTableBody') as HTMLTableSectionElement;
-  const totalMascotasEl = document.getElementById('totalMascotas') as HTMLParagraphElement;
-  const searchInput = document.getElementById('searchInput') as HTMLInputElement;
-  const searchType = document.getElementById('searchType') as HTMLSelectElement;
-  const speciesFilter = document.getElementById('speciesFilter') as HTMLSelectElement;
-  const clientFilter = document.getElementById('clientFilter') as HTMLInputElement;
-  const clientFilterInput = document.getElementById('clientFilterInput') as HTMLInputElement;
-  const clientFilterDropdown = document.getElementById('clientFilterDropdown') as HTMLDivElement;
-  const clearClientFilter = document.getElementById('clearClientFilter') as HTMLButtonElement;
+  const vetNameEl = document.getElementById('vetName') as HTMLSpanElement | null;
+  const pageSubtitle = document.getElementById('pageSubtitle') as HTMLParagraphElement | null;
+  const logoutBtn = document.getElementById('logoutBtn') as HTMLButtonElement | null;
+  const addPetBtn = document.getElementById('addPetBtn') as HTMLButtonElement | null;
+  const loadingState = document.getElementById('loadingState') as HTMLDivElement | null;
+  const emptyState = document.getElementById('emptyState') as HTMLDivElement | null;
+  const tableContainer = document.getElementById('tableContainer') as HTMLDivElement | null;
+  const petsTableBody = document.getElementById('petsTableBody') as HTMLTableSectionElement | null;
+  const totalMascotasEl = document.getElementById('totalMascotas') as HTMLParagraphElement | null;
+  const searchInput = document.getElementById('searchInput') as HTMLInputElement | null;
+  const searchType = document.getElementById('searchType') as HTMLSelectElement | null;
+  const speciesFilter = document.getElementById('speciesFilter') as HTMLSelectElement | null;
+  const clientFilter = document.getElementById('clientFilter') as HTMLInputElement | null;
+  const clientFilterInput = document.getElementById('clientFilterInput') as HTMLInputElement | null;
+  const clientFilterDropdown = document.getElementById('clientFilterDropdown') as HTMLDivElement | null;
+  const clearClientFilter = document.getElementById('clearClientFilter') as HTMLButtonElement | null;
 
   // Sidebar elements
-  const sidebar = document.getElementById('sidebar') as HTMLElement;
-  const sidebarOverlay = document.getElementById('sidebarOverlay') as HTMLDivElement;
-  const hamburgerBtn = document.getElementById('hamburgerBtn') as HTMLButtonElement;
-  const sidebarVetName = document.getElementById('sidebarVetName') as HTMLParagraphElement;
-  const userAvatar = document.getElementById('userAvatar') as HTMLDivElement;
+  const sidebar = document.getElementById('sidebar') as HTMLElement | null;
+  const sidebarOverlay = document.getElementById('sidebarOverlay') as HTMLDivElement | null;
+  const hamburgerBtn = document.getElementById('hamburgerBtn') as HTMLButtonElement | null;
+  const sidebarVetName = document.getElementById('sidebarVetName') as HTMLParagraphElement | null;
+  const userAvatar = document.getElementById('userAvatar') as HTMLDivElement | null;
 
   // Pagination
-  const paginationContainer = document.getElementById('paginationContainer') as HTMLDivElement;
-  const paginationTop = document.getElementById('paginationTop') as HTMLDivElement;
+  const paginationContainer = document.getElementById('paginationContainer') as HTMLDivElement | null;
+  const paginationTop = document.getElementById('paginationTop') as HTMLDivElement | null;
   const prevPageBtns = document.querySelectorAll('.prevPageSync') as NodeListOf<HTMLButtonElement>;
   const nextPageBtns = document.querySelectorAll('.nextPageSync') as NodeListOf<HTMLButtonElement>;
   const currentPageDisplays = document.querySelectorAll('.currentPageSync') as NodeListOf<HTMLSpanElement>;
@@ -479,40 +496,40 @@ import Sidebar from '../components/Sidebar.astro';
   const totalItemsEls = document.querySelectorAll('.totalItemsSync') as NodeListOf<HTMLSpanElement>;
 
   // Pet Modal
-  const petModal = document.getElementById('petModal') as HTMLDivElement;
-  const petModalTitle = document.getElementById('petModalTitle') as HTMLHeadingElement;
-  const closePetModal = document.getElementById('closePetModal') as HTMLButtonElement;
-  const cancelPetBtn = document.getElementById('cancelPetBtn') as HTMLButtonElement;
-  const petForm = document.getElementById('petForm') as HTMLFormElement;
-  const petIdInput = document.getElementById('petId') as HTMLInputElement;
-  const petClienteIdInput = document.getElementById('petClienteId') as HTMLInputElement;
-  const clienteSearchType = document.getElementById('clienteSearchType') as HTMLSelectElement;
-  const clienteSearch = document.getElementById('clienteSearch') as HTMLInputElement;
-  const clienteIdHidden = document.getElementById('clienteIdHidden') as HTMLInputElement;
-  const clienteDropdown = document.getElementById('clienteDropdown') as HTMLDivElement;
-  const selectedClientInfo = document.getElementById('selectedClientInfo') as HTMLParagraphElement;
-  const especieInput = document.getElementById('especieInput') as HTMLInputElement;
-  const razaInput = document.getElementById('razaInput') as HTMLInputElement;
-  const razasList = document.getElementById('razasList') as HTMLDataListElement;
-  const petFormError = document.getElementById('petFormError') as HTMLDivElement;
-  const petFormErrorText = document.getElementById('petFormErrorText') as HTMLParagraphElement;
+  const petModal = document.getElementById('petModal') as HTMLDivElement | null;
+  const petModalTitle = document.getElementById('petModalTitle') as HTMLHeadingElement | null;
+  const closePetModal = document.getElementById('closePetModal') as HTMLButtonElement | null;
+  const cancelPetBtn = document.getElementById('cancelPetBtn') as HTMLButtonElement | null;
+  const petForm = document.getElementById('petForm') as HTMLFormElement | null;
+  const petIdInput = document.getElementById('petId') as HTMLInputElement | null;
+  const petClienteIdInput = document.getElementById('petClienteId') as HTMLInputElement | null;
+  const clienteSearchType = document.getElementById('clienteSearchType') as HTMLSelectElement | null;
+  const clienteSearch = document.getElementById('clienteSearch') as HTMLInputElement | null;
+  const clienteIdHidden = document.getElementById('clienteIdHidden') as HTMLInputElement | null;
+  const clienteDropdown = document.getElementById('clienteDropdown') as HTMLDivElement | null;
+  const selectedClientInfo = document.getElementById('selectedClientInfo') as HTMLParagraphElement | null;
+  const especieInput = document.getElementById('especieInput') as HTMLInputElement | null;
+  const razaInput = document.getElementById('razaInput') as HTMLInputElement | null;
+  const razasList = document.getElementById('razasList') as HTMLDataListElement | null;
+  const petFormError = document.getElementById('petFormError') as HTMLDivElement | null;
+  const petFormErrorText = document.getElementById('petFormErrorText') as HTMLParagraphElement | null;
 
   // Delete modal
-  const deleteModal = document.getElementById('deleteModal') as HTMLDivElement;
-  const cancelDelete = document.getElementById('cancelDelete') as HTMLButtonElement;
-  const confirmDelete = document.getElementById('confirmDelete') as HTMLButtonElement;
+  const deleteModal = document.getElementById('deleteModal') as HTMLDivElement | null;
+  const cancelDelete = document.getElementById('cancelDelete') as HTMLButtonElement | null;
+  const confirmDelete = document.getElementById('confirmDelete') as HTMLButtonElement | null;
 
   // Bitacora modal
-  const bitacoraModal = document.getElementById('bitacoraModal') as HTMLDivElement;
-  const bitacoraPetName = document.getElementById('bitacoraPetName') as HTMLSpanElement;
-  const closeBitacora = document.getElementById('closeBitacora') as HTMLButtonElement;
-  const bitacoraForm = document.getElementById('bitacoraForm') as HTMLFormElement;
-  const bitacoraMascotaIdInput = document.getElementById('bitacoraMascotaId') as HTMLInputElement;
-  const bitacoraFormError = document.getElementById('bitacoraFormError') as HTMLDivElement;
-  const bitacoraFormErrorText = document.getElementById('bitacoraFormErrorText') as HTMLParagraphElement;
-  const bitacoraLoading = document.getElementById('bitacoraLoading') as HTMLDivElement;
-  const bitacoraEmpty = document.getElementById('bitacoraEmpty') as HTMLDivElement;
-  const bitacoraList = document.getElementById('bitacoraList') as HTMLDivElement;
+  const bitacoraModal = document.getElementById('bitacoraModal') as HTMLDivElement | null;
+  const bitacoraPetName = document.getElementById('bitacoraPetName') as HTMLSpanElement | null;
+  const closeBitacora = document.getElementById('closeBitacora') as HTMLButtonElement | null;
+  const bitacoraForm = document.getElementById('bitacoraForm') as HTMLFormElement | null;
+  const bitacoraMascotaIdInput = document.getElementById('bitacoraMascotaId') as HTMLInputElement | null;
+  const bitacoraFormError = document.getElementById('bitacoraFormError') as HTMLDivElement | null;
+  const bitacoraFormErrorText = document.getElementById('bitacoraFormErrorText') as HTMLParagraphElement | null;
+  const bitacoraLoading = document.getElementById('bitacoraLoading') as HTMLDivElement | null;
+  const bitacoraEmpty = document.getElementById('bitacoraEmpty') as HTMLDivElement | null;
+  const bitacoraList = document.getElementById('bitacoraList') as HTMLDivElement | null;
 
   // State
   let pets: MascotaConDueno[] = [];
@@ -524,109 +541,34 @@ import Sidebar from '../components/Sidebar.astro';
   let currentBitacoraMascotaId: number | null = null;
   let contextPetId: number | null = null;
 
-  // Predefined species list (used to detect custom ones)
-  const PREDEFINED_SPECIES = ['Perro', 'Gato', 'Ave', 'Roedor', 'Reptil', 'Pez', 'Anfibio', 'Exotico'];
-  const LS_CUSTOM_SPECIES = 'vetpets_custom_species';
-  const LS_CUSTOM_BREEDS = 'vetpets_custom_breeds_';
-
-  // Breed options by species
-  const breedsBySpecies: Record<string, string[]> = {
-    'Perro': [
-      'Mestizo', 'Labrador Retriever', 'Golden Retriever', 'Pastor Aleman', 'Bulldog Ingles', 'Bulldog Frances',
-      'Poodle', 'Chihuahua', 'Rottweiler', 'Husky Siberiano', 'Beagle', 'Yorkshire Terrier', 'Schnauzer',
-      'Pit Bull', 'American Bully', 'Boxer', 'Dalmata', 'Cocker Spaniel', 'Pug', 'Doberman', 'Shih Tzu',
-      'Basset Hound', 'Border Collie', 'Boston Terrier', 'Bull Terrier', 'Caniche', 'Chow Chow',
-      'Dogo Argentino', 'Fila Brasileiro', 'Fox Terrier', 'Gran Danes', 'Jack Russell', 'Maltipoo',
-      'Maltes', 'Mastin Napolitano', 'Papillon', 'Pastor Australiano', 'Pastor Belga', 'Pekines',
-      'Pointer', 'Pomerania', 'Rhodesian Ridgeback', 'Samoyedo', 'San Bernardo', 'Shar Pei',
-      'Setter Irlandes', 'Shiba Inu', 'Springer Spaniel', 'Staffordshire', 'Terranova', 'Weimaraner',
-      'Welsh Corgi', 'West Highland', 'Xoloitzcuintle'
-    ],
-    'Gato': [
-      'Mestizo', 'Siames', 'Persa', 'Maine Coon', 'Bengali', 'Ragdoll', 'Britanico de Pelo Corto',
-      'Abisinio', 'Sphynx', 'Scottish Fold', 'Angora Turco', 'Birmano', 'Bombay', 'Burmese', 'Chartreux',
-      'Cornish Rex', 'Devon Rex', 'Exotico de Pelo Corto', 'Himalayo', 'Manx', 'Noruego del Bosque',
-      'Oriental', 'Ruso Azul', 'Savannah', 'Singapura', 'Somali', 'Tonkines', 'Van Turco'
-    ],
-    'Ave': [
-      'Periquito Australiano', 'Canario', 'Loro Amazonas', 'Cacatua', 'Agaporni', 'Cotorra Argentina',
-      'Guacamaya', 'Ninfa', 'Calopsita', 'Diamante Mandarin', 'Jilguero', 'Pinzon', 'Cardenal',
-      'Paloma', 'Codorniz', 'Faisán', 'Pavo Real', 'Gallina', 'Pato', 'Ganso', 'Tucan', 'Loro Gris Africano',
-      'Eclectus', 'Caique', 'Quaker', 'Loro Senegalés'
-    ],
-    'Roedor': [
-      'Hamster Sirio', 'Hamster Ruso', 'Hamster Roborovski', 'Cobaya', 'Conejo Holandes', 'Conejo Belier',
-      'Conejo Rex', 'Conejo Angora', 'Conejo Cabeza de Leon', 'Rata Domestica', 'Raton Domestico',
-      'Chinchilla', 'Huron', 'Jerbo', 'Ardilla de Richardson', 'Degú', 'Erizo Africano'
-    ],
-    'Reptil': [
-      'Iguana Verde', 'Tortuga de Orejas Rojas', 'Tortuga Rusa', 'Tortuga Sulcata', 'Gecko Leopardo',
-      'Gecko Crestado', 'Dragon Barbudo', 'Python Ball', 'Boa Constrictor', 'Serpiente del Maiz',
-      'Camaleon Velado', 'Camaleon Pantera', 'Monitor de Sabana', 'Tegu Argentino', 'Tortuga de Caja',
-      'Tortuga Mora', 'Axolotl', 'Salamandra'
-    ],
-    'Pez': [
-      'Betta', 'Goldfish', 'Guppy', 'Molly', 'Platy', 'Tetra Neon', 'Pez Angel', 'Disco', 'Oscar',
-      'Cichilido', 'Corydora', 'Pleco', 'Pez Payaso', 'Pez Cirujano', 'Pez Damisela', 'Pez Globo',
-      'Carpa Koi', 'Pez Bichir'
-    ],
-    'Anfibio': [
-      'Rana Arboricola', 'Rana Africana', 'Sapo Comun', 'Axolotl', 'Salamandra de Fuego',
-      'Triton Japones', 'Rana Punta de Flecha', 'Sapo de Caña'
-    ],
-    'Exotico': [
-      'Mono Capuchino', 'Mono Titi', 'Sugar Glider', 'Perezoso', 'Mapache', 'Coati', 'Kinkaju',
-      'Feneco', 'Zorro', 'Mofeta', 'Armadillo', 'Capibaraa', 'Mini Pig', 'Cabra Enana'
-    ],
-  };
-
-  // Species colors and emojis
-  const speciesEmojis: Record<string, string> = { 'Perro': '🐕', 'Gato': '🐱', 'Ave': '🦜', 'Roedor': '🐹', 'Reptil': '🦎', 'Pez': '🐠', 'Anfibio': '🐸', 'Exotico': '🦥', 'Otro': '🐾' };
-  const speciesColors: Record<string, string> = { 'Perro': 'bg-amber-500/20', 'Gato': 'bg-purple-500/20', 'Ave': 'bg-sky-500/20', 'Roedor': 'bg-pink-500/20', 'Reptil': 'bg-lime-500/20', 'Pez': 'bg-cyan-500/20', 'Anfibio': 'bg-green-500/20', 'Exotico': 'bg-orange-500/20', 'Otro': 'bg-gray-500/20' };
-  const speciesBadgeColors: Record<string, string> = { 'Perro': 'bg-amber-500/20 text-amber-300', 'Gato': 'bg-purple-500/20 text-purple-300', 'Ave': 'bg-sky-500/20 text-sky-300', 'Roedor': 'bg-pink-500/20 text-pink-300', 'Reptil': 'bg-lime-500/20 text-lime-300', 'Pez': 'bg-cyan-500/20 text-cyan-300', 'Anfibio': 'bg-green-500/20 text-green-300', 'Exotico': 'bg-orange-500/20 text-orange-300', 'Otro': 'bg-gray-500/20 text-gray-300' };
-
   // Load vet name
   const vet = getVeterinaria();
   if (vet) {
-    vetNameEl.textContent = vet.nombre;
+    if (vetNameEl) vetNameEl.textContent = vet.nombre;
     if (sidebarVetName) sidebarVetName.textContent = vet.nombre;
     if (userAvatar) userAvatar.textContent = vet.nombre.charAt(0).toUpperCase();
   }
 
   // Sidebar toggle
-  hamburgerBtn.addEventListener('click', () => {
-    sidebar.classList.toggle('-translate-x-full');
-    sidebarOverlay.classList.toggle('hidden');
+  hamburgerBtn?.addEventListener('click', () => {
+    sidebar?.classList.toggle('-translate-x-full');
+    sidebarOverlay?.classList.toggle('hidden');
   });
-  sidebarOverlay.addEventListener('click', () => {
-    sidebar.classList.add('-translate-x-full');
-    sidebarOverlay.classList.add('hidden');
+  sidebarOverlay?.addEventListener('click', () => {
+    sidebar?.classList.add('-translate-x-full');
+    sidebarOverlay?.classList.add('hidden');
   });
-
-  // ── Custom species/breed persistence ──────────────────────────
-  function getCustomSpecies(): string[] {
-    try { return JSON.parse(localStorage.getItem(LS_CUSTOM_SPECIES) || '[]'); } catch { return []; }
-  }
-  function saveCustomSpeciesList(list: string[]) {
-    localStorage.setItem(LS_CUSTOM_SPECIES, JSON.stringify(list));
-  }
-  function getCustomBreeds(species: string): string[] {
-    try { return JSON.parse(localStorage.getItem(LS_CUSTOM_BREEDS + species) || '[]'); } catch { return []; }
-  }
-  function saveCustomBreedsList(species: string, list: string[]) {
-    localStorage.setItem(LS_CUSTOM_BREEDS + species, JSON.stringify(list));
-  }
 
   // Inject custom species into datalist + filter dropdown
   function loadCustomSpeciesOptions() {
-    const especiesDatalist = document.getElementById('especiesList') as HTMLDataListElement;
+    const especiesDatalist = document.getElementById('especiesList') as HTMLDataListElement | null;
     getCustomSpecies().forEach(s => {
-      if (!Array.from(especiesDatalist.options).some(o => o.value === s)) {
+      if (especiesDatalist && !Array.from(especiesDatalist.options).some(o => o.value === s)) {
         const opt = document.createElement('option');
         opt.value = s;
         especiesDatalist.appendChild(opt);
       }
-      if (!Array.from(speciesFilter.options).some(o => o.value === s)) {
+      if (speciesFilter && !Array.from(speciesFilter.options).some(o => o.value === s)) {
         const opt = document.createElement('option');
         opt.value = s; opt.className = 'bg-white'; opt.textContent = s;
         speciesFilter.appendChild(opt);
@@ -634,68 +576,25 @@ import Sidebar from '../components/Sidebar.astro';
     });
   }
 
-  // Persist a new species (if truly new) to localStorage
-  function persistCustomSpecies(especie: string) {
-    if (!especie || PREDEFINED_SPECIES.includes(especie)) return;
-    const list = getCustomSpecies();
-    if (list.includes(especie)) return;
-    list.push(especie);
-    saveCustomSpeciesList(list);
-    // Update datalist
-    const dl = document.getElementById('especiesList') as HTMLDataListElement;
-    if (!Array.from(dl.options).some(o => o.value === especie)) {
-      const opt = document.createElement('option'); opt.value = especie; dl.appendChild(opt);
-    }
-    // Update species filter dropdown
-    if (!Array.from(speciesFilter.options).some(o => o.value === especie)) {
-      const opt = document.createElement('option');
-      opt.value = especie; opt.className = 'bg-white'; opt.textContent = especie;
-      speciesFilter.appendChild(opt);
-    }
-  }
-
-  // Persist a new breed for the given species
-  function persistCustomBreed(especie: string, raza: string) {
-    if (!especie || !raza) return;
-    const predefined = breedsBySpecies[especie] || [];
-    const custom = getCustomBreeds(especie);
-    if (predefined.includes(raza) || custom.includes(raza)) return;
-    custom.push(raza);
-    saveCustomBreedsList(especie, custom);
-  }
-  // ────────────────────────────────────────────────────────────────
-
   // Update breeds when species changes (includes custom breeds)
   function updateBreeds(species: string) {
-    const predefined = breedsBySpecies[species] || [];
-    const custom = getCustomBreeds(species);
-    const all = [...predefined, ...custom.filter(b => !predefined.includes(b))];
+    if (!razasList) return;
+    const all = getBreedsForSpecies(species);
     razasList.innerHTML = all.map(b => `<option value="${b}"></option>`).join('');
   }
 
-  especieInput.addEventListener('input', () => updateBreeds(especieInput.value));
-
-  // Client autocomplete functionality
-  let selectedClientId: number | null = null;
+  especieInput?.addEventListener('input', () => updateBreeds(especieInput.value));
 
   function updateClientDropdown() {
+    if (!clienteSearch || !clienteDropdown) return;
     const term = clienteSearch.value.trim();
-    const searchTypeValue = clienteSearchType.value;
+    const searchTypeValue = clienteSearchType?.value || 'nombre';
     if (!term) {
       clienteDropdown.classList.add('hidden');
       return;
     }
 
-    const matches = clients.filter(c => {
-      if (searchTypeValue === 'id') {
-        return c.id.toString() === term;
-      } else if (searchTypeValue === 'telefono') {
-        const digitsOnly = term.replace(/\D/g, '');
-        return c.telefono.replace(/\D/g, '').includes(digitsOnly);
-      } else {
-        return c.nombre.toLowerCase().includes(term.toLowerCase());
-      }
-    }).slice(0, 8);
+    const matches = filterClientesAutocomplete(clients, term, searchTypeValue);
 
     if (matches.length === 0) {
       clienteDropdown.innerHTML = '<div class="px-4 py-3 text-sm" style="color: #9a8b7c;">No se encontraron clientes</div>';
@@ -711,29 +610,33 @@ import Sidebar from '../components/Sidebar.astro';
   }
 
   (window as any).selectClient = (id: number, nombre: string, telefono: string) => {
-    selectedClientId = id;
-    clienteIdHidden.value = id.toString();
-    clienteSearch.value = nombre;
-    selectedClientInfo.textContent = `✓ ${nombre} - ${telefono}`;
-    selectedClientInfo.classList.remove('hidden');
-    clienteDropdown.classList.add('hidden');
+    if (clienteIdHidden) clienteIdHidden.value = id.toString();
+    if (clienteSearch) clienteSearch.value = nombre;
+    if (selectedClientInfo) {
+      selectedClientInfo.textContent = `✓ ${nombre} - ${telefono}`;
+      selectedClientInfo.classList.remove('hidden');
+    }
+    clienteDropdown?.classList.add('hidden');
   };
 
-  clienteSearch.addEventListener('input', updateClientDropdown);
-  clienteSearch.addEventListener('focus', updateClientDropdown);
-  clienteSearchType.addEventListener('change', () => {
-    clienteSearch.value = '';
-    clienteDropdown.classList.add('hidden');
-    clienteSearch.focus();
+  clienteSearch?.addEventListener('input', updateClientDropdown);
+  clienteSearch?.addEventListener('focus', updateClientDropdown);
+  clienteSearchType?.addEventListener('change', () => {
+    if (clienteSearch) {
+      clienteSearch.value = '';
+      clienteSearch.focus();
+    }
+    clienteDropdown?.classList.add('hidden');
   });
   document.addEventListener('click', (e) => {
-    if (!clienteSearch.contains(e.target as Node) && !clienteDropdown.contains(e.target as Node)) {
+    if (clienteSearch && clienteDropdown && !clienteSearch.contains(e.target as Node) && !clienteDropdown.contains(e.target as Node)) {
       clienteDropdown.classList.add('hidden');
     }
   });
 
   // Client filter dropdown logic
   function updateClientFilterDropdown() {
+    if (!clientFilterInput || !clientFilterDropdown) return;
     const term = clientFilterInput.value.toLowerCase().trim();
 
     if (!term) {
@@ -760,26 +663,26 @@ import Sidebar from '../components/Sidebar.astro';
   }
 
   (window as any).selectClientFilter = (id: number, nombre: string) => {
-    clientFilter.value = id.toString();
-    clientFilterInput.value = nombre;
-    clientFilterDropdown.classList.add('hidden');
-    clearClientFilter.classList.remove('hidden');
+    if (clientFilter) clientFilter.value = id.toString();
+    if (clientFilterInput) clientFilterInput.value = nombre;
+    clientFilterDropdown?.classList.add('hidden');
+    clearClientFilter?.classList.remove('hidden');
     applyFilters();
   };
 
-  clientFilterInput.addEventListener('input', updateClientFilterDropdown);
-  clientFilterInput.addEventListener('focus', updateClientFilterDropdown);
+  clientFilterInput?.addEventListener('input', updateClientFilterDropdown);
+  clientFilterInput?.addEventListener('focus', updateClientFilterDropdown);
   document.addEventListener('click', (e) => {
-    if (!clientFilterInput.contains(e.target as Node) && !clientFilterDropdown.contains(e.target as Node)) {
+    if (clientFilterInput && clientFilterDropdown && !clientFilterInput.contains(e.target as Node) && !clientFilterDropdown.contains(e.target as Node)) {
       clientFilterDropdown.classList.add('hidden');
     }
   });
 
-  clearClientFilter.addEventListener('click', () => {
-    clientFilter.value = '';
-    clientFilterInput.value = '';
+  clearClientFilter?.addEventListener('click', () => {
+    if (clientFilter) clientFilter.value = '';
+    if (clientFilterInput) clientFilterInput.value = '';
     clearClientFilter.classList.add('hidden');
-    pageSubtitle.textContent = 'Gestiona las mascotas de la veterinaria';
+    if (pageSubtitle) pageSubtitle.textContent = 'Gestiona las mascotas de la veterinaria';
     applyFilters();
   });
 
@@ -790,12 +693,12 @@ import Sidebar from '../components/Sidebar.astro';
 
       // If client ID from URL, set filter
       if (clienteIdFromUrl) {
-        clientFilter.value = clienteIdFromUrl;
+        if (clientFilter) clientFilter.value = clienteIdFromUrl;
         const client = clients.find(c => c.id === parseInt(clienteIdFromUrl));
         if (client) {
-          clientFilterInput.value = client.nombre;
-          clearClientFilter.classList.remove('hidden');
-          pageSubtitle.textContent = `Mascotas de ${client.nombre}`;
+          if (clientFilterInput) clientFilterInput.value = client.nombre;
+          clearClientFilter?.classList.remove('hidden');
+          if (pageSubtitle) pageSubtitle.textContent = `Mascotas de ${client.nombre}`;
         }
       }
 
@@ -806,42 +709,22 @@ import Sidebar from '../components/Sidebar.astro';
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
-      loadingState.classList.add('hidden');
+      loadingState?.classList.add('hidden');
     }
   }
 
   // Update stats
   function updateStats() {
-    totalMascotasEl.textContent = pets.length.toString();
+    if (totalMascotasEl) totalMascotasEl.textContent = pets.length.toString();
   }
 
   // Apply filters
   function applyFilters() {
-    const searchTerm = searchInput.value.trim();
-    const searchTermLower = searchTerm.toLowerCase();
-    const searchTypeValue = searchType.value;
-    const speciesValue = speciesFilter.value;
-    const clientValue = clientFilter.value;
-
-    filteredPets = pets.filter(pet => {
-      // Search filter
-      let matchesSearch = true;
-      if (searchTerm) {
-        switch (searchTypeValue) {
-          case 'id':
-            matchesSearch = pet.id.toString() === searchTerm;
-            break;
-          case 'nombre':
-            matchesSearch = pet.nombre.toLowerCase().includes(searchTermLower);
-            break;
-          default: // 'todo'
-            matchesSearch = pet.id.toString() === searchTerm ||
-              pet.nombre.toLowerCase().includes(searchTermLower);
-        }
-      }
-      const matchesSpecies = !speciesValue || pet.especie === speciesValue;
-      const matchesClient = !clientValue || pet.cliente_id === parseInt(clientValue);
-      return matchesSearch && matchesSpecies && matchesClient;
+    filteredPets = filterMascotas(pets, {
+      searchTerm: searchInput?.value || '',
+      searchType: searchType?.value || 'todo',
+      species: speciesFilter?.value || '',
+      clientId: clientFilter?.value || '',
     });
 
     currentPage = 1;
@@ -851,15 +734,15 @@ import Sidebar from '../components/Sidebar.astro';
   // Render table
   function renderTable() {
     if (filteredPets.length === 0) {
-      tableContainer.classList.add('hidden');
-      emptyState.classList.remove('hidden');
-      paginationContainer.classList.add('hidden');
-      paginationTop.classList.add('hidden');
+      tableContainer?.classList.add('hidden');
+      emptyState?.classList.remove('hidden');
+      paginationContainer?.classList.add('hidden');
+      paginationTop?.classList.add('hidden');
       return;
     }
 
-    emptyState.classList.add('hidden');
-    tableContainer.classList.remove('hidden');
+    emptyState?.classList.add('hidden');
+    tableContainer?.classList.remove('hidden');
 
     const totalPages = Math.ceil(filteredPets.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -867,10 +750,10 @@ import Sidebar from '../components/Sidebar.astro';
     const paginatedPets = filteredPets.slice(startIndex, endIndex);
 
     if (filteredPets.length > itemsPerPage) {
-      paginationContainer.classList.remove('hidden');
-      paginationContainer.classList.add('flex');
-      paginationTop.classList.remove('hidden');
-      paginationTop.classList.add('flex');
+      paginationContainer?.classList.remove('hidden');
+      paginationContainer?.classList.add('flex');
+      paginationTop?.classList.remove('hidden');
+      paginationTop?.classList.add('flex');
 
       showingFromEls.forEach(el => el.textContent = (startIndex + 1).toString());
       showingToEls.forEach(el => el.textContent = endIndex.toString());
@@ -880,9 +763,11 @@ import Sidebar from '../components/Sidebar.astro';
       prevPageBtns.forEach(btn => btn.disabled = currentPage === 1);
       nextPageBtns.forEach(btn => btn.disabled = currentPage === totalPages);
     } else {
-      paginationContainer.classList.add('hidden');
-      paginationTop.classList.add('hidden');
+      paginationContainer?.classList.add('hidden');
+      paginationTop?.classList.add('hidden');
     }
+
+    if (!petsTableBody) return;
 
     petsTableBody.innerHTML = paginatedPets.map(pet => `
       <tr class="hover:bg-black/[0.02] transition-colors cursor-pointer" data-pet-id="${pet.id}" oncontextmenu="event.preventDefault(); showPetContextMenu(event, ${pet.id}, '${pet.nombre.replace(/'/g, "\\'")}')">
@@ -933,56 +818,57 @@ import Sidebar from '../components/Sidebar.astro';
 
   // Modal functions
   function openPetModal(title: string, pet?: MascotaConDueno) {
-    petModalTitle.textContent = title;
+    if (!petModal || !petForm) return;
+    if (petModalTitle) petModalTitle.textContent = title;
     petForm.reset();
-    petFormError.classList.add('hidden');
-    razasList.innerHTML = '';
-    clienteSearch.value = '';
-    clienteIdHidden.value = '';
-    selectedClientInfo.classList.add('hidden');
-    clienteDropdown.classList.add('hidden');
+    petFormError?.classList.add('hidden');
+    if (razasList) razasList.innerHTML = '';
+    if (clienteSearch) clienteSearch.value = '';
+    if (clienteIdHidden) clienteIdHidden.value = '';
+    selectedClientInfo?.classList.add('hidden');
+    clienteDropdown?.classList.add('hidden');
 
     if (pet) {
-      petIdInput.value = pet.id.toString();
-      petClienteIdInput.value = pet.cliente_id.toString();
-      clienteIdHidden.value = pet.cliente_id.toString();
-      clienteSearch.value = pet.nombre_dueno;
-      selectedClientInfo.textContent = `✓ ${pet.nombre_dueno} - ${pet.telefono_dueno}`;
-      selectedClientInfo.classList.remove('hidden');
-      (petForm.elements.namedItem('nombre') as HTMLInputElement).value = pet.nombre;
-      especieInput.value = pet.especie;
+      if (petIdInput) petIdInput.value = pet.id.toString();
+      if (petClienteIdInput) petClienteIdInput.value = pet.cliente_id.toString();
+      if (clienteIdHidden) clienteIdHidden.value = pet.cliente_id.toString();
+      if (clienteSearch) clienteSearch.value = pet.nombre_dueno;
+      if (selectedClientInfo) {
+        selectedClientInfo.textContent = `✓ ${pet.nombre_dueno} - ${pet.telefono_dueno}`;
+        selectedClientInfo.classList.remove('hidden');
+      }
+      const nombreEl = petForm.elements.namedItem('nombre') as HTMLInputElement | null;
+      if (nombreEl) nombreEl.value = pet.nombre;
+      if (especieInput) especieInput.value = pet.especie;
       updateBreeds(pet.especie);
-      razaInput.value = pet.raza || '';
+      if (razaInput) razaInput.value = pet.raza || '';
 
-      // Parse edad (can be "X años", "Y meses", or "X años Y meses")
-      const edadStr = pet.edad || '';
-      const aniosMatch = edadStr.match(/(\d+)\s*años?/i);
-      const mesesMatch = edadStr.match(/(\d+)\s*mes(es)?/i);
-      if (aniosMatch) {
-        (petForm.elements.namedItem('edad_anios') as HTMLInputElement).value = aniosMatch[1];
-      }
-      if (mesesMatch) {
-        (petForm.elements.namedItem('edad_meses') as HTMLInputElement).value = mesesMatch[1];
-      }
+      const parsedEdad = parseMascotaEdad(pet.edad);
+      const aniosEl = petForm.elements.namedItem('edad_anios') as HTMLInputElement | null;
+      const mesesEl = petForm.elements.namedItem('edad_meses') as HTMLInputElement | null;
+      if (aniosEl) aniosEl.value = parsedEdad.anios;
+      if (mesesEl) mesesEl.value = parsedEdad.meses;
 
-      // Parse peso
-      const pesoMatch = (pet.peso || '').match(/^([\d.]+)\s*(kg|g)?$/i);
-      if (pesoMatch) {
-        (petForm.elements.namedItem('peso_valor') as HTMLInputElement).value = pesoMatch[1];
-        (petForm.elements.namedItem('peso_unidad') as HTMLSelectElement).value = pesoMatch[2]?.toLowerCase() || 'kg';
-      }
+      const parsedPeso = parseMascotaPeso(pet.peso);
+      const pesoValorEl = petForm.elements.namedItem('peso_valor') as HTMLInputElement | null;
+      const pesoUnidadEl = petForm.elements.namedItem('peso_unidad') as HTMLSelectElement | null;
+      if (pesoValorEl) pesoValorEl.value = parsedPeso.valor;
+      if (pesoUnidadEl) pesoUnidadEl.value = parsedPeso.unidad;
 
-      (petForm.elements.namedItem('notas') as HTMLTextAreaElement).value = pet.notas || '';
+      const notasEl = petForm.elements.namedItem('notas') as HTMLTextAreaElement | null;
+      if (notasEl) notasEl.value = pet.notas || '';
     } else {
-      petIdInput.value = '';
-      petClienteIdInput.value = '';
+      if (petIdInput) petIdInput.value = '';
+      if (petClienteIdInput) petClienteIdInput.value = '';
       if (clienteIdFromUrl) {
         const client = clients.find(c => c.id === parseInt(clienteIdFromUrl));
         if (client) {
-          clienteIdHidden.value = clienteIdFromUrl;
-          clienteSearch.value = client.nombre;
-          selectedClientInfo.textContent = `✓ ${client.nombre} - ${client.telefono}`;
-          selectedClientInfo.classList.remove('hidden');
+          if (clienteIdHidden) clienteIdHidden.value = clienteIdFromUrl;
+          if (clienteSearch) clienteSearch.value = client.nombre;
+          if (selectedClientInfo) {
+            selectedClientInfo.textContent = `✓ ${client.nombre} - ${client.telefono}`;
+            selectedClientInfo.classList.remove('hidden');
+          }
         }
       }
     }
@@ -992,8 +878,8 @@ import Sidebar from '../components/Sidebar.astro';
   }
 
   function closePetModalFn() {
-    petModal.classList.add('hidden');
-    petModal.classList.remove('flex');
+    petModal?.classList.add('hidden');
+    petModal?.classList.remove('flex');
   }
 
   // Global functions
@@ -1004,43 +890,44 @@ import Sidebar from '../components/Sidebar.astro';
 
   (window as any).deletePetPrompt = (id: number) => {
     deletePetId = id;
-    deleteModal.classList.remove('hidden');
-    deleteModal.classList.add('flex');
+    deleteModal?.classList.remove('hidden');
+    deleteModal?.classList.add('flex');
   };
 
   (window as any).openBitacora = async (id: number, name: string) => {
     currentBitacoraMascotaId = id;
-    bitacoraMascotaIdInput.value = id.toString();
-    bitacoraPetName.textContent = name;
-    bitacoraForm.reset();
-    bitacoraFormError.classList.add('hidden');
-    bitacoraModal.classList.remove('hidden');
-    bitacoraModal.classList.add('flex');
+    if (bitacoraMascotaIdInput) bitacoraMascotaIdInput.value = id.toString();
+    if (bitacoraPetName) bitacoraPetName.textContent = name;
+    bitacoraForm?.reset();
+    bitacoraFormError?.classList.add('hidden');
+    bitacoraModal?.classList.remove('hidden');
+    bitacoraModal?.classList.add('flex');
     await loadBitacora(id);
   };
 
   // Bitacora functions
   async function loadBitacora(mascotaId: number) {
-    bitacoraLoading.classList.remove('hidden');
-    bitacoraEmpty.classList.add('hidden');
-    bitacoraList.classList.add('hidden');
+    bitacoraLoading?.classList.remove('hidden');
+    bitacoraEmpty?.classList.add('hidden');
+    bitacoraList?.classList.add('hidden');
 
     try {
       const entradas = await listarBitacora(mascotaId);
       if (entradas.length === 0) {
-        bitacoraEmpty.classList.remove('hidden');
+        bitacoraEmpty?.classList.remove('hidden');
       } else {
         renderBitacora(entradas);
-        bitacoraList.classList.remove('hidden');
+        bitacoraList?.classList.remove('hidden');
       }
     } catch (error) {
       console.error('Error loading bitacora:', error);
     } finally {
-      bitacoraLoading.classList.add('hidden');
+      bitacoraLoading?.classList.add('hidden');
     }
   }
 
   function renderBitacora(entradas: Bitacora[]) {
+    if (!bitacoraList) return;
     bitacoraList.innerHTML = entradas.map(e => `
       <div class="bg-white rounded-xl p-3 md:p-4" style="border: 1px solid #e2e8f0;">
         <div class="flex justify-between items-start gap-2 mb-2">
@@ -1073,22 +960,22 @@ import Sidebar from '../components/Sidebar.astro';
   };
 
   // Event listeners
-  logoutBtn.addEventListener('click', () => {
+  logoutBtn?.addEventListener('click', () => {
     clearSession();
     window.location.href = '/';
   });
 
-  addPetBtn.addEventListener('click', () => openPetModal('Nueva Mascota'));
+  addPetBtn?.addEventListener('click', () => openPetModal('Nueva Mascota'));
 
-  closePetModal.addEventListener('click', closePetModalFn);
-  cancelPetBtn.addEventListener('click', closePetModalFn);
-  petModal.addEventListener('click', (e) => {
+  closePetModal?.addEventListener('click', closePetModalFn);
+  cancelPetBtn?.addEventListener('click', closePetModalFn);
+  petModal?.addEventListener('click', (e) => {
     if (e.target === petModal) closePetModalFn();
   });
 
-  searchInput.addEventListener('input', applyFilters);
-  searchType.addEventListener('change', applyFilters);
-  speciesFilter.addEventListener('change', applyFilters);
+  searchInput?.addEventListener('input', applyFilters);
+  searchType?.addEventListener('change', applyFilters);
+  speciesFilter?.addEventListener('change', applyFilters);
 
   // Pagination (for both top and bottom)
   prevPageBtns.forEach(btn => {
@@ -1104,75 +991,47 @@ import Sidebar from '../components/Sidebar.astro';
   });
 
   // Pet form submit
-  petForm.addEventListener('submit', async (e) => {
+  petForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    petFormError.classList.add('hidden');
+    petFormError?.classList.add('hidden');
 
     const formData = new FormData(petForm);
-    const clienteIdStr = clienteIdHidden.value;
-
-    if (!clienteIdStr) {
-      petFormErrorText.textContent = 'Debes seleccionar un dueño';
-      petFormError.classList.remove('hidden');
-      return;
-    }
-
-    const clienteId = parseInt(clienteIdStr);
-    const edadAnios = formData.get('edad_anios') as string;
-    const edadMeses = formData.get('edad_meses') as string;
-    const pesoValor = formData.get('peso_valor') as string;
-    const pesoUnidad = formData.get('peso_unidad') as string;
-
-    // Build age string
-    let edadStr = '';
-    if (edadAnios && parseInt(edadAnios) > 0) {
-      edadStr = `${edadAnios} año${parseInt(edadAnios) > 1 ? 's' : ''}`;
-    }
-    if (edadMeses && parseInt(edadMeses) > 0) {
-      if (edadStr) edadStr += ' ';
-      edadStr += `${edadMeses} mes${parseInt(edadMeses) > 1 ? 'es' : ''}`;
-    }
-
-    const data: MascotaCreate = {
-      nombre: formData.get('nombre') as string,
-      especie: formData.get('especie') as string,
-      raza: formData.get('raza') as string || undefined,
-      edad: edadStr || undefined,
-      peso: pesoValor ? `${pesoValor} ${pesoUnidad}` : undefined,
-      notas: formData.get('notas') as string || undefined,
-    };
 
     try {
-      const id = petIdInput.value;
-      if (id) {
-        await actualizarMascota(parseInt(id), data);
-      } else {
-        await crearMascota(clienteId, data);
-      }
-      // Persist custom species/breed if new
-      persistCustomSpecies(data.especie);
-      if (data.raza) persistCustomBreed(data.especie, data.raza);
+      await guardarMascotaUseCase({
+        petId: petIdInput?.value || null,
+        clienteIdStr: clienteIdHidden?.value || '',
+        nombre: (formData.get('nombre') as string) || '',
+        especie: (formData.get('especie') as string) || '',
+        raza: (formData.get('raza') as string) || undefined,
+        edadAnios: (formData.get('edad_anios') as string) || undefined,
+        edadMeses: (formData.get('edad_meses') as string) || undefined,
+        pesoValor: (formData.get('peso_valor') as string) || undefined,
+        pesoUnidad: (formData.get('peso_unidad') as string) || 'kg',
+        notas: (formData.get('notas') as string) || undefined,
+      });
+      loadCustomSpeciesOptions();
       closePetModalFn();
       loadData();
     } catch (error) {
-      petFormErrorText.textContent = error instanceof Error ? error.message : 'Error al guardar';
-      petFormError.classList.remove('hidden');
+      if (petFormErrorText) petFormErrorText.textContent = error instanceof Error ? error.message : 'Error al guardar';
+      petFormError?.classList.remove('hidden');
     }
   });
 
   // Delete modal
-  cancelDelete.addEventListener('click', () => {
-    deleteModal.classList.add('hidden');
-    deleteModal.classList.remove('flex');
+  cancelDelete?.addEventListener('click', () => {
+    deleteModal?.classList.add('hidden');
+    deleteModal?.classList.remove('flex');
     deletePetId = null;
   });
 
-  confirmDelete.addEventListener('click', async () => {
+  confirmDelete?.addEventListener('click', async () => {
     if (!deletePetId) return;
     try {
       await eliminarMascota(deletePetId);
-      deleteModal.classList.add('hidden');
-      deleteModal.classList.remove('flex');
+      deleteModal?.classList.add('hidden');
+      deleteModal?.classList.remove('flex');
       deletePetId = null;
       loadData();
     } catch (error) {
@@ -1181,15 +1040,15 @@ import Sidebar from '../components/Sidebar.astro';
   });
 
   // Bitacora modal
-  closeBitacora.addEventListener('click', () => {
-    bitacoraModal.classList.add('hidden');
-    bitacoraModal.classList.remove('flex');
+  closeBitacora?.addEventListener('click', () => {
+    bitacoraModal?.classList.add('hidden');
+    bitacoraModal?.classList.remove('flex');
     currentBitacoraMascotaId = null;
   });
 
-  bitacoraForm.addEventListener('submit', async (e) => {
+  bitacoraForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    bitacoraFormError.classList.add('hidden');
+    bitacoraFormError?.classList.add('hidden');
     if (!currentBitacoraMascotaId) return;
 
     const formData = new FormData(bitacoraForm);
@@ -1203,16 +1062,16 @@ import Sidebar from '../components/Sidebar.astro';
       bitacoraForm.reset();
       await loadBitacora(currentBitacoraMascotaId);
     } catch (error) {
-      bitacoraFormErrorText.textContent = error instanceof Error ? error.message : 'Error al guardar';
-      bitacoraFormError.classList.remove('hidden');
+      if (bitacoraFormErrorText) bitacoraFormErrorText.textContent = error instanceof Error ? error.message : 'Error al guardar';
+      bitacoraFormError?.classList.remove('hidden');
     }
   });
 
   // Pet context menu elements
-  const petContextMenu = document.getElementById('petContextMenu') as HTMLDivElement;
-  const ctxEditPet = document.getElementById('ctxEditPet') as HTMLButtonElement;
-  const ctxBitacora = document.getElementById('ctxBitacora') as HTMLButtonElement;
-  const ctxDeletePet = document.getElementById('ctxDeletePet') as HTMLButtonElement;
+  const petContextMenu = document.getElementById('petContextMenu') as HTMLDivElement | null;
+  const ctxEditPet = document.getElementById('ctxEditPet') as HTMLButtonElement | null;
+  const ctxBitacora = document.getElementById('ctxBitacora') as HTMLButtonElement | null;
+  const ctxDeletePet = document.getElementById('ctxDeletePet') as HTMLButtonElement | null;
   let contextPetName: string = '';
 
   // Context menu with proper positioning
@@ -1220,6 +1079,7 @@ import Sidebar from '../components/Sidebar.astro';
     e.preventDefault();
     contextPetId = petId;
     contextPetName = petName;
+    if (!petContextMenu) return;
 
     const menuWidth = 180;
     const menuHeight = 140;
@@ -1240,34 +1100,34 @@ import Sidebar from '../components/Sidebar.astro';
   };
 
   document.addEventListener('click', () => {
-    petContextMenu.classList.add('hidden');
+    petContextMenu?.classList.add('hidden');
   });
 
   document.addEventListener('scroll', () => {
-    petContextMenu.classList.add('hidden');
+    petContextMenu?.classList.add('hidden');
   }, true);
 
-  ctxEditPet.addEventListener('click', () => {
+  ctxEditPet?.addEventListener('click', () => {
     if (contextPetId) {
       (window as any).editPet(contextPetId);
     }
-    petContextMenu.classList.add('hidden');
+    petContextMenu?.classList.add('hidden');
   });
 
-  ctxBitacora.addEventListener('click', () => {
+  ctxBitacora?.addEventListener('click', () => {
     if (contextPetId && contextPetName) {
       (window as any).openBitacora(contextPetId, contextPetName);
     }
-    petContextMenu.classList.add('hidden');
+    petContextMenu?.classList.add('hidden');
   });
 
-  ctxDeletePet.addEventListener('click', () => {
+  ctxDeletePet?.addEventListener('click', () => {
     if (contextPetId) {
       deletePetId = contextPetId;
-      deleteModal.classList.remove('hidden');
-      deleteModal.classList.add('flex');
+      deleteModal?.classList.remove('hidden');
+      deleteModal?.classList.add('flex');
     }
-    petContextMenu.classList.add('hidden');
+    petContextMenu?.classList.add('hidden');
   });
 
   // Initial load
