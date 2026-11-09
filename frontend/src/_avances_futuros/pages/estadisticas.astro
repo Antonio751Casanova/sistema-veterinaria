@@ -1,0 +1,480 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Sidebar from '../components/Sidebar.astro';
+---
+
+<Layout title="Estadísticas - VetPets">
+  <div class="min-h-screen" style="background: #f5f0eb;">
+    <Sidebar />
+
+    <!-- Main content wrapper -->
+    <div class="lg:ml-64 min-h-screen transition-[margin] duration-200" data-main-content>
+      <!-- Top header -->
+      <header class="sticky top-0 z-30 bg-white/80 backdrop-blur border-b" style="border-color: #ebe5dd;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <button id="hamburgerBtn" class="lg:hidden p-2 rounded-lg hover:bg-black/5 transition-colors" style="color: #3d2e22;">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+            </button>
+            <div>
+              <h1 class="text-xl font-bold" style="color: #3d2e22;">Estadísticas</h1>
+              <p class="text-xs hidden sm:block" style="color: #9a8b7c;">Vista general del rendimiento</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+        <!-- Loading State -->
+        <div id="loadingState" class="flex items-center justify-center py-20">
+          <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-400"></div>
+        </div>
+
+        <!-- Stats Content -->
+        <div id="statsContent" class="hidden">
+          <!-- Summary Cards -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white rounded-xl p-5" style="border: 1px solid #ebe5dd;">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm" style="color: #9a8b7c;">Total Clientes</p>
+                  <p id="totalClientes" class="text-3xl font-bold mt-1" style="color: #3d2e22;">0</p>
+                </div>
+                <div class="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center">
+                  <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div class="bg-white rounded-xl p-5" style="border: 1px solid #ebe5dd;">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm" style="color: #9a8b7c;">Total Mascotas</p>
+                  <p id="totalMascotas" class="text-3xl font-bold mt-1" style="color: #3d2e22;">0</p>
+                </div>
+                <div class="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center">
+                  <span class="text-2xl">&#x1F43E;</span>
+                </div>
+              </div>
+            </div>
+            <div class="bg-white rounded-xl p-5" style="border: 1px solid #ebe5dd;">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm" style="color: #9a8b7c;">Total Citas</p>
+                  <p id="totalCitas" class="text-3xl font-bold mt-1" style="color: #3d2e22;">0</p>
+                </div>
+                <div class="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                  <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div class="bg-white rounded-xl p-5" style="border: 1px solid #ebe5dd;">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm" style="color: #9a8b7c;">Promedio Mascotas/Cliente</p>
+                  <p id="promedioMascotas" class="text-3xl font-bold mt-1" style="color: #3d2e22;">0</p>
+                </div>
+                <div class="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center">
+                  <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Species Distribution -->
+            <div class="bg-white rounded-2xl p-6" style="border: 1px solid #ebe5dd;">
+              <h3 class="text-lg font-semibold mb-4" style="color: #3d2e22;">Distribución por Especie</h3>
+              <div class="relative h-64">
+                <canvas id="speciesChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Citas por Estado -->
+            <div class="bg-white rounded-2xl p-6" style="border: 1px solid #ebe5dd;">
+              <h3 class="text-lg font-semibold mb-4" style="color: #3d2e22;">Citas por Estado</h3>
+              <div class="relative h-64">
+                <canvas id="citasEstadoChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Registrations per Month -->
+          <div class="bg-white rounded-2xl p-6 mb-8" style="border: 1px solid #ebe5dd;">
+            <h3 class="text-lg font-semibold mb-4" style="color: #3d2e22;">Clientes Registrados por Mes</h3>
+            <div class="relative h-72">
+              <canvas id="clientesChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Recent Clients -->
+            <div class="bg-white rounded-2xl p-6" style="border: 1px solid #ebe5dd;">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold" style="color: #3d2e22;">Últimos Clientes</h3>
+                <a href="/clientes" class="text-sm" style="color: #0d9488;">Ver todos &#x2192;</a>
+              </div>
+              <div id="recentClients" class="space-y-3">
+                <p class="text-sm text-center py-4" style="color: #9a8b7c;">Cargando...</p>
+              </div>
+            </div>
+
+            <!-- Recent Pets -->
+            <div class="bg-white rounded-2xl p-6" style="border: 1px solid #ebe5dd;">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold" style="color: #3d2e22;">Últimas Mascotas</h3>
+                <a href="/mascotas" class="text-sm" style="color: #0d9488;">Ver todas &#x2192;</a>
+              </div>
+              <div id="recentPets" class="space-y-3">
+                <p class="text-sm text-center py-4" style="color: #9a8b7c;">Cargando...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  :global(body) { background: #f5f0eb !important; }
+</style>
+
+<script>
+  import { Chart, registerables } from 'chart.js';
+  import { getVetName, isAuthenticated, logout } from '../services/authService';
+  import { listarClientes, type Cliente } from '../services/clienteService';
+  import { listarMascotas, type Mascota } from '../services/mascotaService';
+  import { listarCitas, type CitaConDetalles } from '../services/citaService';
+
+  Chart.register(...registerables);
+
+  // Check auth
+  if (!isAuthenticated()) {
+    window.location.href = '/';
+  }
+
+  // Sidebar elements
+  const sidebar = document.getElementById('sidebar') as HTMLElement;
+  const sidebarOverlay = document.getElementById('sidebarOverlay') as HTMLElement;
+  const hamburgerBtn = document.getElementById('hamburgerBtn') as HTMLButtonElement;
+  const sidebarVetName = document.getElementById('sidebarVetName') as HTMLParagraphElement;
+  const userAvatarEl = document.getElementById('userAvatar') as HTMLDivElement;
+  const sidebarLogoutBtn = document.getElementById('logoutBtn') as HTMLButtonElement;
+
+  // Content elements
+  const loadingState = document.getElementById('loadingState') as HTMLDivElement;
+  const statsContent = document.getElementById('statsContent') as HTMLDivElement;
+
+  // Summary elements
+  const totalClientesEl = document.getElementById('totalClientes') as HTMLParagraphElement;
+  const totalMascotasEl = document.getElementById('totalMascotas') as HTMLParagraphElement;
+  const totalCitasEl = document.getElementById('totalCitas') as HTMLParagraphElement;
+  const promedioMascotasEl = document.getElementById('promedioMascotas') as HTMLParagraphElement;
+
+  // Recent lists
+  const recentClientsEl = document.getElementById('recentClients') as HTMLDivElement;
+  const recentPetsEl = document.getElementById('recentPets') as HTMLDivElement;
+
+  // Sidebar toggle
+  hamburgerBtn?.addEventListener('click', () => {
+    sidebar?.classList.remove('-translate-x-full');
+    sidebarOverlay?.classList.remove('hidden');
+  });
+  sidebarOverlay?.addEventListener('click', () => {
+    sidebar?.classList.add('-translate-x-full');
+    sidebarOverlay?.classList.add('hidden');
+  });
+
+  // Set vet name
+  const vetName = getVetName() || 'Veterinaria';
+  if (sidebarVetName) sidebarVetName.textContent = vetName;
+  if (userAvatarEl) userAvatarEl.textContent = vetName.charAt(0).toUpperCase();
+  const vetNameEl = document.getElementById('vetName') as HTMLElement;
+  if (vetNameEl) vetNameEl.textContent = vetName;
+
+  // Logout
+  sidebarLogoutBtn?.addEventListener('click', () => {
+    logout();
+    window.location.href = '/';
+  });
+
+  // Species emojis
+  const speciesEmojis: Record<string, string> = { 'Perro': '🐕', 'Gato': '🐱', 'Ave': '🦜', 'Roedor': '🐹', 'Reptil': '🦎', 'Otro': '🐾' };
+
+  // Load data
+  async function loadStats() {
+    try {
+      const [clientes, mascotas, citas] = await Promise.all([
+        listarClientes(),
+        listarMascotas(),
+        listarCitas()
+      ]);
+
+      // Update summary
+      totalClientesEl.textContent = clientes.length.toString();
+      totalMascotasEl.textContent = mascotas.length.toString();
+      totalCitasEl.textContent = citas.length.toString();
+      promedioMascotasEl.textContent = clientes.length > 0
+        ? (mascotas.length / clientes.length).toFixed(1)
+        : '0';
+
+      // Render charts
+      renderSpeciesChart(mascotas);
+      renderCitasEstadoChart(citas);
+      renderClientesChart(clientes);
+
+      // Render recent lists
+      renderRecentClients(clientes);
+      renderRecentPets(mascotas);
+
+      loadingState.classList.add('hidden');
+      statsContent.classList.remove('hidden');
+    } catch (error) {
+      console.error('Error loading stats:', error);
+    }
+  }
+
+  function renderSpeciesChart(mascotas: Mascota[]) {
+    const speciesCount: Record<string, number> = {};
+    mascotas.forEach(m => {
+      speciesCount[m.especie] = (speciesCount[m.especie] || 0) + 1;
+    });
+
+    const labels = Object.keys(speciesCount);
+    const data = Object.values(speciesCount);
+
+    const colors = [
+      'rgba(245, 158, 11, 0.8)',  // amber
+      'rgba(168, 85, 247, 0.8)',  // purple
+      'rgba(14, 165, 233, 0.8)',  // sky
+      'rgba(236, 72, 153, 0.8)',  // pink
+      'rgba(132, 204, 22, 0.8)',  // lime
+      'rgba(107, 114, 128, 0.8)'  // gray
+    ];
+
+    new Chart(document.getElementById('speciesChart') as HTMLCanvasElement, {
+      type: 'doughnut',
+      data: {
+        labels: labels.map(l => `${speciesEmojis[l] || '🐾'} ${l}`),
+        datasets: [{
+          data,
+          backgroundColor: colors.slice(0, labels.length),
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: {
+              color: '#9a8b7c',
+              padding: 15,
+              usePointStyle: true
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function renderCitasEstadoChart(citas: CitaConDetalles[]) {
+    const estadoCount: Record<string, number> = {
+      'pendiente': 0,
+      'confirmado': 0,
+      'en_espera': 0,
+      'completado': 0,
+      'rechazado': 0
+    };
+
+    citas.forEach(c => {
+      if (estadoCount[c.estado] !== undefined) {
+        estadoCount[c.estado]++;
+      }
+    });
+
+    const labels = ['Pendiente', 'Confirmado', 'En Espera', 'Completado', 'Rechazado'];
+    const data = [
+      estadoCount['pendiente'],
+      estadoCount['confirmado'],
+      estadoCount['en_espera'],
+      estadoCount['completado'],
+      estadoCount['rechazado']
+    ];
+
+    const colors = [
+      'rgba(234, 179, 8, 0.8)',   // yellow
+      'rgba(16, 185, 129, 0.8)', // emerald
+      'rgba(14, 165, 233, 0.8)', // sky
+      'rgba(107, 114, 128, 0.8)',// gray
+      'rgba(239, 68, 68, 0.8)'   // red
+    ];
+
+    new Chart(document.getElementById('citasEstadoChart') as HTMLCanvasElement, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          data,
+          backgroundColor: colors,
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { color: '#9a8b7c' },
+            grid: { color: 'rgba(0,0,0,0.06)' }
+          },
+          x: {
+            ticks: { color: '#9a8b7c' },
+            grid: { display: false }
+          }
+        }
+      }
+    });
+  }
+
+  function renderClientesChart(clientes: Cliente[]) {
+    const monthlyCount: Record<string, number> = {};
+    const now = new Date();
+
+    // Initialize last 6 months
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      monthlyCount[key] = 0;
+    }
+
+    clientes.forEach(c => {
+      const d = new Date(c.fecha_creacion);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      if (monthlyCount[key] !== undefined) {
+        monthlyCount[key]++;
+      }
+    });
+
+    const labels = Object.keys(monthlyCount).map(k => {
+      const [year, month] = k.split('-');
+      const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+      return `${monthNames[parseInt(month) - 1]} ${year}`;
+    });
+    const data = Object.values(monthlyCount);
+
+    new Chart(document.getElementById('clientesChart') as HTMLCanvasElement, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Clientes registrados',
+          data,
+          borderColor: 'rgba(16, 185, 129, 1)',
+          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: 'rgba(16, 185, 129, 1)',
+          pointBorderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { color: '#9a8b7c' },
+            grid: { color: 'rgba(0,0,0,0.06)' }
+          },
+          x: {
+            ticks: { color: '#9a8b7c' },
+            grid: { display: false }
+          }
+        }
+      }
+    });
+  }
+
+  function formatDate(date: string) {
+    return new Date(date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+  }
+
+  function renderRecentClients(clientes: Cliente[]) {
+    const recent = [...clientes]
+      .sort((a, b) => new Date(b.fecha_creacion).getTime() - new Date(a.fecha_creacion).getTime())
+      .slice(0, 5);
+
+    if (recent.length === 0) {
+      recentClientsEl.innerHTML = '<p class="text-sm text-center py-4" style="color: #9a8b7c;">No hay clientes registrados</p>';
+      return;
+    }
+
+    recentClientsEl.innerHTML = recent.map(c => `
+      <a href="/mascotas?cliente=${c.id}" class="flex items-center justify-between p-3 bg-white rounded-lg hover:shadow-sm transition-all" style="border: 1px solid #ebe5dd;">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+            <span class="text-blue-400 font-semibold">${c.nombre.charAt(0)}</span>
+          </div>
+          <div>
+            <p class="text-sm font-medium" style="color: #3d2e22;">${c.nombre}</p>
+            <p class="text-xs" style="color: #9a8b7c;">${c.telefono}</p>
+          </div>
+        </div>
+        <span class="text-xs" style="color: #b8a99a;">${formatDate(c.fecha_creacion)}</span>
+      </a>
+    `).join('');
+  }
+
+  function renderRecentPets(mascotas: Mascota[]) {
+    const recent = [...mascotas]
+      .sort((a, b) => new Date(b.fecha_creacion).getTime() - new Date(a.fecha_creacion).getTime())
+      .slice(0, 5);
+
+    if (recent.length === 0) {
+      recentPetsEl.innerHTML = '<p class="text-sm text-center py-4" style="color: #9a8b7c;">No hay mascotas registradas</p>';
+      return;
+    }
+
+    recentPetsEl.innerHTML = recent.map(m => `
+      <div class="flex items-center justify-between p-3 bg-white rounded-lg" style="border: 1px solid #ebe5dd;">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+            <span class="text-lg">${speciesEmojis[m.especie] || '🐾'}</span>
+          </div>
+          <div>
+            <p class="text-sm font-medium" style="color: #3d2e22;">${m.nombre}</p>
+            <p class="text-xs" style="color: #9a8b7c;">${m.especie} • ${m.raza}</p>
+          </div>
+        </div>
+        <span class="text-xs" style="color: #b8a99a;">${formatDate(m.fecha_creacion)}</span>
+      </div>
+    `).join('');
+  }
+
+  // Initial load
+  loadStats();
+</script>

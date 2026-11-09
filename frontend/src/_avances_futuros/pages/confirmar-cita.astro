@@ -1,0 +1,270 @@
+---
+// confirmar-cita.astro
+// Página pública para que el cliente confirme o rechace su cita.
+// NO usa Layout ni Sidebar — el cliente no debe ver la UI del veterinario.
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Confirmar Cita - VetPets</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        background: #f5f0eb;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+      }
+      .card {
+        background: white;
+        border: 1px solid #ebe5dd;
+        border-radius: 1.25rem;
+        padding: 2.5rem 2rem;
+        max-width: 440px;
+        width: 100%;
+        box-shadow: 0 4px 24px rgba(61, 46, 34, 0.08);
+        text-align: center;
+      }
+      .icon-circle {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2rem;
+      }
+      .icon-circle.green  { background: #d1fae5; }
+      .icon-circle.red    { background: #fee2e2; }
+      .icon-circle.yellow { background: #fef3c7; }
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #3d2e22;
+        margin-bottom: 0.5rem;
+      }
+      .subtitle {
+        color: #9a8b7c;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+      }
+      .details-card {
+        background: #faf6f0;
+        border: 1px solid #ebe5dd;
+        border-radius: 0.75rem;
+        padding: 1rem 1.25rem;
+        text-align: left;
+      }
+      .details-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #9a8b7c;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 0.5rem;
+      }
+      .details-pet {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #3d2e22;
+        margin-bottom: 0.2rem;
+      }
+      .details-type {
+        font-size: 0.9rem;
+        color: #5c4433;
+        margin-bottom: 0.2rem;
+      }
+      .details-date {
+        font-size: 0.85rem;
+        color: #9a8b7c;
+      }
+      .spinner {
+        width: 48px;
+        height: 48px;
+        border: 3px solid #ebe5dd;
+        border-top-color: #0d9488;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin: 0 auto 1.25rem;
+      }
+      .footer-logo {
+        margin-top: 2rem;
+        font-size: 0.8rem;
+        color: #b8a99a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+  </head>
+  <body>
+
+    <!-- Estado: Cargando -->
+    <div id="stateLoading" class="card">
+      <div class="spinner"></div>
+      <p style="color: #9a8b7c; font-size: 0.95rem;">Procesando su solicitud...</p>
+    </div>
+
+    <!-- Estado: Éxito -->
+    <div id="stateSuccess" class="card" style="display: none;">
+      <div id="successIcon" class="icon-circle green"></div>
+      <h1 id="successTitle"></h1>
+      <p id="successMessage" class="subtitle"></p>
+      <div id="citaDetails" class="details-card"></div>
+      <div class="footer-logo">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        </svg>
+        VetPets — Gestión Veterinaria
+      </div>
+    </div>
+
+    <!-- Estado: Error -->
+    <div id="stateError" class="card" style="display: none;">
+      <div id="errorIcon" class="icon-circle red" style="font-size: 2rem;">✕</div>
+      <h1 id="errorTitle">Enlace no válido</h1>
+      <p id="errorMessage" class="subtitle"></p>
+      <div class="footer-logo">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        </svg>
+        VetPets — Gestión Veterinaria
+      </div>
+    </div>
+
+    <script>
+      import {
+        confirmarCitaPublic,
+        rechazarCitaPublic,
+        type CitaConfirmacionPublicResponse
+      } from '../services/citaService';
+
+      const stateLoading = document.getElementById('stateLoading')!;
+      const stateSuccess = document.getElementById('stateSuccess')!;
+      const stateError   = document.getElementById('stateError')!;
+
+      const successIcon    = document.getElementById('successIcon')!;
+      const successTitle   = document.getElementById('successTitle')!;
+      const successMessage = document.getElementById('successMessage')!;
+      const citaDetails    = document.getElementById('citaDetails')!;
+      const errorIcon    = document.getElementById('errorIcon')!;
+      const errorTitle   = document.getElementById('errorTitle')!;
+      const errorMessage = document.getElementById('errorMessage')!;
+
+      function formatFecha(isoString: string): string {
+        const fecha = new Date(isoString);
+        const fechaStr = fecha.toLocaleDateString('es-MX', {
+          weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+        const horaStr = fecha.toLocaleTimeString('es-MX', {
+          hour: '2-digit', minute: '2-digit'
+        });
+        return `${fechaStr} a las ${horaStr}`;
+      }
+
+      function showSuccess(
+        titulo: string,
+        mensaje: string,
+        data: CitaConfirmacionPublicResponse,
+        isConfirm: boolean
+      ) {
+        stateLoading.style.display = 'none';
+        stateSuccess.style.display = 'block';
+
+        if (isConfirm) {
+          successIcon.className = 'icon-circle green';
+          successIcon.textContent = '✓';
+          // ✓ con estilo verde
+        } else {
+          successIcon.className = 'icon-circle red';
+          successIcon.textContent = '✕';
+        }
+
+        successTitle.textContent = titulo;
+        successMessage.textContent = mensaje;
+
+        citaDetails.innerHTML = `
+          <p class="details-label">Detalles de la cita</p>
+          <p class="details-pet">${data.nombre_mascota}</p>
+          <p class="details-type">${data.tipo_atencion}</p>
+          <p class="details-date">${formatFecha(data.fecha_hora)}</p>
+        `;
+      }
+
+      function showError(mensaje: string, titulo?: string, iconClass?: string, iconText?: string) {
+        stateLoading.style.display = 'none';
+        stateError.style.display = 'block';
+        errorMessage.textContent = mensaje;
+        if (titulo) errorTitle.textContent = titulo;
+        if (iconClass) errorIcon.className = `icon-circle ${iconClass}`;
+        if (iconText) errorIcon.textContent = iconText;
+      }
+
+      async function processAction() {
+        const params = new URLSearchParams(window.location.search);
+        const tokenConfirmar = params.get('confirmar');
+        const tokenRechazar  = params.get('rechazar');
+
+        const token  = tokenConfirmar ?? tokenRechazar;
+        const accion = tokenConfirmar ? 'confirmar' : tokenRechazar ? 'rechazar' : null;
+
+        if (!token || !accion) {
+          showError('Enlace no válido. Por favor usa el enlace enviado por WhatsApp.');
+          return;
+        }
+
+        try {
+          if (accion === 'confirmar') {
+            const data = await confirmarCitaPublic(token);
+            const alreadyDone = data.message.includes('previamente') || data.message.includes('completada');
+            showSuccess(
+              alreadyDone ? 'Cita ya procesada' : '¡Cita confirmada!',
+              data.message,
+              data,
+              true
+            );
+          } else {
+            const data = await rechazarCitaPublic(token);
+            const alreadyDone = data.message.includes('previamente') || data.message.includes('procesada');
+            showSuccess(
+              alreadyDone ? 'Cita ya procesada' : 'Cita cancelada',
+              data.message,
+              data,
+              false
+            );
+          }
+        } catch (error: unknown) {
+          const msg = error instanceof Error
+            ? error.message
+            : 'Ocurrió un error inesperado. Por favor contacta a la veterinaria directamente.';
+
+          if (msg.includes('ya pasó')) {
+            showError(msg, 'Cita expirada', 'yellow', '⏰');
+          } else if (msg.includes('inválido') || msg.includes('expirado')) {
+            showError(msg, 'Enlace no válido', 'red', '✕');
+          } else {
+            showError(msg, 'Error', 'red', '✕');
+          }
+        }
+      }
+
+      processAction();
+    </script>
+  </body>
+</html>
